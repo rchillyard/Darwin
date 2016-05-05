@@ -1,4 +1,4 @@
-package com.phasmid.darwin.genetics.dna
+package com.phasmid.darwin.genetics
 
 /**
   * Created by scalaprof on 5/5/16.
