@@ -1,6 +1,6 @@
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.genetics.dna.{Cytosine, Guanine}
+import com.phasmid.darwin.genetics.dna._
 import org.scalatest.{FlatSpec, Matchers}
 
 /**

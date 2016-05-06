@@ -10,5 +10,5 @@ package object genetics {
     def name: String
     override def toString = name
   }
-  type MultiStrand[A] = Seq[Strand[A]]
+
 }

@@ -8,4 +8,10 @@ case class Fitness(x: Double) {
   def * (other: Fitness): Fitness = Fitness(x*other.x)
 }
 
+/**
+ * @author scalaprof
+ *
+ * @tparam X
+ * @tparam T
+ */
 trait FitnessFunction[X,T] extends ((EcoFactor[X],Trait[T])=>Fitness)

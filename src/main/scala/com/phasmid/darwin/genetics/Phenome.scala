@@ -5,4 +5,8 @@ package com.phasmid.darwin.genetics
   */
 case class Phenome(name: String, characteristics: Seq[Characteristic]) extends Identifier
 
+/**
+ * @author scalaprof
+ *
+ */
 case class Characteristic(name: String) extends Identifier
