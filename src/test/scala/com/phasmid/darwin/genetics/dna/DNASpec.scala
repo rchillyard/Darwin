@@ -26,7 +26,7 @@ class DNASpec extends FlatSpec with Matchers {
     Thymine.pair shouldBe Adenine
   }
 
-//  "DNA(CTG)" should "appear as CTG" in {
+//  "DNA(CTG)" should "appear bs CTG" in {
 //    val dna = DNA("CTG")
 //    dna.toString should be ("CTG")
 //  }
