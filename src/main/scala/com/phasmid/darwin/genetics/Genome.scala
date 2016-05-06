@@ -7,24 +7,33 @@ package com.phasmid.darwin.genetics
   * @tparam P the type of ploidy: for the usual diploid arrangement, P is Boolean;
   *           for haploid: P is Unit;
   *           for multiploid: P is Int.
-  *
   * @author scalaprof
  */
-case class Genome[P](name: String, karyotype: Seq[Chromosome], ploidy: P, transcriber: Transcriber)(implicit ps: Seq[P]) extends Identifier {
+case class Genome[P](name: String, karyotype: Seq[Chromosome], ploidy: P, transcriber: Transcriber) extends Identifier {
   def transcribe[B](bsss: Seq[Seq[Strand[B]]]): Genotype[P] = {
-    val genes = for ((bss, k) <- bsss zip karyotype; l <- k.loci; p <- ps) yield transcribe(bss, p, l)
+    val genes = for ((bss, k) <- bsss zip karyotype; l <- k.loci) yield transcribeGene(bss, l)
     Genotype[P](this, genes)
   }
-  def transcribe[B](bss: Seq[Strand[B]], p: P, locus: Locus): Gene[P] = {
-    val as = for (bs <- bss) yield transcriber.transcribe(bs)(locus)
-    // FIXME need to fix this
-    (fAsP(as) _).asInstanceOf[Gene[P]]
-  }
-  def fAsP(as: Seq[Allele])(p: P): Allele = p match {
-    case u: Unit => as.head
-    case q: Boolean => if (q) as.head else as(1)
-    case q: Int => as(q)
-    case _ => throw new GeneticsException("type P must be Boolean or Int")
+
+  /**
+    * This is essentially a private method made public only for unit testing
+    *
+    * @param bss
+    * @param locus
+    * @tparam B
+    * @return
+    */
+  def transcribeGene[B](bss: Seq[Strand[B]], locus: Locus): Gene[P] =
+    PGene(locus,for (bs <- bss) yield transcriber.transcribe(bs)(locus))
+
+  case class PGene(locus: Locus, as: Seq[Allele]) extends Gene[P] {
+    def apply(p: P): Allele = p match {
+      case u: Unit => as.head
+      case q: Boolean => if (q) as.head else as(1)
+      case q: Int => as(q)
+      case _ => throw new GeneticsException("type P must be Unit, Boolean or Int")
+    }
+    val name = locus.name
   }
 }
 
@@ -45,7 +54,6 @@ case class Chromosome(name: String, isSex: Boolean, loci: Seq[Locus]) extends Id
   * A location is the position on the chromosome that a locus can be found.
   *
   * @author scalaprof
-  *
   * @param name the name that we give to the "gene" at this locus
   * @param offset the offset at which the gene starts in the strand for this Chromosome
   * @param length the length of the gene in terms of the strand

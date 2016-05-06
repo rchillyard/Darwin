@@ -6,7 +6,7 @@ import org.scalatest.{FlatSpec, Matchers}
 /**
  * @author scalaprof
  */
-class GenomicSpec extends FlatSpec with Matchers {
+class GeneSpec extends FlatSpec with Matchers {
 
   "Gene" should "have 2 Alleles" in {
     val locus = Locus("hox",0,0)
