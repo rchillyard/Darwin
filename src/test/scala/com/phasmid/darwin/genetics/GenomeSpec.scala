@@ -11,12 +11,7 @@ class GenomeSpec extends FlatSpec with Matchers {
 
   val transcriber = new Transcriber {
     // XXX this is a simple 1:1 mapping from bases to alleles
-    def transcribe[Base](bs: Strand[Base])(locus: Locus): Allele = bs.locate(locus) match
-    {
-      case Some(x) => Allele(x.head.toString)
-      case None => throw new GeneticsException(s"invalid locus $locus for strand of length ${bs.bases.length}")
-      case x => throw new GeneticsException(s"cannot transcribe $x")
-    }
+    override def transcribeBases[B](bs: Seq[B]): Allele = Allele(bs.head.toString)
   }
 
   val hox = Locus("hox", 0, 1) // C or A
@@ -26,7 +21,7 @@ class GenomeSpec extends FlatSpec with Matchers {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox)))
     val g = Genome("test",karyotype,true,transcriber)
     // NOTE that we must explicitly state the type because the sequences are only of length 1
-    val bss: Seq[Strand[Base]] = Seq(Strand(Seq(Cytosine)),Strand(Seq(Adenine)))
+    val bss: Seq[Sequence[Base]] = Seq(Sequence(Seq(Cytosine)),Sequence(Seq(Adenine)))
     val geneHox: Gene[Boolean] = g.transcribeGene(bss, hox)
     geneHox.name shouldBe "hox"
     geneHox.apply(false) shouldBe Allele("A")
@@ -36,7 +31,7 @@ class GenomeSpec extends FlatSpec with Matchers {
   it should "should get multiple loci right" in {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox,hix)))
     val g = Genome("test",karyotype,true,transcriber)
-    val bss = Seq(Strand(Seq(Cytosine,Guanine)),Strand(Seq(Adenine,Guanine)))
+    val bss = Seq(Sequence(Seq(Cytosine,Guanine)),Sequence(Seq(Adenine,Guanine)))
     val geneHox: Gene[Boolean] = g.transcribeGene(bss, hox)
     geneHox.name shouldBe "hox"
     geneHox.apply(false) shouldBe Allele("A")
@@ -51,7 +46,7 @@ class GenomeSpec extends FlatSpec with Matchers {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox)))
     val g = Genome("test",karyotype,true,transcriber)
     val loci = g.loci
-    val bsss = Seq(Seq(Strand(Seq(Cytosine,Guanine)),Strand(Seq(Adenine,Guanine))))
+    val bsss = Seq(Seq(Sequence(Seq(Cytosine,Guanine)),Sequence(Seq(Adenine,Guanine))))
     val gt: Genotype[Boolean] = g.transcribe(bsss)
     gt.genome shouldBe g
     gt.genes.size shouldBe loci
@@ -68,7 +63,7 @@ class GenomeSpec extends FlatSpec with Matchers {
     val karyotype: Seq[Chromosome] = Seq(chromosome1,chromosome2,chromosome3)
     val g = Genome("test",karyotype,true,transcriber)
     val loci = g.loci
-    val bsss = Seq(Seq(Strand("CG"),Strand("AG")),Seq(Strand("CT"),Strand("AG")),Seq(Strand("CGT"),Strand("AGA")))
+    val bsss = Seq(Seq(Sequence("CG"),Sequence("AG")),Seq(Sequence("CT"),Sequence("AG")),Seq(Sequence("CGT"),Sequence("AGA")))
     val gt: Genotype[Boolean] = g.transcribe(bsss)
     gt.genome shouldBe g
     gt.genes.size shouldBe loci
@@ -79,7 +74,7 @@ class GenomeSpec extends FlatSpec with Matchers {
   }
 
   "Transcriber transcriber" should "work" in {
-    val bs = Strand(Seq(Cytosine,Guanine))
+    val bs = Sequence(Seq(Cytosine,Guanine))
     val allele = transcriber.transcribe(bs)(hox)
   }
 

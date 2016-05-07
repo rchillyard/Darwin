@@ -1,6 +1,9 @@
 package com.phasmid.darwin.genetics
 
 /**
+  * Fitness is a measure of the viability of an organism's phenotype adapting to an environment.
+  * It's a Double value and should be in the range 0..1
+  *
   * Created by scalaprof on 5/5/16.
   */
 case class Fitness(x: Double) {

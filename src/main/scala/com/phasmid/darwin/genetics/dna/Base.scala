@@ -4,8 +4,8 @@ import com.phasmid.darwin.genetics.Identifier
 
 /**
   * This module defines the DNA base set.
-  * Thus Base can be used as the type in Strand[B] if you want DNA-based genetics.
-  * Of course, you could equally well just defined Strand[Int]
+  * Thus Base can be used as the type in Sequence[B] if you want DNA-based genetics.
+  * Of course, you could equally well just define Sequence[Int] or Sequence[Boolean] or whatever.
   *
  * @author scalaprof
  */
