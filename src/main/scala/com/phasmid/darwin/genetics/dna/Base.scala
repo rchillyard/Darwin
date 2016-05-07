@@ -40,5 +40,6 @@ object Base {
     case 'T' => Thymine
     case _ => Invalid(x)
   }
+  implicit def convert(c: Char): Base = apply(c)
   implicit val render: Seq[Base]=>String = {bs => bs.mkString("","","")}
 }

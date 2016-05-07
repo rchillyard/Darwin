@@ -13,16 +13,14 @@ class GenomeSpec extends FlatSpec with Matchers {
     // XXX this is a simple 1:1 mapping from bases to alleles
     def transcribe[Base](bs: Strand[Base])(locus: Locus): Allele = bs.locate(locus) match
     {
-      case Seq(Cytosine) => Allele("C")
-      case Seq(Guanine) => Allele("G")
-      case Seq(Adenine) => Allele("A")
-      case Seq(Thymine) => Allele("T")
+      case Some(x) => Allele(x.head.toString)
+      case None => throw new GeneticsException(s"invalid locus $locus for strand of length ${bs.bases.length}")
       case x => throw new GeneticsException(s"cannot transcribe $x")
     }
   }
 
-  val hox = Locus("hox", 0, 1)
-  val hix = Locus("hix", 1, 1)
+  val hox = Locus("hox", 0, 1) // C or A
+  val hix = Locus("hix", 1, 1) // G or G
   
   "Genome.transcribeGene" should "should give Alleles A and C" in {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox)))
@@ -52,11 +50,11 @@ class GenomeSpec extends FlatSpec with Matchers {
   "Genome.transcribe" should "work" in {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox)))
     val g = Genome("test",karyotype,true,transcriber)
+    val loci = g.loci
     val bsss = Seq(Seq(Strand(Seq(Cytosine,Guanine)),Strand(Seq(Adenine,Guanine))))
     val gt: Genotype[Boolean] = g.transcribe(bsss)
-    println(gt)
     gt.genome shouldBe g
-    gt.genes.size shouldBe 1
+    gt.genes.size shouldBe loci
     val gene = gt.genes.head
     gene.name shouldBe "hox"
     gene.apply(false) shouldBe Allele("A")
@@ -66,13 +64,14 @@ class GenomeSpec extends FlatSpec with Matchers {
   it should "work with multiple chromosomes" in {
     val chromosome1 = Chromosome("test1", isSex = false, Seq(hox,hix))
     val chromosome2 = Chromosome("test2", isSex = false, Seq(Locus("hoxB", 1, 1)))
-    val karyotype = Seq(chromosome1,chromosome2)
+    val chromosome3 = Chromosome("test3", isSex = false, Seq(Locus("hoxA", 0, 1),Locus("hoxB", 1, 1),Locus("hoxC", 2, 1)))
+    val karyotype: Seq[Chromosome] = Seq(chromosome1,chromosome2,chromosome3)
     val g = Genome("test",karyotype,true,transcriber)
-    val bsss = Seq(Seq(Strand(Seq(Cytosine,Guanine)),Strand(Seq(Adenine,Guanine))))
+    val loci = g.loci
+    val bsss = Seq(Seq(Strand("CG"),Strand("AG")),Seq(Strand("CT"),Strand("AG")),Seq(Strand("CGT"),Strand("AGA")))
     val gt: Genotype[Boolean] = g.transcribe(bsss)
-    println(gt)
     gt.genome shouldBe g
-    gt.genes.size shouldBe 2
+    gt.genes.size shouldBe loci
     val gene = gt.genes.head
     gene.name shouldBe "hox"
     gene.apply(false) shouldBe Allele("A")
