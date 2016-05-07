@@ -1,5 +1,6 @@
 package com.phasmid.darwin
 
+import com.phasmid.darwin.genetics.Sequence
 import com.phasmid.darwin.genetics.dna.Base
 
 /**
@@ -42,5 +43,9 @@ package object genetics {
     *           But different applications might want to choose something else.
     */
   type Nucleus[B] = Seq[SequenceSet[B]]
+
+  type NucleusDNA = Nucleus[Base]
+
+  type NaturalGenome = Genome[Base,Boolean,String]
 
 }

@@ -10,7 +10,7 @@ class GeneSpec extends FlatSpec with Matchers {
 
   "Gene" should "have 2 Alleles" in {
     val locus = Locus("hox",0,0)
-    val x = GeneDiploid(locus,(Allele("x"),Allele("y")))
+    val x = GeneDiploidString(locus,(Allele("x"),Allele("y")))
     x(true) shouldBe Allele("x")
   }
 }
