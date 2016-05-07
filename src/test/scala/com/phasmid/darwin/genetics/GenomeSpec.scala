@@ -13,12 +13,12 @@ class GenomeSpec extends FlatSpec with Matchers {
   val hox = Locus("hox", 0, 1) // C or A
   val hix = Locus("hix", 1, 1) // G or G
   
-  "transcribeGene" should "give Alleles A and C" in {
+  "transcribe" should "give Alleles A and C" in {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox)))
     val g = Genome("test",karyotype,true,transcriber)
     // NOTE that we must explicitly state the type because the sequences are only of length 1
     val bss: Seq[Sequence[Base]] = Seq(Sequence(Seq(Cytosine)),Sequence(Seq(Adenine)))
-    val geneHox: Gene[Boolean,String] = g.transcribeGene(bss, hox)
+    val geneHox: Gene[Boolean,String] = g.transcribe(bss, hox)
     geneHox.name shouldBe "hox"
     geneHox.apply(false) shouldBe Allele("A")
     geneHox.apply(true) shouldBe Allele("C")
@@ -28,11 +28,11 @@ class GenomeSpec extends FlatSpec with Matchers {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox,hix)))
     val g = Genome("test",karyotype,true,transcriber)
     val bss = Seq(Sequence(Seq(Cytosine,Guanine)),Sequence(Seq(Adenine,Guanine)))
-    val geneHox: Gene[Boolean,String] = g.transcribeGene(bss, hox)
+    val geneHox: Gene[Boolean,String] = g.transcribe(bss, hox)
     geneHox.name shouldBe "hox"
     geneHox.apply(false) shouldBe Allele("A")
     geneHox.apply(true) shouldBe Allele("C")
-    val geneHix: Gene[Boolean,String] = g.transcribeGene(bss, hix)
+    val geneHix: Gene[Boolean,String] = g.transcribe(bss, hix)
     geneHix.name shouldBe "hix"
     geneHix.apply(false) shouldBe Allele("G")
     geneHix.apply(true) shouldBe Allele("G")
@@ -42,10 +42,10 @@ class GenomeSpec extends FlatSpec with Matchers {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox,hix)))
     val g = Genome("test",karyotype,(),transcriber)
     val bss = Seq(Sequence(Seq(Cytosine,Guanine)))
-    val geneHox: Gene[Unit,String] = g.transcribeGene(bss, hox)
+    val geneHox: Gene[Unit,String] = g.transcribe(bss, hox)
     geneHox.name shouldBe "hox"
     geneHox.apply(()) shouldBe Allele("C")
-    val geneHix: Gene[Unit,String] = g.transcribeGene(bss, hix)
+    val geneHix: Gene[Unit,String] = g.transcribe(bss, hix)
     geneHix.name shouldBe "hix"
     geneHix.apply(()) shouldBe Allele("G")
   }
@@ -54,12 +54,12 @@ class GenomeSpec extends FlatSpec with Matchers {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox,hix)))
     val g = Genome("test",karyotype,3,transcriber)
     val bss = Seq(Sequence(Seq(Cytosine,Guanine)),Sequence(Seq(Adenine,Thymine)),Sequence(Seq(Guanine,Adenine)))
-    val geneHox: Gene[Int,String] = g.transcribeGene(bss, hox)
+    val geneHox: Gene[Int,String] = g.transcribe(bss, hox)
     geneHox.name shouldBe "hox"
     geneHox.apply(0) shouldBe Allele("C")
     geneHox.apply(1) shouldBe Allele("A")
     geneHox.apply(2) shouldBe Allele("G")
-    val geneHix: Gene[Int,String] = g.transcribeGene(bss, hix)
+    val geneHix: Gene[Int,String] = g.transcribe(bss, hix)
     geneHix.name shouldBe "hix"
     geneHix.apply(1) shouldBe Allele("T")
   }

@@ -8,8 +8,9 @@ import com.phasmid.darwin.util.MonadOps
   *
   * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
   * @tparam P the ploidy type for the Genotype, typically (for eukaryotic genetics) Boolean (ploidy=2)
+  * @tparam G the underlying gene value type
   */
-trait Genomic[B,P,T] extends (Nucleus[B]=>Genotype[P,T]) with Identifier
+trait Genomic[B,P,G] extends (Nucleus[B]=>Genotype[P,G]) with Identifier
 
 /**
   * Genome represents a template for a Genotype. It is a particular subtype for the Genomic trait.
@@ -19,9 +20,10 @@ trait Genomic[B,P,T] extends (Nucleus[B]=>Genotype[P,T]) with Identifier
   * @tparam P the type of ploidy: for the usual diploid arrangement, P is Boolean;
   *           for haploid: P is Unit;
   *           for multiploid: P is Int.
+  * @tparam G the underlying gene value type
   * @author scalaprof
  */
-case class Genome[B,P,T](name: String, karyotype: Seq[Chromosome], ploidy: P, transcriber: Transcriber[B,T]) extends Genomic[B,P,T] {
+case class Genome[B,P,G](name: String, karyotype: Seq[Chromosome], ploidy: P, transcriber: Transcriber[B,G]) extends Genomic[B,P,G] {
   def chromosomes = karyotype.size
   def loci = karyotype map (_.loci) sum
 
@@ -32,10 +34,10 @@ case class Genome[B,P,T](name: String, karyotype: Seq[Chromosome], ploidy: P, tr
     *             while the outer dimension should match the ploidy (2 for diploid)
     * @return a new instance of Genotype[P]
     */
-  def apply(bsss: Nucleus[B]): Genotype[P,T] = {
+  def apply(bsss: Nucleus[B]): Genotype[P,G] = {
     require(bsss.size == chromosomes,s"size of outer Sequences dimension (${bsss.size}) should equal the karyotype ($chromosomes)")
-    val genes = for ((bss, k) <- bsss zip karyotype; l <- k.ls) yield transcribeGene(bss, l)
-    Genotype[P,T](genes)
+    val genes = for ((bss, k) <- bsss zip karyotype; l <- k.ls) yield transcribe(bss, l)
+    Genotype[P,G](genes)
   }
 
   /**
@@ -45,23 +47,17 @@ case class Genome[B,P,T](name: String, karyotype: Seq[Chromosome], ploidy: P, tr
     * @param locus the locus of the gene on the Sequence
     * @return a new instance of Gene[P]
     */
-  def transcribeGene(bss: SequenceSet[B], locus: Locus): Gene[P,T] =
+  def transcribe(bss: SequenceSet[B], locus: Locus): Gene[P,G] =
     PGene(locus, for (bs <- bss; g <- transcriber(bs,locus)) yield g)
 
   /**
     * This class defines a generic type of Gene that corresponds to Gene[P].
+    *
     * @param locus the locus on a Chromosome at which the Gene is to be found
     * @param as a sequence of Alleles. For a diploid system (P is Boolean), then the cardinality of as should be 2
     */
-  case class PGene(locus: Locus, as: Seq[Allele[T]]) extends Gene[P,T] {
-    def apply(p: P): Allele[T] = p match {
-      case u: Unit => as.head
-      case q: Boolean => if (q) as.head else as(1)
-      case q: Int => as(q)
-      case _ => throw new GeneticsException("type P must be Unit, Boolean or Int")
-    }
-    val name = locus.name
-  }
+  case class PGene(locus: Locus, as: Seq[Allele[G]]) extends AbstractGene[P,G](locus,as)
+
 }
 
 /**

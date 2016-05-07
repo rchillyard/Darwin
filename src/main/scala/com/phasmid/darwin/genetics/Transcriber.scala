@@ -34,7 +34,7 @@ trait Transcriber[B,T] extends ((Sequence[B],Locus)=>Option[Allele[T]]) {
   def transcribeBases(bs: Seq[B]): Allele[T]
 
   /**
-    * This method is called directly by the Genome method transcribeGene and indirectly by the Genome's
+    * This method is called directly by the Genome method transcribe and indirectly by the Genome's
     * transcribe method.
     * It is normally not necessary to override this method.
     *
