@@ -6,7 +6,7 @@ import org.scalatest.{FlatSpec, Matchers}
 /**
  * @author scalaprof
  */
-class GeneSpec extends FlatSpec with Matchers {
+class GenotypeSpec extends FlatSpec with Matchers {
 
   /**
     * A diploid gene which extends Gene[Boolean,String]

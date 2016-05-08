@@ -7,7 +7,7 @@ import com.phasmid.darwin.genetics.dna.Base
   *
  * @author scalaprof
  */
-case class Phenotype[T](phenome: Phenome, traits: Seq[Trait[T]])
+case class Phenotype[T](traits: Seq[Trait[T]])
 
 /**
  * @author scalaprof

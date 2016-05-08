@@ -1,7 +1,5 @@
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.util.MonadOps
-
 /**
   * Genomic is a trait which provides the functionality to transcribe a Nucleus (that's to say a matrix of Sequences)
   * into a Genotype.

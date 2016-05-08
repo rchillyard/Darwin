@@ -20,6 +20,9 @@ case class Genotype[P,G](genes: Seq[Gene[P,G]])
   * This trait defines the function to take a selector (a P) and return the particular Allele that corresponds to
   * that selection for the given gene.
   *
+  * TODO we are somewhat confusing the concepts of a Locus and a Gene. The Locus isn't really just a position on the
+  * chromosome--it should also tell us what possible Alleles can appear there and maybe something about dominance, if any.
+  *
   * @tparam P
   * For a diploid system, P will be Boolean.
   * For a haploid system, P will be Unit.
@@ -33,6 +36,20 @@ trait Gene[P,G] extends (P=>Allele[G]) with Identifier {
     */
   def distinct: Product
 }
+
+/**
+  * This trait defines the concept of Dominance for Mendelian genetics.
+  * @return
+  */
+trait Dominance[G] extends (()=>Option[Allele[G]]) {
+  /**
+    * the apply method yields, if appropriate, the dominant gene
+    * @return Some(allele) or None
+    */
+  def apply(): Option[Allele[G]] = None
+}
+
+case class MendelianGene[P,G](locus: Locus, alleles: Seq[Allele[G]], dominant: Allele[G]) extends AbstractDominanceGene[P,G](locus, alleles, dominant)
 
 abstract class AbstractGene[P,G](locus: Locus, as: Seq[Allele[G]]) extends Gene[P,G] {
 
@@ -61,7 +78,7 @@ abstract class AbstractGene[P,G](locus: Locus, as: Seq[Allele[G]]) extends Gene[
   }
 }
 
-
+abstract class AbstractDominanceGene[P,G](locus: Locus, as: Seq[Allele[G]], dominant: Allele[G]) extends AbstractGene[P,G](locus,as) with Dominance[G]
 
 /**
   * An allele with a particular name/identifier
