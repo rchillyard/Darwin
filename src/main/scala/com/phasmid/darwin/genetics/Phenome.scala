@@ -10,10 +10,10 @@ package com.phasmid.darwin.genetics
   *
   * Created by scalaprof on 5/5/16.
   *
-  * @param name the identifier of this Phenome, for example Homo Sapiens, or more generally, say, Apes.
+  * @param name            the identifier of this Phenome, for example Homo Sapiens, or more generally, say, Apes.
   * @param characteristics the "characteristics" modeled by this Phenome: properties that are represented in a specific Phenotype
   *                        as Traits.
-  * @param expresser the Expresser function which maps Genes into Traits.
+  * @param expresser       the Expresser function which maps Genes into Traits.
   * @tparam P the ploidy type for the Genotype, typically (for eukaryotic genetics) Boolean (ploidy=2)
   * @tparam G the underlying Gene value type, typically String
   * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double

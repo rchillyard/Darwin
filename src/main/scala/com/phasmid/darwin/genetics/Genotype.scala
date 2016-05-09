@@ -38,6 +38,7 @@ trait Gene[P, G] extends (P => Allele[G]) with Identifier {
 
 /**
   * This trait models the notion of a locus in the sense of the alleles that are possible at that locus.
+  * Even in diploid systems, it is possible to have more than two alleles. See for example blood types in humans.
   * Additionally, we specify if there is a dominant allele
   * We use Location (in Genome) to model the position on a Chromosome at which the gene (and its alleles) can be found.
   *

@@ -6,7 +6,7 @@ package com.phasmid.darwin.genetics
   *
   * @tparam T the underlying type of the Traits
   * @author scalaprof
-  * Created by scalaprof on 5/5/16.
+  *         Created by scalaprof on 5/5/16.
   */
 case class Phenotype[T](traits: Seq[Trait[T]])
 

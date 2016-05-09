@@ -12,6 +12,8 @@ import com.phasmid.darwin.util.MonadOps
   * </ol>
   * All three methods may be overridden in extenders of Transcriber, but transcribeBases MUST be defined.
   *
+  * CONSIDER defining the function as a type in package
+  *
   * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
   * @tparam T the gene type
   */
@@ -47,7 +49,7 @@ sealed trait Transcriber[B, T] extends ((Sequence[B], Location) => Option[Allele
   def apply(bs: Sequence[B], location: Location): Option[Allele[T]] = MonadOps.optionLift(transcribeBases _)(locateBases(bs, location))
 }
 
-case class PlainTranscriber[B, T](f: Seq[B] => Allele[T]) extends Transcriber[B, T] {
+abstract class AbstractTranscriber[B, T](f: Seq[B] => Allele[T]) extends Transcriber[B, T] {
   /**
     * This method is required to be defined by sub-types (extenders) of Transcriber.
     * Given a Seq[B] corresponding to the location of a gene on a Chromosome, return the Allele that
@@ -58,3 +60,5 @@ case class PlainTranscriber[B, T](f: Seq[B] => Allele[T]) extends Transcriber[B,
     */
   override def transcribeBases(bs: Seq[B]): Allele[T] = f(bs)
 }
+
+case class PlainTranscriber[B, T](f: Seq[B] => Allele[T]) extends AbstractTranscriber[B, T](f)

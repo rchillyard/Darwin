@@ -59,7 +59,7 @@ package object genetics {
     * //          for polyploid: P is Int.
     * //@tparam G the underlying gene value type
     */
-  type Genomic[B, P, G] = (Nucleus[B]) => Genotype[P, G]
+  type Genomic[B, P, G] = Nucleus[B] => Genotype[P, G]
 
   /**
     * Phenomic is a type which provides the functionality to express a Genotype (that's to say a sequence of Genes)
@@ -69,7 +69,7 @@ package object genetics {
     * //@tparam G the underlying Gene value type, typically String
     * //@tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
     */
-  type Phenomic[P, G, T] = (Genotype[P, G]) => Phenotype[T]
+  type Phenomic[P, G, T] = Genotype[P, G] => Phenotype[T]
 
   /**
     * No... I think what we want to do is to create another model from the Phenotype: an adaptation.
@@ -79,5 +79,10 @@ package object genetics {
     * //@tparam T the underlying type of the Traits
     * //@tparam X the underlying type of the ecological types such as Environment
     */
-  type Ecological[T,X] = (Phenotype[T]) => Adaptatype[X]
+  type Ecological[T, X] = Phenotype[T] => Adaptatype[X]
+
+  type EcoFitness[X] = EcoFactor[X] => Option[Fitness]
+
+  type FitnessFunction[T, X] = ((T, String, X) => Fitness)
+
 }

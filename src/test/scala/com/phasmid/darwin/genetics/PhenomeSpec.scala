@@ -21,7 +21,6 @@ class PhenomeSpec extends FlatSpec with Matchers {
     case (c, _) => throw new GeneticsException(s"no trait traitMapper for $c")
   }
 
-  // TODO the map should really come from the definition of the phenome itself, i.e. the characteristics.
   val expresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](traitMapper)
 
   "apply" should "work" in {

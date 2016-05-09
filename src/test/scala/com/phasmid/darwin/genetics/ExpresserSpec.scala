@@ -24,7 +24,7 @@ class ExpresserSpec extends FlatSpec with Matchers {
       override def toString = s"gene $name at $locus with alleles: ${apply(true)} and ${apply(false)} and distinct: $distinct"
     }
 
-    val exp = new Expresser[Boolean, String, Double] {
+    val exp = new AbstractExpresser[Boolean, String, Double] {
       // XXX a rather simple non-Mendelian selector which determines the allele simply from one specific alternative of the gene
       override def selectAllele(gene: Gene[Boolean, String]): Allele[String] = gene(true)
 
