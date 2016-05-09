@@ -15,7 +15,7 @@ import com.phasmid.darwin.util.MonadOps
   * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
   * @tparam T the gene type
   */
-trait Transcriber[B, T] extends ((Sequence[B], Location) => Option[Allele[T]]) {
+sealed trait Transcriber[B, T] extends ((Sequence[B], Location) => Option[Allele[T]]) {
   /**
     * This method locates a Seq[B] from a Sequence[B] according to the details of the given locus
     *

@@ -1,16 +1,5 @@
 package com.phasmid.darwin.genetics
 
-/**
-  * Genomic is a trait which provides the functionality to transcribe a Nucleus (that's to say a matrix of Sequences)
-  * into a Genotype.
-  *
-  * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
-  * @tparam P the ploidy type for the Genotype, typically (for eukaryotic genetics) is Boolean (ploidy=2);
-  *           for haploid: P is Unit;
-  *           for polyploid: P is Int.
-  * @tparam G the underlying gene value type
-  */
-trait Genomic[B, P, G] extends (Nucleus[B] => Genotype[P, G]) with Identifier
 
 /**
   * Genome represents a template for a Genotype. It is a particular subtype for the Genomic trait.
@@ -29,7 +18,7 @@ trait Genomic[B, P, G] extends (Nucleus[B] => Genotype[P, G]) with Identifier
   */
 case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
                            // CONSIDER combining transcriber and locusMap
-                           transcriber: Transcriber[B, G], locusMap: (Location) => Locus[G]) extends Genomic[B, P, G] {
+                           transcriber: Transcriber[B, G], locusMap: (Location) => Locus[G]) extends Genomic[B, P, G] with Identifier {
   def chromosomes = karyotype.size
 
   def loci = (karyotype map (_.loci)).sum

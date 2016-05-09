@@ -2,6 +2,8 @@ package com.phasmid.darwin.genetics.dna
 
 import com.phasmid.darwin.genetics.Identifier
 
+import scala.language.implicitConversions
+
 /**
   * This module defines the DNA base set.
   * Thus Base can be used as the type in Sequence[B] if you want DNA-based genetics.

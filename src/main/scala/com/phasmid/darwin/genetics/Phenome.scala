@@ -18,7 +18,7 @@ package com.phasmid.darwin.genetics
   * @tparam G the underlying Gene value type, typically String
   * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
   */
-case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T]) extends Phenomic[P, G, T] {
+case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T]) extends Phenomic[P, G, T] with Identifier {
 
   /**
     * Method to express a Genotype with respect to this Phenome.
@@ -38,14 +38,3 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
   * @param name the identifier of this Characteristic
   */
 case class Characteristic(name: String) extends Identifier
-
-/**
-  * Phenomic is a trait which provides the functionality to express a Genotype (that's to say a sequence of Genes)
-  * into a Phenotype. As far as I'm aware, Phenomic is not a real word.
-  *
-  * @tparam P the ploidy type for the Genotype, typically (for eukaryotic genetics) Boolean (ploidy=2)
-  * @tparam G the underlying Gene value type, typically String
-  * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
-  */
-trait Phenomic[P, G, T] extends (Genotype[P, G] => Phenotype[T]) with Identifier
-

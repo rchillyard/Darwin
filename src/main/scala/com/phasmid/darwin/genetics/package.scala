@@ -49,4 +49,35 @@ package object genetics {
 
   type NaturalGenome = Genome[Base, Boolean, String]
 
+  /**
+    * Genomic is a trait which provides the functionality to transcribe a Nucleus (that's to say a matrix of Sequences)
+    * into a Genotype.
+    *
+    * //@tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
+    * //@tparam P the ploidy type for the Genotype, typically (for eukaryotic genetics) is Boolean (ploidy=2);
+    * //          for haploid: P is Unit;
+    * //          for polyploid: P is Int.
+    * //@tparam G the underlying gene value type
+    */
+  type Genomic[B, P, G] = (Nucleus[B]) => Genotype[P, G]
+
+  /**
+    * Phenomic is a type which provides the functionality to express a Genotype (that's to say a sequence of Genes)
+    * into a Phenotype. As far as I'm aware, Phenomic is not a real word.
+    *
+    * //@tparam P the ploidy type for the Genotype, typically (for eukaryotic genetics) Boolean (ploidy=2)
+    * //@tparam G the underlying Gene value type, typically String
+    * //@tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
+    */
+  type Phenomic[P, G, T] = (Genotype[P, G]) => Phenotype[T]
+
+  /**
+    * No... I think what we want to do is to create another model from the Phenotype: an adaptation.
+    * This adaptation can then be crossed with an Environment to determine the fitness function.
+    *
+    * This type models the evaluation of adaptation for a specific Phenotype in an Environment
+    * //@tparam T the underlying type of the Traits
+    * //@tparam X the underlying type of the ecological types such as Environment
+    */
+  type Ecological[T,X] = (Phenotype[T]) => Adaptatype[X]
 }

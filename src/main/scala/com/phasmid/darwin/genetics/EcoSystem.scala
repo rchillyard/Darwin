@@ -1,14 +1,5 @@
 package com.phasmid.darwin.genetics
 
-/**
-  * No... I think what we want to do is to create another model from the Phenotype: an adaptation.
-  * This adaptation can then be crossed with an Environment to determine the fitness function.
-  *
-  * This trait models the evaluation of adaptation for a specific Phenotype in an Environment
-  * @tparam X the underlying type of the ecological types such as Environment
-  * @tparam T the underlying type of the Traits
-  */
-trait Ecological[X,T] extends ((Phenotype[T],Environment[X])=>Fitness) with Identifier
 
 /**
   * FIXME
@@ -21,14 +12,15 @@ trait Ecological[X,T] extends ((Phenotype[T],Environment[X])=>Fitness) with Iden
   * And, finally, Phenome is to Phenomic as Genome is to Genomic.
   *
 
-  * @param name
-  * @param factors
-  * @param fitnessFunction
+  * @param name the identifier for this EcoSystem
+  * @param factors the (eco) factors that we expect to find in Environments which support this eco-system
+  * @param fitnessFunction the function which measures the fitness of a particular Phenotype within a particular Environment
   * @tparam X the underlying type of the ecological types such as Environment
   * @tparam T the underlying type of the Traits
   */
-case class EcoSystem[X,T](name: String, factors: Map[Trait[T], Factor], fitnessFunction: FitnessFunction[X, T]) extends Ecological[X,T] {
+case class EcoSystem[X,T](name: String, factors: Map[Trait[T], Factor], fitnessFunction: FitnessFunction[X, T]) extends Ecological[X,T] with Identifier {
 
+  // FIXME implement me
   def apply(phenotype: Phenotype[T], environment: Environment[X]): Fitness = ???
 }
 
