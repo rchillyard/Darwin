@@ -7,14 +7,14 @@ package com.phasmid.darwin.genetics
   * Created by scalaprof on 5/5/16.
   */
 case class Fitness(x: Double) {
-  require(x>=0.0 && x<=1.0,s"invalid Fitness: $x must be in range 0..1")
-  def * (other: Fitness): Fitness = Fitness(x*other.x)
+  require(x >= 0.0 && x <= 1.0, s"invalid Fitness: $x must be in range 0..1")
+
+  def *(other: Fitness): Fitness = Fitness(x * other.x)
 }
 
 /**
- * @author scalaprof
- *
- * @tparam X the base type of the eco factors
- * @tparam T the base type of the traits
- */
-trait FitnessFunction[X,T] extends ((EcoFactor[X],Trait[T])=>Fitness)
+  * @author scalaprof
+  * @tparam X the base type of the eco factors
+  * @tparam T the base type of the traits
+  */
+trait FitnessFunction[X, T] extends ((EcoFactor[X], Trait[T]) => Fitness)

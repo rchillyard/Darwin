@@ -1,6 +1,5 @@
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.genetics.dna._
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
@@ -8,34 +7,29 @@ import org.scalatest.{FlatSpec, Matchers}
   */
 class PhenomeSpec extends FlatSpec with Matchers {
 
-  val locus1 = PlainLocus(Location("height",0,0),Seq(Allele("T"),Allele("S")),Some(Allele("S")))
-  val locus2 = PlainLocus(Location("girth",1,0),Seq(Allele("P"),Allele("Q")),Some(Allele("P")))
-  val gene1 = MendelianGene[Boolean,String](locus1,Seq(Allele("T"),Allele("S")))
-  val gene2 = MendelianGene[Boolean,String](locus2,Seq(Allele("P"),Allele("Q")))
+  val ts = Set(Allele("T"), Allele("S"))
+  val pq = Set(Allele("P"), Allele("Q"))
+  val locus1 = PlainLocus(Location("height", 0, 0), ts, Some(Allele("S")))
+  val locus2 = PlainLocus(Location("girth", 1, 0), pq, Some(Allele("P")))
+  val gene1 = MendelianGene[Boolean, String](locus1, Seq(Allele("T"), Allele("S")))
+  val gene2 = MendelianGene[Boolean, String](locus2, Seq(Allele("P"), Allele("Q")))
   val height = Characteristic("height")
   val girth = Characteristic("girth")
-  val tall = Trait[Double](height,2.0)
-  val short = Trait[Double](height,1.6)
-  val fat = Trait[Double](girth,3.0)
-  val thin = Trait[Double](girth,1.2)
-  val mapper: (Locus[String],Allele[String])=>Trait[Double] = {
-    case (`locus1`,Allele("T")) => tall
-    case (`locus1`,Allele("S")) => short
-    case (`locus2`,Allele("Q")) => fat
-    case (`locus2`,Allele("P")) => thin
-    case (l,a) => throw new GeneticsException(s"no mapper for ($l,$a)")
+  val traitMapper: (Characteristic, Allele[String]) => Trait[Double] = {
+    case (`height`, Allele(h)) => Trait(height, h match { case "T" => 2.0; case "S" => 1.6 })
+    case (`girth`, Allele(g)) => Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 })
+    case (c, _) => throw new GeneticsException(s"no trait traitMapper for $c")
   }
 
   // TODO the map should really come from the definition of the phenome itself, i.e. the characteristics.
-  val expresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](mapper)
+  val expresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](traitMapper)
 
   "apply" should "work" in {
-    val genotype = Genotype(Seq(gene1,gene2))
-    val phenome = Phenome("test",Seq(),expresser)
+    val genotype = Genotype(Seq(gene1, gene2))
+    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locus1 -> height, locus2 -> girth), expresser)
     val phenotype = phenome(genotype)
-    println(phenotype)
     phenotype.traits.length shouldBe 2
-    phenotype.traits.head shouldBe short
-    phenotype.traits.tail.head shouldBe thin
+    phenotype.traits.head shouldBe Trait[Double](height, 1.6)
+    phenotype.traits.tail.head shouldBe Trait[Double](height, 1.2)
   }
 }

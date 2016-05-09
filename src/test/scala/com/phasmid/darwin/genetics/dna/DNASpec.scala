@@ -3,8 +3,8 @@ package com.phasmid.darwin.genetics.dna
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
- * @author scalaprof
- */
+  * @author scalaprof
+  */
 
 class DNASpec extends FlatSpec with Matchers {
 
