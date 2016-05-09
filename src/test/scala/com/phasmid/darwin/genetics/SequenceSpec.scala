@@ -19,9 +19,9 @@ class SequenceSpec extends FlatSpec with Matchers {
     x.bases.size shouldBe 2
     x.toString shouldBe "CG"
   }
-  "locate" should "fail for bad Locus" in {
+  "locate" should "fail for bad Location" in {
     val x = Sequence.create(Cytosine)
-    val r = x.locate(Locus("",-1,0))
+    val r = x.locate(Location("",-1,0))
     r should matchPattern { case None => }
   }
   "concatenation" should "work with +: base" in {

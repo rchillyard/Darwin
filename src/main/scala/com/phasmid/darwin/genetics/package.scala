@@ -25,9 +25,9 @@ package object genetics {
     * The cardinality of this set is the same as the ploidy for the Genome that transcribes it.
     * For diploid genetics, that number is 2
     *
-    * @tparam B is the underlying type of the Sequence: for natural genetics, B is Base, that's to say one of a
-    *           set of four alphabetic bases made up of proteins and which make up the molecule called DNA.
-    *           But different applications might want to choose something else.
+//    * @tparam B is the underlying type of the Sequence: for natural genetics, B is Base, that's to say one of a
+//    *           set of four alphabetic bases made up of proteins and which make up the molecule called DNA.
+//    *           But different applications might want to choose something else.
     */
   type SequenceSet[B] = Seq[Sequence[B]]
 
@@ -38,9 +38,9 @@ package object genetics {
     * The cardinality of this set is the same as the karyotype (number of chromosome pairs) for the Genome that transcribes it.
     * For humans, that number is 23
     *
-    * @tparam B is the underlying type of the Sequence: for natural genetics, B is Base, that's to say one of a
-    *           set of four alphabetic bases made up of proteins and which make up the molecule called DNA.
-    *           But different applications might want to choose something else.
+//    * @tparam B is the underlying type of the Sequence: for natural genetics, B is Base, that's to say one of a
+//    *           set of four alphabetic bases made up of proteins and which make up the molecule called DNA.
+//    *           But different applications might want to choose something else.
     */
   type Nucleus[B] = Seq[SequenceSet[B]]
 

@@ -15,19 +15,21 @@ import com.phasmid.darwin.util.MonadOps
   * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
   * @tparam T the gene type
   */
-trait Transcriber[B,T] extends ((Sequence[B],Locus)=>Option[Allele[T]]) {
+trait Transcriber[B,T] extends ((Sequence[B],Location) => Option[Allele[T]]) {
   /**
     * This method locates a Seq[B] from a Sequence[B] according to the details of the given locus
-    * @param bs the Sequence[B] (corresponding to a Chromosome) on which the locus is expected to be found
-    * @param locus the locus
+ *
+    * @param bs the Sequence[B] (corresponding to a Chromosome) on which the location is expected to be found
+    * @param location the location
     * @return Some(Seq[B]) if the location was found, otherwise None
     */
-  def locateBases(bs: Sequence[B], locus: Locus): Option[Seq[B]] = bs.locate(locus)
+  def locateBases(bs: Sequence[B], location: Location): Option[Seq[B]] = bs.locate(location)
 
   /**
     * This method is required to be defined by sub-types (extenders) of Transcriber.
     * Given a Seq[B] corresponding to the location of a gene on a Chromosome, return the Allele that
     * this sequence encodes.
+ *
     * @param bs the sequence of bases
     * @return an Allele
     */
@@ -39,10 +41,10 @@ trait Transcriber[B,T] extends ((Sequence[B],Locus)=>Option[Allele[T]]) {
     * It is normally not necessary to override this method.
     *
     * @param bs the Sequence of bases to transcribe
-    * @param locus the locus on the Chromosome at which we expect to find the gene we are interested in
+    * @param location the locus on the Chromosome at which we expect to find the gene we are interested in
     * @return Some(Allele) assuming that all went well, otherwise None
     */
-  def apply(bs: Sequence[B],locus: Locus): Option[Allele[T]] = MonadOps.optionLift(transcribeBases _)(locateBases(bs,locus))
+  def apply(bs: Sequence[B],location: Location): Option[Allele[T]] = MonadOps.optionLift(transcribeBases _)(locateBases(bs,location))
 }
 
 case class PlainTranscriber[B,T](f: Seq[B]=>Allele[T]) extends Transcriber[B,T] {

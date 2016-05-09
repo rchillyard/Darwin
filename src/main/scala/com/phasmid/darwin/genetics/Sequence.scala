@@ -10,12 +10,12 @@ import scala.util.Try
   * Created by scalaprof on 5/5/16.
   */
 case class Sequence[+B](bases: Seq[B]) {
-  def locate(locus: Locus): Option[Seq[B]] =
-    if (locus.offset>=0 && locus.length+locus.offset<=bases.length)
-      Try(bases.slice(locus.offset, locus.offset+locus.length)).toOption
+  def locate(location: Location): Option[Seq[B]] =
+    if (location.offset>=0 && location.length+location.offset<=bases.length)
+      Try(bases.slice(location.offset, location.offset+location.length)).toOption
     else None
   def :+[Z>:B] (other: Sequence[Z]): Sequence[Z] = :+ (other.bases)
-  def +:[Z>:B] (other: Sequence[Z]): Sequence[Z] = (other.bases) +: this
+  def +:[Z>:B] (other: Sequence[Z]): Sequence[Z] = other.bases +: this
   def :+[Z>:B] (other: Seq[Z]): Sequence[Z] = Sequence(bases++other)
   def +:[Z>:B] (other: Seq[Z]): Sequence[Z] = Sequence(other++:bases)
   def :+[Z>:B] (other: Z): Sequence[Z] = :+(Seq(other))

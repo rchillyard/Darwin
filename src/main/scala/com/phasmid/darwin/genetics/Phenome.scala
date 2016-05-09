@@ -7,7 +7,7 @@ case class Phenome[P,G,T](name: String, characteristics: Seq[Characteristic], ex
 
   /**
     * method to express this Phenome
-    * @param genotype
+    * @param genotype the genotype to be expressed
     * @return
     */
   def apply(genotype: Genotype[P,G]): Phenotype[T] = Phenotype(for (g <- genotype.genes) yield expresser(g))

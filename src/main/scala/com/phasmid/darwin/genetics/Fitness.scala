@@ -14,7 +14,7 @@ case class Fitness(x: Double) {
 /**
  * @author scalaprof
  *
- * @tparam X
- * @tparam T
+ * @tparam X the base type of the eco factors
+ * @tparam T the base type of the traits
  */
 trait FitnessFunction[X,T] extends ((EcoFactor[X],Trait[T])=>Fitness)
