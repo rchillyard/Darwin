@@ -15,9 +15,9 @@ import com.phasmid.darwin.util.MonadOps
   * CONSIDER defining the function as a type in package
   *
   * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
-  * @tparam T the gene type
+  * @tparam G the gene type
   */
-sealed trait Transcriber[B, T] extends ((Sequence[B], Location) => Option[Allele[T]]) {
+sealed trait Transcriber[B, G] extends ((Sequence[B], Location) => Option[Allele[G]]) {
   /**
     * This method locates a Seq[B] from a Sequence[B] according to the details of the given locus
     *
@@ -35,21 +35,28 @@ sealed trait Transcriber[B, T] extends ((Sequence[B], Location) => Option[Allele
     * @param bs the sequence of bases
     * @return an Allele
     */
-  def transcribeBases(bs: Seq[B]): Allele[T]
+  def transcribeBases(bs: Seq[B]): Allele[G]
 
   /**
     * This method is called directly by the Genome method transcribe and indirectly by the Genome's
-    * transcribe method.
+    * apply method.
+    * 
     * It is normally not necessary to override this method.
     *
     * @param bs       the Sequence of bases to transcribe
     * @param location the locus on the Chromosome at which we expect to find the gene we are interested in
     * @return Some(Allele) assuming that all went well, otherwise None
     */
-  def apply(bs: Sequence[B], location: Location): Option[Allele[T]] = MonadOps.optionLift(transcribeBases _)(locateBases(bs, location))
+  def apply(bs: Sequence[B], location: Location): Option[Allele[G]] = MonadOps.optionLift(transcribeBases _)(locateBases(bs, location))
 }
 
-abstract class AbstractTranscriber[B, T](f: Seq[B] => Allele[T]) extends Transcriber[B, T] {
+/**
+  * An abstract base class for extenders of Transcriber.
+  * @param f a function which, given a Seq[B] will return an Allele[G]
+  * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
+  * @tparam G the gene type
+  */
+abstract class AbstractTranscriber[B, G](f: Seq[B] => Allele[G]) extends Transcriber[B, G] {
   /**
     * This method is required to be defined by sub-types (extenders) of Transcriber.
     * Given a Seq[B] corresponding to the location of a gene on a Chromosome, return the Allele that
@@ -58,7 +65,7 @@ abstract class AbstractTranscriber[B, T](f: Seq[B] => Allele[T]) extends Transcr
     * @param bs the sequence of bases
     * @return an Allele
     */
-  override def transcribeBases(bs: Seq[B]): Allele[T] = f(bs)
+  override def transcribeBases(bs: Seq[B]): Allele[G] = f(bs)
 }
 
-case class PlainTranscriber[B, T](f: Seq[B] => Allele[T]) extends AbstractTranscriber[B, T](f)
+case class PlainTranscriber[B, G](f: Seq[B] => Allele[G]) extends AbstractTranscriber[B, G](f)

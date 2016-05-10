@@ -29,7 +29,7 @@ trait Gene[P, G] extends (P => Allele[G]) with Identifier {
   def locus: Locus[G]
 
   /**
-    * returns distinct allele as a Tuple
+    * Method to get all the different alleles present
     *
     * @return a tuple of Allele[G]
     */
@@ -45,14 +45,23 @@ trait Gene[P, G] extends (P => Allele[G]) with Identifier {
   * @tparam G the underlying Gene type
   */
 trait Locus[G] extends (() => Set[Allele[G]]) {
+  /**
+    * @return the Location of this Locus
+    */
   def location: Location
 
+  /**
+    * @return Some(Allele) if there is a dominant allele; else None
+    */
   def dominant: Option[Allele[G]]
 
   override def toString = s"Locus at $location with dominant: $dominant and possible alleles: ${apply()}"
 }
 
 case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: Option[Allele[G]]) extends Locus[G] {
+  /**
+    * @return the actual Alleles present at this Locus
+    */
   def apply(): Set[Allele[G]] = alleles
 }
 
@@ -67,14 +76,22 @@ case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: 
   *           Otherwise, P will be Int.
   * @tparam G the underlying Gene type
   */
-case class MendelianGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends AbstractDominanceGene[P, G](l, as) {
+case class MendelianGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as) {
   override def toString = s"""MendelianGene: at $l with alleles: ${as.mkString(", ")}"""
 }
 
 abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[P, G] {
 
+  /**
+    * @return this Gene's Locus
+    */
   def locus = l
 
+  /**
+    * Method to yield one of the Alleles present
+    * @param p the selector, an instance of the Ploidy type (usually Boolean, but could be Unit or Int)
+    * @return the selected Allele
+    */
   def apply(p: P): Allele[G] = p match {
     case u: Unit => as.head
     case q: Boolean => if (q) as.head else as(1)
@@ -99,8 +116,6 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
     }
   }
 }
-
-abstract class AbstractDominanceGene[P, G](locus: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](locus, as)
 
 /**
   * An allele with a particular name/identifier

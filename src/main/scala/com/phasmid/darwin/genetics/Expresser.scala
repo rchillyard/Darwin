@@ -19,7 +19,7 @@ package com.phasmid.darwin.genetics
   * @tparam G the gene type
   * @tparam T the trait type
   */
-sealed trait Expresser[P, G, T] extends ((Characteristic, Gene[P, G]) => Trait[T]) {
+sealed trait Expresser[P, G, T] extends ExpresserFunction[P,G,T] {
   /**
     * Method to select the operative Allele for this Gene.
     * If your application is based on non-Mendelian genetics, you will need to override this method.

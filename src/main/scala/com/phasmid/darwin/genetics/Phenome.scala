@@ -19,7 +19,6 @@ package com.phasmid.darwin.genetics
   * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
   */
 case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T]) extends Phenomic[P, G, T] with Identifier {
-
   /**
     * Method to express a Genotype with respect to this Phenome.
     * Note that if a Locus doesn't have a mapping in the characteristics map, we currently ignore it.

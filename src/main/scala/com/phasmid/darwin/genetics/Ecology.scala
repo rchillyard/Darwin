@@ -6,7 +6,7 @@ package com.phasmid.darwin.genetics
 case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Ecological[T, X] with Identifier {
 
   /**
-    * The apply method for this Ecology. For each Trait in the given Phenotype, we lookup its corresponding Factor
+    * The apply method for this Ecology. For each Trait in the given Phenotype, we look up its corresponding Factor
     * and invoke the Adapter to create an Adaptation.
     *
     * Note that if the lookup fails, we simply ignore the trait without warning.
@@ -15,7 +15,7 @@ case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: Fi
     * @return an Adaptatype
     */
   def apply(phenotype: Phenotype[T]): Adaptatype[X] =
-    Adaptatype(for (t <- phenotype.traits; f <- factors.get(t.characteristic.name); p <- adapter.apply(f, t, fitness)) yield p)
+    Adaptatype(for (t <- phenotype.traits; f <- factors.get(t.characteristic.name); a <- adapter(f, t, fitness)) yield a)
 }
 
 case class Factor(name: String) extends Identifier

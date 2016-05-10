@@ -33,7 +33,7 @@ class ExpresserSpec extends FlatSpec with Matchers {
         case (c, _) => throw new GeneticsException(s"traitMapper failed for $c")
       }
     }
-    exp.apply(height, gene) shouldBe tall
+    exp(height, gene) shouldBe tall
   }
   it should "work for Mendelian expression" in {
     val ts = Set(Allele("T"), Allele("S"))
@@ -48,7 +48,7 @@ class ExpresserSpec extends FlatSpec with Matchers {
       case (c, _) => throw new GeneticsException(s"traitMapper failed for $c")
     }
     val exp = ExpresserMendelian[Boolean, String, Double](traitMapper)
-    exp.apply(height, gene1) shouldBe short
+    exp(height, gene1) shouldBe short
   }
 }
 

@@ -19,8 +19,14 @@ package com.phasmid.darwin.genetics
 case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
                            // CONSIDER combining transcriber and locusMap
                            transcriber: Transcriber[B, G], locusMap: (Location) => Locus[G]) extends Genomic[B, P, G] with Identifier {
+  /**
+    * @return the the number of chromosomes (pairs, actually) defined for this Genome. Synonymous with "karyotype"
+    */
   def chromosomes = karyotype.size
 
+  /**
+    * @return the total number of loci (locations) on this Genome
+    */
   def loci = (karyotype map (_.loci)).sum
 
   /**
@@ -53,7 +59,6 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @param as a sequence of Alleles. For a diploid system (P is Boolean), then the cardinality of as should be 2
     */
   case class PGene(l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as)
-
 }
 
 /**
@@ -68,6 +73,9 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
   * @param ls    the gene loci on this Chromosome
   */
 case class Chromosome(name: String, isSex: Boolean, ls: Seq[Location]) extends Identifier {
+  /**
+    * @return the number of locations (loci) in this Chromosome
+    */
   def loci = ls.size
 }
 

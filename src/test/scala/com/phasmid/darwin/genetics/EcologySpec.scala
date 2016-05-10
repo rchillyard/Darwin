@@ -31,8 +31,7 @@ class EcologySpec extends FlatSpec with Matchers {
     val adaptations = adaptatype.adaptations
     adaptations.size shouldBe 1
     adaptations.head should matchPattern { case Adaptation(Factor("elephant grass"), _) => }
-    val ff = adaptations.head.ecoFitness
-    val fitness = ff(EcoFactor(elephantGrass, 1.6))
+    val fitness = adaptations.head.ecoFitness(EcoFactor(elephantGrass, 1.6))
     fitness should matchPattern { case Some(Fitness(_)) => }
     fitness.get.x shouldBe 0.0
   }

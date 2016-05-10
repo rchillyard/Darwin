@@ -31,8 +31,8 @@ class GenomeSpec extends FlatSpec with Matchers {
     val bss: Seq[Sequence[Base]] = Seq(Sequence(Seq(Cytosine)), Sequence(Seq(Adenine)))
     val geneHox: Gene[Boolean, String] = g.transcribe(bss, hox)
     geneHox.name shouldBe "hox"
-    geneHox.apply(false) shouldBe Allele("A")
-    geneHox.apply(true) shouldBe Allele("C")
+    geneHox(false) shouldBe Allele("A")
+    geneHox(true) shouldBe Allele("C")
   }
 
   it should "get multiple loci right" in {
@@ -41,12 +41,12 @@ class GenomeSpec extends FlatSpec with Matchers {
     val bss = Seq(Sequence(Seq(Cytosine, Guanine)), Sequence(Seq(Adenine, Guanine)))
     val geneHox: Gene[Boolean, String] = g.transcribe(bss, hox)
     geneHox.name shouldBe "hox"
-    geneHox.apply(false) shouldBe Allele("A")
-    geneHox.apply(true) shouldBe Allele("C")
+    geneHox(false) shouldBe Allele("A")
+    geneHox(true) shouldBe Allele("C")
     val geneHix: Gene[Boolean, String] = g.transcribe(bss, hix)
     geneHix.name shouldBe "hix"
-    geneHix.apply(false) shouldBe Allele("G")
-    geneHix.apply(true) shouldBe Allele("G")
+    geneHix(false) shouldBe Allele("G")
+    geneHix(true) shouldBe Allele("G")
   }
 
   it should "work with haploid genetics" in {
@@ -55,10 +55,10 @@ class GenomeSpec extends FlatSpec with Matchers {
     val bss = Seq(Sequence(Seq(Cytosine, Guanine)))
     val geneHox: Gene[Unit, String] = g.transcribe(bss, hox)
     geneHox.name shouldBe "hox"
-    geneHox.apply(()) shouldBe Allele("C")
+    geneHox(()) shouldBe Allele("C")
     val geneHix: Gene[Unit, String] = g.transcribe(bss, hix)
     geneHix.name shouldBe "hix"
-    geneHix.apply(()) shouldBe Allele("G")
+    geneHix(()) shouldBe Allele("G")
   }
 
   it should "work with triploid genetics" in {
@@ -67,12 +67,12 @@ class GenomeSpec extends FlatSpec with Matchers {
     val bss = Seq(Sequence(Seq(Cytosine, Guanine)), Sequence(Seq(Adenine, Thymine)), Sequence(Seq(Guanine, Adenine)))
     val geneHox: Gene[Int, String] = g.transcribe(bss, hox)
     geneHox.name shouldBe "hox"
-    geneHox.apply(0) shouldBe Allele("C")
-    geneHox.apply(1) shouldBe Allele("A")
-    geneHox.apply(2) shouldBe Allele("G")
+    geneHox(0) shouldBe Allele("C")
+    geneHox(1) shouldBe Allele("A")
+    geneHox(2) shouldBe Allele("G")
     val geneHix: Gene[Int, String] = g.transcribe(bss, hix)
     geneHix.name shouldBe "hix"
-    geneHix.apply(1) shouldBe Allele("T")
+    geneHix(1) shouldBe Allele("T")
   }
 
   "apply" should "work" in {
@@ -84,8 +84,8 @@ class GenomeSpec extends FlatSpec with Matchers {
     gt.genes.size shouldBe loci
     val gene = gt.genes.head
     gene.name shouldBe "hox"
-    gene.apply(false) shouldBe Allele("A")
-    gene.apply(true) shouldBe Allele("C")
+    gene(false) shouldBe Allele("A")
+    gene(true) shouldBe Allele("C")
   }
 
   it should "work with multiple chromosomes" in {
@@ -100,7 +100,7 @@ class GenomeSpec extends FlatSpec with Matchers {
     gt.genes.size shouldBe loci
     val gene = gt.genes.head
     gene.name shouldBe "hox"
-    gene.apply(false) shouldBe Allele("A")
-    gene.apply(true) shouldBe Allele("C")
+    gene(false) shouldBe Allele("A")
+    gene(true) shouldBe Allele("C")
   }
 }
