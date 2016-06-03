@@ -28,12 +28,12 @@ class ExpresserSpec extends FlatSpec with Matchers {
       // XXX a rather simple non-Mendelian selector which determines the allele simply from one specific alternative of the gene
       override def selectAllele(gene: Gene[Boolean, String]): Allele[String] = gene(true)
 
-      val traitMapper: (Characteristic, Allele[String]) => Trait[Double] = {
-        case (_, Allele(h)) => Trait(height, h match { case "T" => 2.0; case "S" => 1.6 })
-        case (c, _) => throw new GeneticsException(s"traitMapper failed for $c")
+      val traitMapper: (Characteristic, Allele[String]) => Option[Trait[Double]] = {
+        case (_, Allele(h)) => Some(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
+        case (c, _) => System.err.println(s"traitMapper failed for $c"); None
       }
     }
-    exp(height, gene) shouldBe tall
+    exp(height, gene) shouldBe Some(tall)
   }
   it should "work for Mendelian expression" in {
     val ts = Set(Allele("T"), Allele("S"))
@@ -42,13 +42,13 @@ class ExpresserSpec extends FlatSpec with Matchers {
     val locus2 = PlainLocus(Location("girth", 0, 0), pq, Some(Allele("P")))
     val gene1 = MendelianGene[Boolean, String](locus1, Seq(Allele("T"), Allele("S")))
     val girth = Characteristic("girth")
-    val traitMapper: (Characteristic, Allele[String]) => Trait[Double] = {
-      case (`height`, Allele(h)) => Trait(height, h match { case "T" => 2.0; case "S" => 1.6 })
-      case (`girth`, Allele(g)) => Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 })
-      case (c, _) => throw new GeneticsException(s"traitMapper failed for $c")
+    val traitMapper: (Characteristic, Allele[String]) => Option[Trait[Double]] = {
+      case (`height`, Allele(h)) => Some(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
+      case (`girth`, Allele(g)) => Some(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
+      case (c, _) => System.err.println(s"traitMapper failed for $c"); None
     }
     val exp = ExpresserMendelian[Boolean, String, Double](traitMapper)
-    exp(height, gene1) shouldBe short
+    exp(height, gene1) shouldBe Some(short)
   }
 }
 

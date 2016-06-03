@@ -28,7 +28,7 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     * @param genotype the genotype to be expressed
     * @return a Phenotype
     */
-  def apply(genotype: Genotype[P, G]): Phenotype[T] = Phenotype(for (g <- genotype.genes; c <- characteristics.get(g.locus)) yield expresser(c, g))
+  def apply(genotype: Genotype[P, G]): Phenotype[T] = Phenotype(for (g <- genotype.genes; c <- characteristics.get(g.locus); t <- expresser(c, g)) yield t)
 }
 
 /**

@@ -13,11 +13,9 @@ package com.phasmid.darwin.genetics
   * </ol>
   * All three methods may be overridden in extenders of Expresser, but traitMapper MUST be defined.
   *
-  * CONSIDER defining the function as a type in package
-  *
-  * @tparam P the ploidy type
-  * @tparam G the gene type
-  * @tparam T the trait type
+  * //@tparam P the ploidy type
+  * //@tparam G the gene type
+  * //@tparam T the trait type
   */
 sealed trait Expresser[P, G, T] extends ExpresserFunction[P,G,T] {
   /**
@@ -44,7 +42,7 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P,G,T] {
   /**
     * Function to make a Trait given a Characteristic and an Allele.
     */
-  val traitMapper: (Characteristic, Allele[G]) => Trait[T]
+  val traitMapper: TraitMapper[G,T]
 
   /**
     * Method to make a Trait given a Gene.
@@ -53,9 +51,9 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P,G,T] {
     * @param gene the given gene
     * @return a new Trait
     */
-  def apply(ch: Characteristic, gene: Gene[P, G]): Trait[T] = traitMapper(ch, selectAllele(gene))
+  def apply(ch: Characteristic, gene: Gene[P, G]): Option[Trait[T]] = traitMapper(ch, selectAllele(gene))
 }
 
 abstract class AbstractExpresser[P, G, T] extends Expresser[P, G, T]
 
-case class ExpresserMendelian[P, G, T](traitMapper: (Characteristic, Allele[G]) => Trait[T]) extends AbstractExpresser[P, G, T]
+case class ExpresserMendelian[P, G, T](traitMapper: TraitMapper[G,T]) extends AbstractExpresser[P, G, T]

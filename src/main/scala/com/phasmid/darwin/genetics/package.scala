@@ -83,12 +83,65 @@ package object genetics {
     */
   type Ecological[TraitType, EcoType] = Phenotype[TraitType] => Adaptatype[EcoType]
 
+  /**
+    * This function type is the type of a parameter of an Adaptation. In the context of an Adapter, this function
+    * will yield, for a given EcoType, an optional Fitness.
+    *
+    * CONSIDER making the result a Try instead of an Option
+    *
+    * //@tparam EcoType
+    */
   type EcoFitness[EcoType] = EcoFactor[EcoType] => Option[Fitness]
 
-  type FitnessFunction[TraitType, EcoType] = (TraitType, String, EcoType) => Fitness
+  /**
+    * This function type is the type of a parameter of an Adapter. For a tuple of trait value, function "type", and eco factor value.
+    *
+    * TODO need to rename FunctionType
+    *
+    * //@tparam TraitType
+    * //@tparam EcoType
+    */
+  type FitnessFunction[TraitType, EcoType] = (TraitType, FunctionType[TraitType,EcoType], EcoType) => Fitness
 
-  type ExpresserFunction[Ploidy,GeneType,TraitType] = (Characteristic, Gene[Ploidy, GeneType]) => Trait[TraitType]
+  /**
+    * This function type is a mapper between a Characterstic/Allele pair and an (optional) Trait. It is used by implementers
+    * of the ExpresserFunction
+    *
+    * CONSIDER making the result a Try instead of an Option
+    *
+    * //@tparam GeneType
+    * //@tparam TraitType
+    */
+  type TraitMapper[GeneType,TraitType] = (Characteristic, Allele[GeneType]) => Option[Trait[TraitType]]
 
+  /**
+    * This function type is the basis of the transcription of sequences of bases into genes.
+
+    * CONSIDER making the result a Try instead of an Option
+    *
+    * //@tparam BaseType
+    * //@tparam GeneType
+    */
+  type TranscriberFunction[BaseType,GeneType] = (Sequence[BaseType], Location) => Option[Allele[GeneType]]
+
+  /**
+    * This function type is the basis of the expression of genes into traits.
+    *
+    * CONSIDER making the result a Try instead of an Option
+    *
+    * //@tparam Ploidy
+    * //@tparam GeneType
+    * //@tparam TraitType
+    */
+  type ExpresserFunction[Ploidy,GeneType,TraitType] = (Characteristic, Gene[Ploidy, GeneType]) => Option[Trait[TraitType]]
+
+  /**
+    * This function type is the basis of the success of traits into adaptations. [Yes, I know this needs a better explanation].
+    *
+    * CONSIDER making the result a Try instead of an Option
+    *
+    * //@tparam TraitType
+    * //@tparam EcoType
+    */
   type AdapterFunction[TraitType,EcoType] = (Factor, Trait[TraitType], FitnessFunction[TraitType, EcoType]) => Option[Adaptation[EcoType]]
-
 }

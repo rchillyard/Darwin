@@ -10,14 +10,12 @@ import com.phasmid.darwin.util.MonadOps
   * <li>transcribeBases: transcribe that region into a particular Allele.</li>
   * <li>apply: locateBases and transcribeBases.</li>
   * </ol>
-  * All three methods may be overridden in extenders of Transcriber, but transcribeBases MUST be defined.
-  *
-  * CONSIDER defining the function as a type in package
+  * All three methods may be overridden by extenders of Transcriber, but transcribeBases MUST be defined.
   *
   * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
   * @tparam G the gene type
   */
-sealed trait Transcriber[B, G] extends ((Sequence[B], Location) => Option[Allele[G]]) {
+sealed trait Transcriber[B, G] extends TranscriberFunction[B,G] {
   /**
     * This method locates a Seq[B] from a Sequence[B] according to the details of the given locus
     *

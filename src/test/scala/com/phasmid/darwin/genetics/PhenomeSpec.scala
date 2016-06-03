@@ -15,10 +15,10 @@ class PhenomeSpec extends FlatSpec with Matchers {
   val gene2 = MendelianGene[Boolean, String](locus2, Seq(Allele("P"), Allele("Q")))
   val height = Characteristic("height")
   val girth = Characteristic("girth")
-  val traitMapper: (Characteristic, Allele[String]) => Trait[Double] = {
-    case (`height`, Allele(h)) => Trait(height, h match { case "T" => 2.0; case "S" => 1.6 })
-    case (`girth`, Allele(g)) => Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 })
-    case (c, _) => throw new GeneticsException(s"no trait traitMapper for $c")
+  val traitMapper: (Characteristic, Allele[String]) => Option[Trait[Double]] = {
+    case (`height`, Allele(h)) => Some(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
+    case (`girth`, Allele(g)) => Some(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
+    case (c, _) => System.err.println(s"no trait traitMapper for $c"); None
   }
 
   val expresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](traitMapper)

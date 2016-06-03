@@ -11,3 +11,10 @@ case class Fitness(x: Double) {
 
   def *(other: Fitness): Fitness = Fitness(x * other.x)
 }
+
+case class FunctionType[T,X](shape: String, f: (T,X)=>Fitness)
+
+object Fitness {
+  val delta = FunctionType[Double,Double]("delta",{(t,x) => if (t >= x) Fitness(1) else Fitness(0)})
+  val inverseDelta = FunctionType[Double,Double]("delta-inv",{(t,x) => if (t < x) Fitness(1) else Fitness(0)})
+}

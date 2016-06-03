@@ -8,18 +8,17 @@ import org.scalatest.{FlatSpec, Matchers}
 class EcologySpec extends FlatSpec with Matchers {
 
   val adapter: Adapter[Double, Double] = new AbstractAdapter[Double, Double] {
-    def matchFactors(f: Factor, t: Trait[Double]): Option[(Double, String)] = f match {
+    def matchFactors(f: Factor, t: Trait[Double]): Option[(Double, FunctionType[Double,Double])] = f match {
       case Factor("elephant grass") => t.characteristic.name match {
-        case "height" => Some(t.value, "delta-inv")
+        case "height" => Some(t.value, Fitness.inverseDelta)
         case _ => None
       }
     }
   }
 
-  def fitnessFunction(t: Double, shape: String, x: Double): Fitness = shape match {
-    case "delta" => if (t >= x) Fitness(1) else Fitness(0)
-    case "delta-inv" => if (t < x) Fitness(1) else Fitness(0)
-    case _ => throw new GeneticsException(s"ecoFitness does not implement shape $shape")
+  def fitnessFunction(t: Double, functionType: FunctionType[Double,Double], x: Double): Fitness = functionType match {
+    case FunctionType(s,f) => f(t,x)
+    case _ => throw new GeneticsException(s"ecoFitness does not implement functionType: $functionType")
   }
 
   "apply" should "work" in {
