@@ -15,7 +15,7 @@ resolvers += Resolver.sonatypeRepo("public")
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies ++= Seq(
-//	"com.phasmid" %% "lascala" % "1.0.0-SNAPSHOT",
+	"com.phasmid" %% "lascala" % "1.0.0-SNAPSHOT",
 	"org.scala-lang.modules" %% "scala-xml" % "1.0.4",
 	"org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
 	"org.scalatest" %% "scalatest" % scalaTestVersion % "test"

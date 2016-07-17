@@ -1,6 +1,8 @@
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.util.MonadOps
+import com.phasmid.laScala.FP
+
+import scala.util.Try
 
 /**
   * A Transcriber is the heart of the process for taking Sequence information and generating its corresponding Genotype.
@@ -45,11 +47,12 @@ sealed trait Transcriber[B, G] extends TranscriberFunction[B,G] {
     * @param location the locus on the Chromosome at which we expect to find the gene we are interested in
     * @return Some(Allele) assuming that all went well, otherwise None
     */
-  def apply(bs: Sequence[B], location: Location): Option[Allele[G]] = MonadOps.optionLift(transcribeBases _)(locateBases(bs, location))
+  def apply(bs: Sequence[B], location: Location): Try[Allele[G]] = FP.lift(transcribeBases _)(FP.optionToTry(locateBases(bs, location)))
 }
 
 /**
   * An abstract base class for extenders of Transcriber.
+  *
   * @param f a function which, given a Seq[B] will return an Allele[G]
   * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
   * @tparam G the gene type

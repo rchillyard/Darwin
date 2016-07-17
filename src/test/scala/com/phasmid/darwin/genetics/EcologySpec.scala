@@ -2,22 +2,24 @@ package com.phasmid.darwin.genetics
 
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.util._
+
 /**
   * Created by scalaprof on 5/6/16.
   */
 class EcologySpec extends FlatSpec with Matchers {
 
   val adapter: Adapter[Double, Double] = new AbstractAdapter[Double, Double] {
-    def matchFactors(f: Factor, t: Trait[Double]): Option[(Double, FunctionType[Double,Double])] = f match {
+    def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, FunctionShape[Double, Double])] = f match {
       case Factor("elephant grass") => t.characteristic.name match {
-        case "height" => Some(t.value, Fitness.inverseDelta)
-        case _ => None
+        case "height" => Success(t.value, Fitness.inverseDelta)
+        case _ => Failure(new GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
   }
 
-  def fitnessFunction(t: Double, functionType: FunctionType[Double,Double], x: Double): Fitness = functionType match {
-    case FunctionType(s,f) => f(t,x)
+  def fitnessFunction(t: Double, functionType: FunctionShape[Double, Double], x: Double): Fitness = functionType match {
+    case FunctionShape(s, f) => f(t, x)
     case _ => throw new GeneticsException(s"ecoFitness does not implement functionType: $functionType")
   }
 
@@ -31,7 +33,7 @@ class EcologySpec extends FlatSpec with Matchers {
     adaptations.size shouldBe 1
     adaptations.head should matchPattern { case Adaptation(Factor("elephant grass"), _) => }
     val fitness = adaptations.head.ecoFitness(EcoFactor(elephantGrass, 1.6))
-    fitness should matchPattern { case Some(Fitness(_)) => }
+    fitness should matchPattern { case Success(Fitness(_)) => }
     fitness.get.x shouldBe 0.0
   }
 }

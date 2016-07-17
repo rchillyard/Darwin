@@ -2,6 +2,8 @@ package com.phasmid.darwin
 
 import com.phasmid.darwin.genetics.dna.Base
 
+import scala.util.Try
+
 /**
   * The genetics package contains all of the code which is the basis of genetic algorithms.
   * There are four distinct "models":
@@ -10,7 +12,7 @@ import com.phasmid.darwin.genetics.dna.Base
   * <dd>This is a random collection of values which is the source of variation in the adaptability of organisms
   * to an environment.</dd>
   * <dt>Genotype</dt>
-  * <dd>This is the set of an organim's "genes" which are transcribed from the Sequences.</dd>
+  * <dd>This is the set of an organism's "genes" which are transcribed from the Sequences.</dd>
   * </dl>
   * Created by scalaprof on 5/5/16.
   */
@@ -91,20 +93,20 @@ package object genetics {
     *
     * //@tparam EcoType
     */
-  type EcoFitness[EcoType] = EcoFactor[EcoType] => Option[Fitness]
+  type EcoFitness[EcoType] = EcoFactor[EcoType] => Try[Fitness]
 
   /**
     * This function type is the type of a parameter of an Adapter. For a tuple of trait value, function "type", and eco factor value.
     *
-    * TODO need to rename FunctionType
+    * TODO need to rename FunctionShape
     *
     * //@tparam TraitType
     * //@tparam EcoType
     */
-  type FitnessFunction[TraitType, EcoType] = (TraitType, FunctionType[TraitType,EcoType], EcoType) => Fitness
+  type FitnessFunction[TraitType, EcoType] = (TraitType, FunctionShape[TraitType, EcoType], EcoType) => Fitness
 
   /**
-    * This function type is a mapper between a Characterstic/Allele pair and an (optional) Trait. It is used by implementers
+    * This function type is a mapper between a Characteristic/Allele pair and an (optional) Trait. It is used by implementers
     * of the ExpresserFunction
     *
     * CONSIDER making the result a Try instead of an Option
@@ -112,17 +114,17 @@ package object genetics {
     * //@tparam GeneType
     * //@tparam TraitType
     */
-  type TraitMapper[GeneType,TraitType] = (Characteristic, Allele[GeneType]) => Option[Trait[TraitType]]
+  type TraitMapper[GeneType, TraitType] = (Characteristic, Allele[GeneType]) => Try[Trait[TraitType]]
 
   /**
     * This function type is the basis of the transcription of sequences of bases into genes.
-
+    *
     * CONSIDER making the result a Try instead of an Option
     *
     * //@tparam BaseType
     * //@tparam GeneType
     */
-  type TranscriberFunction[BaseType,GeneType] = (Sequence[BaseType], Location) => Option[Allele[GeneType]]
+  type TranscriberFunction[BaseType, GeneType] = (Sequence[BaseType], Location) => Try[Allele[GeneType]]
 
   /**
     * This function type is the basis of the expression of genes into traits.
@@ -133,7 +135,7 @@ package object genetics {
     * //@tparam GeneType
     * //@tparam TraitType
     */
-  type ExpresserFunction[Ploidy,GeneType,TraitType] = (Characteristic, Gene[Ploidy, GeneType]) => Option[Trait[TraitType]]
+  type ExpresserFunction[Ploidy, GeneType, TraitType] = (Characteristic, Gene[Ploidy, GeneType]) => Try[Trait[TraitType]]
 
   /**
     * This function type is the basis of the success of traits into adaptations. [Yes, I know this needs a better explanation].
@@ -143,5 +145,5 @@ package object genetics {
     * //@tparam TraitType
     * //@tparam EcoType
     */
-  type AdapterFunction[TraitType,EcoType] = (Factor, Trait[TraitType], FitnessFunction[TraitType, EcoType]) => Option[Adaptation[EcoType]]
+  type AdapterFunction[TraitType, EcoType] = (Factor, Trait[TraitType], FitnessFunction[TraitType, EcoType]) => Try[Adaptation[EcoType]]
 }

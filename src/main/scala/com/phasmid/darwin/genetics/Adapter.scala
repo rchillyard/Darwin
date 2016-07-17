@@ -1,24 +1,28 @@
 package com.phasmid.darwin.genetics
 
+import scala.util.{Failure, Success, Try}
+
 /**
   * Created by scalaprof on 5/9/16.
   *
   * CONSIDER defining the function as a type in package
+  *
+  * XXX why is this sealed?
   */
 sealed trait Adapter[T, X] extends AdapterFunction[T,X] {
 
-  def matchFactors(f: Factor, t: Trait[T]): Option[(T, FunctionType[T,X])]
+  def matchFactors(f: Factor, t: Trait[T]): Try[(T, FunctionShape[T, X])]
 
-  override def apply(factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X]): Option[Adaptation[X]] = {
+  override def apply(factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X]): Try[Adaptation[X]] = {
     // TODO tidy this all up nicely
-    val fc: (T) => (FunctionType[T,X]) => (X) => Fitness = ff.curried
-    val f_x_f_o: Option[(X) => Fitness] = for ((t, s) <- matchFactors(factor, `trait`)) yield fc(t)(s)
-    def f_xe_fo(ef: EcoFactor[X]): Option[Fitness] = f_x_f_o match {
+    val fc: (T) => (FunctionShape[T, X]) => (X) => Fitness = ff.curried
+    val x_f_t: Try[(X) => Fitness] = for ((t, s) <- matchFactors(factor, `trait`)) yield fc(t)(s)
+    def f_xe_fo(ef: EcoFactor[X]): Try[Fitness] = x_f_t match {
       // TODO need to check the factor types
-      case Some(f) => Some(f(ef.x))
-      case _ => None
+      case Success(f) => Success(f(ef.x))
+      case Failure(t) => Failure(t)
     }
-    f_x_f_o map { f => Adaptation(factor, f_xe_fo) }
+    x_f_t map { f => Adaptation(factor, f_xe_fo) }
   }
 }
 

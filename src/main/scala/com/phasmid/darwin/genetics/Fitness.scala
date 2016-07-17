@@ -12,9 +12,17 @@ case class Fitness(x: Double) {
   def *(other: Fitness): Fitness = Fitness(x * other.x)
 }
 
-case class FunctionType[T,X](shape: String, f: (T,X)=>Fitness)
+/**
+  * This case class defines a (T,X)=>Fitness function and a shape factor
+  *
+  * @param shape the shape of the function
+  * @param f     the (T,X)=>Fitness
+  * @tparam T the type of the first parameter to f
+  * @tparam X the type of the second parameter to f
+  */
+case class FunctionShape[T, X](shape: String, f: (T, X) => Fitness)
 
 object Fitness {
-  val delta = FunctionType[Double,Double]("delta",{(t,x) => if (t >= x) Fitness(1) else Fitness(0)})
-  val inverseDelta = FunctionType[Double,Double]("delta-inv",{(t,x) => if (t < x) Fitness(1) else Fitness(0)})
+  val delta = FunctionShape[Double, Double]("delta", { (t, x) => if (t >= x) Fitness(1) else Fitness(0) })
+  val inverseDelta = FunctionShape[Double, Double]("delta-inv", { (t, x) => if (t < x) Fitness(1) else Fitness(0)})
 }

@@ -1,5 +1,7 @@
 package com.phasmid.darwin.genetics
 
+import scala.util.Try
+
 /**
   * Created by scalaprof on 5/7/16.
   *
@@ -51,7 +53,7 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P,G,T] {
     * @param gene the given gene
     * @return a new Trait
     */
-  def apply(ch: Characteristic, gene: Gene[P, G]): Option[Trait[T]] = traitMapper(ch, selectAllele(gene))
+  def apply(ch: Characteristic, gene: Gene[P, G]): Try[Trait[T]] = traitMapper(ch, selectAllele(gene))
 }
 
 abstract class AbstractExpresser[P, G, T] extends Expresser[P, G, T]

@@ -1,5 +1,9 @@
 package com.phasmid.darwin.genetics
 
+import com.phasmid.laScala.FP
+
+import scala.util.Try
+
 /**
   * This class represents a Phenome: that's to say the template for creating a Phenotype as a result of "expressing" a Genotype.
   * Phenome is to Genome as Phenotype is to Genotype.
@@ -28,7 +32,10 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     * @param genotype the genotype to be expressed
     * @return a Phenotype
     */
-  def apply(genotype: Genotype[P, G]): Phenotype[T] = Phenotype(for (g <- genotype.genes; c <- characteristics.get(g.locus); t <- expresser(c, g)) yield t)
+  def apply(genotype: Genotype[P, G]): Phenotype[T] = {
+    val ttts: Seq[Try[Trait[T]]] = for (g <- genotype.genes; c <- characteristics.get(g.locus)) yield for (t <- expresser(c, g)) yield t
+    Phenotype(FP.sequence(ttts).get)
+  }
 }
 
 /**

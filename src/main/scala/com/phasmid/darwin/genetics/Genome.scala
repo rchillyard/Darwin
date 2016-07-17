@@ -1,5 +1,7 @@
 package com.phasmid.darwin.genetics
 
+import com.phasmid.laScala.FP
+
 
 /**
   * Genome represents a template for a Genotype. It is a particular subtype for the Genomic trait.
@@ -49,8 +51,10 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @param location the location of the gene on the Sequence
     * @return a new instance of Gene[P]
     */
-  def transcribe(bss: SequenceSet[B], location: Location): Gene[P, G] =
-    PGene(locusMap(location), for (bs <- bss; g <- transcriber(bs, location)) yield g)
+  def transcribe(bss: SequenceSet[B], location: Location): Gene[P, G] = {
+    val as = for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g
+    PGene(locusMap(location), FP.sequence(as).get)
+  }
 
   /**
     * This class defines a generic type of Gene that corresponds to Gene[P].

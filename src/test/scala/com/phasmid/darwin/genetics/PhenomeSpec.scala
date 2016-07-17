@@ -2,6 +2,8 @@ package com.phasmid.darwin.genetics
 
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.util._
+
 /**
   * Created by scalaprof on 5/6/16.
   */
@@ -15,10 +17,10 @@ class PhenomeSpec extends FlatSpec with Matchers {
   val gene2 = MendelianGene[Boolean, String](locus2, Seq(Allele("P"), Allele("Q")))
   val height = Characteristic("height")
   val girth = Characteristic("girth")
-  val traitMapper: (Characteristic, Allele[String]) => Option[Trait[Double]] = {
-    case (`height`, Allele(h)) => Some(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
-    case (`girth`, Allele(g)) => Some(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
-    case (c, _) => System.err.println(s"no trait traitMapper for $c"); None
+  val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
+    case (`height`, Allele(h)) => Success(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
+    case (`girth`, Allele(g)) => Success(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
+    case (c, _) => Failure(new GeneticsException(s"no trait traitMapper for $c"))
   }
 
   val expresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](traitMapper)
