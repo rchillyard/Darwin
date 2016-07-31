@@ -63,6 +63,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @param as a sequence of Alleles. For a diploid system (P is Boolean), then the cardinality of as should be 2
     */
   case class PGene(l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as)
+
 }
 
 /**

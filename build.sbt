@@ -16,8 +16,8 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 
 libraryDependencies ++= Seq(
 	"com.phasmid" %% "lascala" % "1.0.0-SNAPSHOT",
-	"org.scala-lang.modules" %% "scala-xml" % "1.0.4",
-	"org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
+//	"org.scala-lang.modules" %% "scala-xml" % "1.0.4",
+//	"org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
 	"org.scalatest" %% "scalatest" % scalaTestVersion % "test"
 //	akkaGroup %% "akka-actor" % akkaVersion,
 //	"org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1"

@@ -74,33 +74,4 @@ class GenomeSpec extends FlatSpec with Matchers {
     geneHix.name shouldBe "hix"
     geneHix(1) shouldBe Allele("T")
   }
-
-  "apply" should "work" in {
-    val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox)))
-    val g = Genome("test", karyotype, true, transcriber, locusMap)
-    val loci = g.loci
-    val bsss = Seq(Seq(Sequence(Seq(Cytosine, Guanine)), Sequence(Seq(Adenine, Guanine))))
-    val gt: Genotype[Boolean, String] = g(bsss)
-    gt.genes.size shouldBe loci
-    val gene = gt.genes.head
-    gene.name shouldBe "hox"
-    gene(false) shouldBe Allele("A")
-    gene(true) shouldBe Allele("C")
-  }
-
-  it should "work with multiple chromosomes" in {
-    val chromosome1 = Chromosome("test1", isSex = false, Seq(hox, hix))
-    val chromosome2 = Chromosome("test2", isSex = false, Seq(hoxB))
-    val chromosome3 = Chromosome("test3", isSex = false, Seq(hoxA, hoxB, hoxC))
-    val karyotype: Seq[Chromosome] = Seq(chromosome1, chromosome2, chromosome3)
-    val g = Genome("test", karyotype, true, transcriber, locusMap)
-    val loci = g.loci
-    val bsss: Nucleus[Base] = Seq(Seq(Sequence("CG"), Sequence("AG")), Seq(Sequence("CT"), Sequence("AG")), Seq(Sequence("CGT"), Sequence("AGA")))
-    val gt: Genotype[Boolean, String] = g(bsss)
-    gt.genes.size shouldBe loci
-    val gene = gt.genes.head
-    gene.name shouldBe "hox"
-    gene(false) shouldBe Allele("A")
-    gene(true) shouldBe Allele("C")
-  }
 }

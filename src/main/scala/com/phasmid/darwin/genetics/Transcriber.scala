@@ -17,7 +17,7 @@ import scala.util.Try
   * @tparam B the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
   * @tparam G the gene type
   */
-sealed trait Transcriber[B, G] extends TranscriberFunction[B,G] {
+sealed trait Transcriber[B, G] extends TranscriberFunction[B, G] {
   /**
     * This method locates a Seq[B] from a Sequence[B] according to the details of the given locus
     *
@@ -40,12 +40,12 @@ sealed trait Transcriber[B, G] extends TranscriberFunction[B,G] {
   /**
     * This method is called directly by the Genome method transcribe and indirectly by the Genome's
     * apply method.
-    * 
+    *
     * It is normally not necessary to override this method.
     *
     * @param bs       the Sequence of bases to transcribe
     * @param location the locus on the Chromosome at which we expect to find the gene we are interested in
-    * @return Some(Allele) assuming that all went well, otherwise None
+    * @return Success(Allele) assuming that all went well, otherwise Failure
     */
   def apply(bs: Sequence[B], location: Location): Try[Allele[G]] = FP.lift(transcribeBases _)(FP.optionToTry(locateBases(bs, location)))
 }

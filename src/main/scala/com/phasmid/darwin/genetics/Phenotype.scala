@@ -14,7 +14,7 @@ case class Phenotype[T](traits: Seq[Trait[T]])
 /**
   *
   * @param characteristic the Characteristic of this Trait
-  * @param value the T value of this Trait
+  * @param value          the T value of this Trait
   * @tparam T the underlying type of the Trait
   */
 case class Trait[T](characteristic: Characteristic, value: T)

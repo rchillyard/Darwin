@@ -19,7 +19,7 @@ import scala.util.Try
   * //@tparam G the gene type
   * //@tparam T the trait type
   */
-sealed trait Expresser[P, G, T] extends ExpresserFunction[P,G,T] {
+sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
   /**
     * Method to select the operative Allele for this Gene.
     * If your application is based on non-Mendelian genetics, you will need to override this method.
@@ -44,7 +44,7 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P,G,T] {
   /**
     * Function to make a Trait given a Characteristic and an Allele.
     */
-  val traitMapper: TraitMapper[G,T]
+  val traitMapper: TraitMapper[G, T]
 
   /**
     * Method to make a Trait given a Gene.
@@ -58,4 +58,4 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P,G,T] {
 
 abstract class AbstractExpresser[P, G, T] extends Expresser[P, G, T]
 
-case class ExpresserMendelian[P, G, T](traitMapper: TraitMapper[G,T]) extends AbstractExpresser[P, G, T]
+case class ExpresserMendelian[P, G, T](traitMapper: TraitMapper[G, T]) extends AbstractExpresser[P, G, T]

@@ -89,6 +89,7 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
 
   /**
     * Method to yield one of the Alleles present
+    *
     * @param p the selector, an instance of the Ploidy type (usually Boolean, but could be Unit or Int)
     * @return the selected Allele
     */

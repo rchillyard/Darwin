@@ -9,7 +9,7 @@ import scala.util.{Failure, Success, Try}
   *
   * XXX why is this sealed?
   */
-sealed trait Adapter[T, X] extends AdapterFunction[T,X] {
+sealed trait Adapter[T, X] extends AdapterFunction[T, X] {
 
   def matchFactors(f: Factor, t: Trait[T]): Try[(T, FunctionShape[T, X])]
 

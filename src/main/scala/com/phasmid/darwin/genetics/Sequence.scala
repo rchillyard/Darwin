@@ -10,6 +10,7 @@ import scala.util.Try
 case class Sequence[+B](bases: Seq[B]) {
   /**
     * Method to locate a Location on this Sequence.
+    *
     * @param location the desired Location
     * @return Some(sequence) if location found, otherwise None
     */
@@ -44,7 +45,8 @@ trait Renderer[B] extends (Seq[B] => String)
 object Sequence {
   /**
     * Method to construct a Sequence from a String of Char
-    * @param w the String
+    *
+    * @param w    the String
     * @param conv the method to convert from a Char to a B
     * @tparam B The Base type
     * @return a Sequence[B]
@@ -53,6 +55,7 @@ object Sequence {
 
   /**
     * Method to construct a Sequence from a variable number of bases
+    *
     * @param bases the bases
     * @tparam B the Base type
     * @return a Sequence[B]
