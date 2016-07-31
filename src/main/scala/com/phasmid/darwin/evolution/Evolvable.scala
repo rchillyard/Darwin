@@ -1,7 +1,7 @@
 package com.phasmid.darwin.evolution
 
 import com.phasmid.laScala.values.Rational
-import com.phasmid.laScala.{Incrementable, RNG}
+import com.phasmid.laScala.{Incrementable, RNG, Shuffle}
 
 /**
   * Created by scalaprof on 7/27/16.
@@ -48,7 +48,7 @@ trait Evolvable[X, Y] extends Generation[X] {
   * @tparam Q the type of Generation which this Evolvable object supports
   * @tparam Y the type of the Random number generator to be used
   */
-abstract class BaseEvolvable[Q: Incrementable, X, Y](members: Iterable[X], go: Option[Generation[Q]]) extends Evolvable[X, Y] {
+abstract class BaseEvolvable[Q: Incrementable, X, Y](members: Iterable[X], go: Option[Generation[Q]]) extends Evolvable[X, Y] with Iterable[X] {
 
   /**
     * @return an Iterator based on the members of this Evolvable
@@ -56,14 +56,24 @@ abstract class BaseEvolvable[Q: Incrementable, X, Y](members: Iterable[X], go: O
   def iterator: Iterator[X] = members.iterator
 
   /**
-    * This method yields an iterator of members which survive this generation.
+    * This method yields an iterator from the elements of xs which survive this generation.
     * Note that, although the default implementation simply culls all the unfit members
     * and keeps all of the fit members, sub-classes may redefine this method to allow a random choice
     * of survivors which is only partially guided by fitness.
     *
+    * CONSIDER do we really need this method, as opposed to survivors()?
+    *
     * @return an Iterator containing the elements of xs who survive this generation.
     */
   def survivors(xs: Iterator[X]): Iterator[X] = xs filter (evaluateFitness(_))
+
+  /**
+    * This method yields an iterator of members which survive this generation.
+    * It invokes survivors(iterator) to do its work
+    *
+    * @return an Iterator containing the elements of xs who survive this generation.
+    */
+  def survivors: Iterator[X] = survivors(iterator)
 
   /**
     * This method yields the complement of survivors such that survivors + nonSurvivors = this
@@ -84,7 +94,7 @@ abstract class BaseEvolvable[Q: Incrementable, X, Y](members: Iterable[X], go: O
     * @param fraction the fraction of members that will be randomly selected.
     * @return an Iterator containing a randomly chosen fraction of the members of this.
     */
-  def *(fraction: Rational): Iterator[X]
+  def *(fraction: Rational): Iterator[X] = shuffle.take((fraction * members.size).floor.toInt).toIterator
 
   /**
     * Method to create a new concrete instance of this BaseEvolvable.
@@ -103,10 +113,16 @@ abstract class BaseEvolvable[Q: Incrementable, X, Y](members: Iterable[X], go: O
     * @return a new Generation of X
     */
   def next: Generation[X] = {
-    val (s, n) = (build(survivors(iterator), None), build(nonSurvivors, None))
+    val (s, n) = (build(survivors, None), build(nonSurvivors, None))
     val nextGeneration = (s.iterator ++ s.offspring ++ build(n * k, None).offspring).toSeq.distinct
     build(nextGeneration.iterator, for (g <- go) yield g.next)
   }
+
+  /**
+    * Method to shuffle the order of this Evolvable
+    * @return a randomly-shuffled iterable on the members
+    */
+  def shuffle: Iterable[X]
 
 }
 

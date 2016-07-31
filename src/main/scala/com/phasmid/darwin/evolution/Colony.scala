@@ -45,4 +45,6 @@ case class Colony[B, P, G, T, X](organisms: Iterable[Organism[B, P, G, T, X]], g
     * @return the value of this Generation
     */
   override def get: Organism[B, P, G, T, X] = ???
+
+  override def shuffle: Iterable[Organism[B, P, G, T, X]] = ???
 }
