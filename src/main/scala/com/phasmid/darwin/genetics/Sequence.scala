@@ -1,9 +1,13 @@
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.genetics.dna.Base
+
 import scala.util.Try
 
 /**
   * This class models the physical genetic material from which a genotype is derived.
+  *
+  * CONSIDER another possible name for this type is Chromatid. Geneticists please advise.
   *
   * Created by scalaprof on 5/5/16.
   */
@@ -51,7 +55,7 @@ object Sequence {
     * @tparam B The Base type
     * @return a Sequence[B]
     */
-  def apply[B](w: String)(implicit conv: Char => B): Sequence[B] = new Sequence((for (c <- w) yield conv(c)).toList)
+  def apply[B](w: String)(implicit conv: Char => B): Sequence[B] = new Sequence((for (c <- w) yield conv(c)).toSeq)
 
   /**
     * Method to construct a Sequence from a variable number of bases
@@ -64,5 +68,15 @@ object Sequence {
 
   implicit def renderer[B] = new Renderer[B] {
     def apply(bs: Seq[B]): String = bs.mkString("", "", "")
+  }
+}
+
+trait Ordinal[X] {
+  def fromInt(i: Int): X
+}
+
+object Ordinal {
+  implicit object OrdinalBase extends Ordinal[Base] {
+    override def fromInt(i: Int): Base = Base(i)
   }
 }

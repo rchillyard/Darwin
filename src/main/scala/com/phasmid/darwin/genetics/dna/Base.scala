@@ -53,6 +53,12 @@ object Base {
     case 'T' => Thymine
     case _ => Invalid(x)
   }
+  def apply(x: Int) = x%4 match {
+    case 0 => Guanine
+    case 1 => Cytosine
+    case 2 => Adenine
+    case 3 => Thymine
+  }
 
   implicit def convert(c: Char): Base = apply(c)
 

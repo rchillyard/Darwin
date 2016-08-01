@@ -9,7 +9,7 @@ import org.scalatest.{FlatSpec, Matchers}
 class GenomeSpec extends FlatSpec with Matchers {
 
   // XXX this is a very simple 1:1 mapping from bases to alleles
-  val transcriber = PlainTranscriber[Base, String] { bs => Allele(bs.head.toString) }
+  val transcriber = PlainTranscriber[Base, String] { bs => Some(Allele(bs.head.toString)) }
   val hox = Location("hox", 0, 1)
   // C or A
   val hix = Location("hix", 1, 1)

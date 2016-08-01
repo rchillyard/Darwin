@@ -32,7 +32,7 @@ trait Evolvable[X, Y] extends Generation[X] {
   def offspring: Iterator[X]
 
   /**
-    * This is the rate at which
+    * This is the rate at which non-survivors can yet have offspring
     *
     * @return
     */
@@ -114,6 +114,8 @@ abstract class BaseEvolvable[Q: Incrementable, X, Y](members: Iterable[X], go: O
     */
   def next: Generation[X] = {
     val (s, n) = (build(survivors, None), build(nonSurvivors, None))
+    // TODO need to fix this because, currently, sexual reproduction will be from pairs
+    // chosen from two different populations: survivors and non-survivors.
     val nextGeneration = (s.iterator ++ s.offspring ++ build(n * k, None).offspring).toSeq.distinct
     build(nextGeneration.iterator, for (g <- go) yield g.next)
   }
