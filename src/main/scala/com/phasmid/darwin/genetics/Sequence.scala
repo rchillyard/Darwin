@@ -50,12 +50,14 @@ object Sequence {
   /**
     * Method to construct a Sequence from a String of Char
     *
+    * XXX at one point, we converted the result of the for comprehension into a List. I'm not sure why but it doesn't seem to be needed
+    *
     * @param w    the String
     * @param conv the method to convert from a Char to a B
     * @tparam B The Base type
     * @return a Sequence[B]
     */
-  def apply[B](w: String)(implicit conv: Char => B): Sequence[B] = new Sequence((for (c <- w) yield conv(c)).toSeq)
+  def apply[B](w: String)(implicit conv: Char => B): Sequence[B] = new Sequence((for (c <- w) yield conv(c)))
 
   /**
     * Method to construct a Sequence from a variable number of bases

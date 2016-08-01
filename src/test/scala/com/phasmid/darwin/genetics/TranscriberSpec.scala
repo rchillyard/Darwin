@@ -8,7 +8,7 @@ import scala.util.Success
 /**
   * Created by scalaprof on 5/6/16.
   */
-class TranscribeSpec extends FlatSpec with Matchers {
+class TranscriberSpec extends FlatSpec with Matchers {
 
   "apply" should "work with Base objects" in {
     // XXX this is a very simple 1:1 mapping from bases to alleles
