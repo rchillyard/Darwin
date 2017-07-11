@@ -33,6 +33,7 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
       case Some(x) => x == a
       case _ => throw new GeneticsException(s"gene does not define dominant")
     }
+
     gene.distinct match {
       // XXX it would be nice to avoid these instanceOf operators. Maybe we should give up on Product and just use Seq
       case Product1(x) => x.asInstanceOf[Allele[G]]

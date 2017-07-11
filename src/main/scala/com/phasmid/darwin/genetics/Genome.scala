@@ -1,6 +1,6 @@
 package com.phasmid.darwin.genetics
 
-import com.phasmid.laScala.FP
+import com.phasmid.laScala.fp.FP._
 
 
 /**
@@ -24,12 +24,12 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
   /**
     * @return the the number of chromosomes (pairs, actually) defined for this Genome. Synonymous with "karyotype"
     */
-  def chromosomes = karyotype.size
+  def chromosomes: Int = karyotype.size
 
   /**
     * @return the total number of loci (locations) on this Genome
     */
-  def loci = (karyotype map (_.loci)).sum
+  def loci: Int = (karyotype map (_.loci)).sum
 
   /**
     * method to transcribe a matrix of Sequences into a Genotype
@@ -53,7 +53,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     */
   def transcribe(bss: SequenceSet[B], location: Location): Gene[P, G] = {
     val as = for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g
-    PGene(locusMap(location), FP.sequence(as).get)
+    PGene(locusMap(location), sequence(as).get)
   }
 
   /**
@@ -81,7 +81,7 @@ case class Chromosome(name: String, isSex: Boolean, ls: Seq[Location]) extends I
   /**
     * @return the number of locations (loci) in this Chromosome
     */
-  def loci = ls.size
+  def loci: Int = ls.size
 }
 
 /**

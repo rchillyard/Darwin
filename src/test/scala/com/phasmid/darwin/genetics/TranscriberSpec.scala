@@ -3,8 +3,6 @@ package com.phasmid.darwin.genetics
 import com.phasmid.darwin.genetics.dna._
 import org.scalatest.{FlatSpec, Matchers}
 
-import scala.util.Success
-
 /**
   * Created by scalaprof on 5/6/16.
   */

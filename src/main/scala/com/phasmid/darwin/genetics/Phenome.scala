@@ -1,6 +1,6 @@
 package com.phasmid.darwin.genetics
 
-import com.phasmid.laScala.FP
+import com.phasmid.laScala.fp.FP._
 
 import scala.util.Try
 
@@ -34,7 +34,7 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     */
   def apply(genotype: Genotype[P, G]): Phenotype[T] = {
     val ttts: Seq[Try[Trait[T]]] = for (g <- genotype.genes; c <- characteristics.get(g.locus)) yield for (t <- expresser(c, g)) yield t
-    Phenotype(FP.sequence(ttts).get)
+    Phenotype(sequence(ttts).get)
   }
 }
 

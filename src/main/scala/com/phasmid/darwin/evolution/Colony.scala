@@ -1,22 +1,19 @@
 package com.phasmid.darwin.evolution
 
 import com.phasmid.laScala.RNG
-import com.phasmid.laScala.values.Rational
+import com.phasmid.laScala.values.{Incrementable, Rational}
 
 /**
   * Created by scalaprof on 7/27/16.
   */
-case class Colony[B, P, G, T, X](organisms: Iterable[Organism[B, P, G, T, X]], generation: Generation[Long]) extends BaseEvolvable[Long, Organism[B, P, G, T, X], Long](organisms, Some(generation)) {
+case class Colony[B, P, G, T, V: Incrementable, X](organisms: Iterable[Organism[B, P, G, T, X]], generation: Version[V]) extends BaseEvolvable[V, Organism[B, P, G, T, X], Long](organisms, Some(generation)) {
   /**
     * This method randomly selects a fraction of this Evolvable
     *
     * @param fraction the fraction of members that will be randomly selected.
     * @return an Iterator containing a randomly chosen fraction of the members of this.
     */
-  override def *(fraction: Rational): Iterator[Organism[B, P, G, T, X]] = ???
-
-  // CONSIDER using CanBuildFrom
-  override def build(members: Iterator[Organism[B, P, G, T, X]], go: Option[Generation[Long]]): BaseEvolvable[Long, Organism[B, P, G, T, X], Long] = ???
+  override def *(fraction: Rational[Long]): Iterator[Organism[B, P, G, T, X]] = ???
 
   /**
     * Evaluate the fitness of a member of this Evolvable
@@ -41,10 +38,8 @@ case class Colony[B, P, G, T, X](organisms: Iterable[Organism[B, P, G, T, X]], g
     */
   override def offspring: Iterator[Organism[B, P, G, T, X]] = ???
 
-  /**
-    * @return the value of this Generation
-    */
-  override def get: Organism[B, P, G, T, X] = ???
-
   override def shuffle: Iterable[Organism[B, P, G, T, X]] = ???
+
+  // CONSIDER using CanBuildFrom
+  def build(members: Iterator[Organism[B, P, G, T, X]], vo: Option[Subversioned[V]]): BaseEvolvable[V, Organism[B, P, G, T, X], Long] = ???
 }

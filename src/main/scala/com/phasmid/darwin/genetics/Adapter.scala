@@ -17,12 +17,14 @@ sealed trait Adapter[T, X] extends AdapterFunction[T, X] {
     // TODO tidy this all up nicely
     val fc: (T) => (FunctionShape[T, X]) => (X) => Fitness = ff.curried
     val x_f_t: Try[(X) => Fitness] = for ((t, s) <- matchFactors(factor, `trait`)) yield fc(t)(s)
+
     def f_xe_fo(ef: EcoFactor[X]): Try[Fitness] = x_f_t match {
       // TODO need to check the factor types
       case Success(f) => Success(f(ef.x))
       case Failure(t) => Failure(t)
     }
-    x_f_t map { f => Adaptation(factor, f_xe_fo) }
+
+    x_f_t map { _ => Adaptation(factor, f_xe_fo) }
   }
 }
 

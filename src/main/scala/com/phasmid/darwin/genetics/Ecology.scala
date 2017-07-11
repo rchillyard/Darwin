@@ -1,6 +1,6 @@
 package com.phasmid.darwin.genetics
 
-import com.phasmid.laScala.FP
+import com.phasmid.laScala.fp.FP._
 
 
 /**
@@ -19,7 +19,7 @@ case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: Fi
     */
   def apply(phenotype: Phenotype[T]): Adaptatype[X] = {
     val xats = for (t <- phenotype.traits; f <- factors.get(t.characteristic.name)) yield for (a <- adapter(f, t, fitness)) yield a
-    Adaptatype(FP.sequence(xats).get)
+    Adaptatype(sequence(xats).get)
   }
 }
 

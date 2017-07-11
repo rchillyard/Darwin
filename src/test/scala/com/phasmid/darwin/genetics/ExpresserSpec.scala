@@ -9,9 +9,9 @@ import scala.util.{Failure, Success, Try}
   */
 class ExpresserSpec extends FlatSpec with Matchers {
 
-  val height = Characteristic("height")
-  val tall = Trait[Double](height, 2.0)
-  val short = Trait[Double](height, 1.6)
+  private val height = Characteristic("height")
+  private val tall = Trait[Double](height, 2.0)
+  private val short = Trait[Double](height, 1.6)
 
   "apply" should "work" in {
     val gene = new Gene[Boolean, String] {

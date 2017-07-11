@@ -23,6 +23,6 @@ case class Fitness(x: Double) {
 case class FunctionShape[T, X](shape: String, f: (T, X) => Fitness)
 
 object Fitness {
-  val delta = FunctionShape[Double, Double]("delta", { (t, x) => if (t >= x) Fitness(1) else Fitness(0) })
-  val inverseDelta = FunctionShape[Double, Double]("delta-inv", { (t, x) => if (t < x) Fitness(1) else Fitness(0) })
+  val delta: FunctionShape[Double, Double] = FunctionShape[Double, Double]("delta", { (t, x) => if (t >= x) Fitness(1) else Fitness(0) })
+  val inverseDelta: FunctionShape[Double, Double] = FunctionShape[Double, Double]("delta-inv", { (t, x) => if (t < x) Fitness(1) else Fitness(0) })
 }

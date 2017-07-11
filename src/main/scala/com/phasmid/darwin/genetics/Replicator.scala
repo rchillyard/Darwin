@@ -10,7 +10,7 @@ trait Replicator[B] {
   /**
     * Replicate a sequence of B elements
     *
-    * @param bs
+    * @param bs a base sequence
     * @return a Seq of B which may be an imperfect copy of s
     */
   def replicate(bs: Seq[B]): Seq[B]
@@ -18,7 +18,7 @@ trait Replicator[B] {
   /**
     * Replicate a Sequence of B elements
     *
-    * @param bs
+    * @param bs a base sequence
     * @return a Sequence of B which may be an imperfect copy of s
     */
   def replicate(bs: Sequence[B]): Sequence[B] = Sequence(replicate(bs.bases))
@@ -34,7 +34,7 @@ trait Replicator[B] {
 case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Replicator[B] {
   // NOTE: a variable.
   var i = 0
-  val rmnopc = RNG.values(r) map { _ % mnopc }
+  private val rmnopc = RNG.values(r) map ( _ % mnopc )
 
   def random: Int = {i = i + 1; rmnopc(i)}
 

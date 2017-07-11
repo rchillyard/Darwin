@@ -37,7 +37,7 @@ case class Sequence[+B](bases: Seq[B]) {
 
   // TODO bring back the implicit renderer: but be aware that can
   // mess up the concatenation methods above.
-  override def toString = bases.mkString("", "", "")
+  override def toString: String = bases.mkString("", "", "")
 }
 
 trait Renderer[B] extends (Seq[B] => String)
@@ -57,7 +57,7 @@ object Sequence {
     * @tparam B The Base type
     * @return a Sequence[B]
     */
-  def apply[B](w: String)(implicit conv: Char => B): Sequence[B] = new Sequence((for (c <- w) yield conv(c)))
+  def apply[B](w: String)(implicit conv: Char => B): Sequence[B] = new Sequence(for (c <- w) yield conv(c))
 
   /**
     * Method to construct a Sequence from a variable number of bases
@@ -78,7 +78,9 @@ trait Ordinal[X] {
 }
 
 object Ordinal {
+
   implicit object OrdinalBase extends Ordinal[Base] {
     override def fromInt(i: Int): Base = Base(i)
   }
+
 }

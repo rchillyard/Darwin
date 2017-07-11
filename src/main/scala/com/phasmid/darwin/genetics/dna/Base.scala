@@ -46,14 +46,15 @@ case class Invalid(x: Char) extends Base {
 }
 
 object Base {
-  def apply(x: Char) = x match {
+  def apply(x: Char): Base = x match {
     case 'G' => Guanine
     case 'C' => Cytosine
     case 'A' => Adenine
     case 'T' => Thymine
     case _ => Invalid(x)
   }
-  def apply(x: Int) = x%4 match {
+
+  def apply(x: Int): Base = x % 4 match {
     case 0 => Guanine
     case 1 => Cytosine
     case 2 => Adenine

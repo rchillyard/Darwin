@@ -1,9 +1,5 @@
 package com.phasmid.darwin.genetics
 
-import com.phasmid.laScala.FP
-
-import scala.util.Try
-
 /**
   * A Transcriber is the heart of the process for taking Sequence information and generating its corresponding Genotype.
   * There are two more or less independent phases, and one phase which combines the two others:
@@ -49,7 +45,7 @@ sealed trait Transcriber[B, G] extends TranscriberFunction[B, G] {
     * @param location the locus on the Chromosome at which we expect to find the gene we are interested in
     * @return Success(Allele) assuming that all went well, otherwise Failure
     */
-  def apply(bs: Sequence[B], location: Location): Option[Allele[G]] = for (bs <- locateBases(bs,location); ga <- transcribeBases(bs)) yield ga
+  def apply(bs: Sequence[B], location: Location): Option[Allele[G]] = for (bs <- locateBases(bs, location); ga <- transcribeBases(bs)) yield ga
 }
 
 /**

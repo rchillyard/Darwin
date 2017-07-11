@@ -16,7 +16,7 @@ class GeneSpec extends FlatSpec with Matchers {
   case class GeneDiploidString(location: Location, alleles: (Allele[String], Allele[String])) extends Gene[Boolean, String] {
     def apply(p: Boolean): Allele[String] = if (p) alleles._1 else alleles._2
 
-    val name = location.name
+    val name: String = location.name
 
     override def distinct: Product = alleles._1
 

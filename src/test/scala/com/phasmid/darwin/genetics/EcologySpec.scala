@@ -19,7 +19,7 @@ class EcologySpec extends FlatSpec with Matchers {
   }
 
   def fitnessFunction(t: Double, functionType: FunctionShape[Double, Double], x: Double): Fitness = functionType match {
-    case FunctionShape(s, f) => f(t, x)
+    case FunctionShape(_, f) => f(t, x)
     case _ => throw new GeneticsException(s"ecoFitness does not implement functionType: $functionType")
   }
 

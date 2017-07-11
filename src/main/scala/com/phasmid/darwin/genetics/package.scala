@@ -21,7 +21,7 @@ package object genetics {
   trait Identifier {
     def name: String
 
-    override def toString = name
+    override def toString: String = name
   }
 
   /**
@@ -47,8 +47,15 @@ package object genetics {
     */
   type Nucleus[BaseType] = Seq[SequenceSet[BaseType]]
 
+  /**
+    * A specific nuclear type where BaseType is set to Base, that's to say as in the nuclei of the natural world.
+    */
   type NucleusDNA = Nucleus[Base]
 
+  /**
+    * A specific Genome type where BaseType is set to Base, Ploidy is Boolean and GeneType is String.
+    * That's to say, genomes of the natural, eukaryotic world (everything except bacteria).
+    */
   type NaturalGenome = Genome[Base, Boolean, String]
 
   // Function Types...
@@ -57,11 +64,13 @@ package object genetics {
     * Genomic is a trait which provides the functionality to transcribe a Nucleus (that's to say a matrix of Sequences)
     * into a Genotype.
     *
-    * @tparam BaseType the underlying type of Nucleus and its Sequences, typically (for natural genetic algorithms) Base
-    * @tparam Ploidy the ploidy type for the Genotype, typically (for eukaryotic genetics) is Boolean (ploidy=2);
-    *               for haploid: Ploidy is Unit;
-    *           for polyploid: Ploidy is Int.
-    * @tparam GeneType the underlying gene value type
+    * @tparam BaseType is the underlying type of the Sequence: for natural genetics, BaseType is Base, that's to say one of a
+    *                  set of four alphabetic bases made up of proteins and which make up the molecule called DNA.
+    *                  But different applications might want to choose something else.
+    * @tparam Ploidy   the ploidy type for the Genotype, typically (for eukaryotic genetics) is Boolean (ploidy=2);
+    *                  for haploid: Ploidy is Unit;
+    *                  for polyploid: Ploidy is Int.
+    * @tparam GeneType the underlying Gene value type, typically String
     */
   type Genomic[BaseType, Ploidy, GeneType] = Nucleus[BaseType] => Genotype[Ploidy, GeneType]
 
@@ -69,8 +78,10 @@ package object genetics {
     * Phenomic is a type which provides the functionality to express a Genotype (that's to say a sequence of Genes)
     * into a Phenotype. As far as I'm aware, Phenomic is not a real word.
     *
-    * @tparam Ploidy the ploidy type for the Genotype, typically (for eukaryotic genetics) Boolean (ploidy=2)
-    * @tparam GeneType the underlying Gene value type, typically String
+    * @tparam Ploidy    the ploidy type for the Genotype, typically (for eukaryotic genetics) is Boolean (ploidy=2);
+    *                   for haploid: Ploidy is Unit;
+    *                   for polyploid: Ploidy is Int.
+    * @tparam GeneType  the underlying Gene value type, typically String
     * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
     */
   type Phenomic[Ploidy, GeneType, TraitType] = Genotype[Ploidy, GeneType] => Phenotype[TraitType]
@@ -80,8 +91,9 @@ package object genetics {
     * This adaptation can then be crossed with an Environment to determine the fitness function.
     *
     * This type models the evaluation of adaptation for a specific Phenotype in an Environment
-    * @tparam TraitType the underlying type of the Traits
-    * @tparam EcoType the underlying type of the ecological types such as Environment
+    *
+    * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
+    * @tparam EcoType   the underlying type of the ecological types such as Environment
     */
   type Ecological[TraitType, EcoType] = Phenotype[TraitType] => Adaptatype[EcoType]
 
@@ -91,7 +103,7 @@ package object genetics {
     *
     * CONSIDER making the result a Try instead of an Option
     *
-    * @tparam EcoType
+    * @tparam EcoType the underlying type of the ecological types such as Environment
     */
   type EcoFitness[EcoType] = EcoFactor[EcoType] => Try[Fitness]
 
@@ -100,8 +112,8 @@ package object genetics {
     *
     * TODO need to rename FunctionShape
     *
-    * @tparam TraitType
-    * @tparam EcoType
+    * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
+    * @tparam EcoType   the underlying type of the ecological types such as Environment
     */
   type FitnessFunction[TraitType, EcoType] = (TraitType, FunctionShape[TraitType, EcoType], EcoType) => Fitness
 
@@ -109,8 +121,8 @@ package object genetics {
     * This function type is a mapper between a Characteristic/Allele pair and an (optional) Trait. It is used by implementers
     * of the ExpresserFunction
     *
-    * @tparam GeneType
-    * @tparam TraitType
+    * @tparam GeneType  the underlying Gene value type, typically String
+    * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
     */
   type TraitMapper[GeneType, TraitType] = (Characteristic, Allele[GeneType]) => Try[Trait[TraitType]]
 
@@ -118,25 +130,29 @@ package object genetics {
     * This function type is the basis of the transcription of sequences of bases into genes.
     * This function returns an Option, rather than a Try, because it is relatively normal for the transcriber to fail.
     *
-    * @tparam BaseType
-    * @tparam GeneType
+    * @tparam BaseType is the underlying type of the Sequence: for natural genetics, BaseType is Base, that's to say one of a
+    *                  set of four alphabetic bases made up of proteins and which make up the molecule called DNA.
+    *                  But different applications might want to choose something else.
+    * @tparam GeneType the underlying Gene value type, typically String
     */
   type TranscriberFunction[BaseType, GeneType] = (Sequence[BaseType], Location) => Option[Allele[GeneType]]
 
   /**
     * This function type is the basis of the expression of genes into traits.
     *
-    * @tparam Ploidy
-    * @tparam GeneType
-    * @tparam TraitType
+    * @tparam Ploidy    the ploidy type for the Genotype, typically (for eukaryotic genetics) is Boolean (ploidy=2);
+    *                   for haploid: Ploidy is Unit;
+    *                   for polyploid: Ploidy is Int.
+    * @tparam GeneType  the underlying Gene value type, typically String
+    * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
     */
   type ExpresserFunction[Ploidy, GeneType, TraitType] = (Characteristic, Gene[Ploidy, GeneType]) => Try[Trait[TraitType]]
 
   /**
     * This function type is the basis of the success of traits into adaptations. [Yes, I know this needs a better explanation].
     *
-    * @tparam TraitType
-    * @tparam EcoType
+    * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
+    * @tparam EcoType   the underlying type of the ecological types such as Environment
     */
   type AdapterFunction[TraitType, EcoType] = (Factor, Trait[TraitType], FitnessFunction[TraitType, EcoType]) => Try[Adaptation[EcoType]]
 }

@@ -85,7 +85,7 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
   /**
     * @return this Gene's Locus
     */
-  def locus = l
+  def locus: Locus[G] = l
 
   /**
     * Method to yield one of the Alleles present
@@ -94,13 +94,13 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
     * @return the selected Allele
     */
   def apply(p: P): Allele[G] = p match {
-    case u: Unit => as.head
+    case _: Unit => as.head
     case q: Boolean => if (q) as.head else as(1)
     case q: Int => as(q)
     case _ => throw new GeneticsException("type P must be Unit, Boolean or Int")
   }
 
-  val name = locus.location.name
+  val name: String = locus.location.name
 
   /**
     * Returns distinct alleles as a Tuple

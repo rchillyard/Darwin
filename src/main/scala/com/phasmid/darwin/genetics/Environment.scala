@@ -13,6 +13,6 @@ package com.phasmid.darwin.genetics
 case class Environment[X](name: String, factors: EcoFactor[X]) extends Identifier
 
 case class EcoFactor[X](factor: Factor, x: X) extends Identifier {
-  val name = factor.name
+  val name: String = factor.name
 }
 
