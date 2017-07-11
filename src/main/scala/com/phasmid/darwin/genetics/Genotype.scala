@@ -97,7 +97,7 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
     case _: Unit => as.head
     case q: Boolean => if (q) as.head else as(1)
     case q: Int => as(q)
-    case _ => throw new GeneticsException("type P must be Unit, Boolean or Int")
+    case _ => throw GeneticsException("type P must be Unit, Boolean or Int")
   }
 
   val name: String = locus.location.name
@@ -113,7 +113,7 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
       case 1 => x.head
       case 2 => (x.head, x.tail.head)
       case 3 => (x.head, x.tail.head, x.tail.tail.head)
-      case _ => throw new GeneticsException(s"unsupported number of distinct alleles: $x")
+      case _ => throw GeneticsException(s"unsupported number of distinct alleles: $x")
     }
   }
 }

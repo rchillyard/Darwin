@@ -32,7 +32,7 @@ class ExpresserSpec extends FlatSpec with Matchers {
 
       val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
         case (_, Allele(h)) => Success(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
-        case (c, _) => Failure(new GeneticsException(s"traitMapper failed for $c"))
+        case (c, _) => Failure(GeneticsException(s"traitMapper failed for $c"))
       }
     }
     exp(height, gene) shouldBe Success(tall)
@@ -47,7 +47,7 @@ class ExpresserSpec extends FlatSpec with Matchers {
     val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
       case (`height`, Allele(h)) => Success(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
       case (`girth`, Allele(g)) => Success(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
-      case (c, _) => Failure(new GeneticsException(s"traitMapper failed for $c"))
+      case (c, _) => Failure(GeneticsException(s"traitMapper failed for $c"))
     }
     val exp = ExpresserMendelian[Boolean, String, Double](traitMapper)
     exp(height, gene1) shouldBe Success(short)

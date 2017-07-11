@@ -20,7 +20,7 @@ class PhenomeSpec extends FlatSpec with Matchers {
   val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
     case (`height`, Allele(h)) => Success(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
     case (`girth`, Allele(g)) => Success(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
-    case (c, _) => Failure(new GeneticsException(s"no trait traitMapper for $c"))
+    case (c, _) => Failure(GeneticsException(s"no trait traitMapper for $c"))
   }
 
   val expresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](traitMapper)

@@ -13,14 +13,14 @@ class EcologySpec extends FlatSpec with Matchers {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, FunctionShape[Double, Double])] = f match {
       case Factor("elephant grass") => t.characteristic.name match {
         case "height" => Success(t.value, Fitness.inverseDelta)
-        case _ => Failure(new GeneticsException(s"no match for factor: ${t.characteristic.name}"))
+        case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
   }
 
   def fitnessFunction(t: Double, functionType: FunctionShape[Double, Double], x: Double): Fitness = functionType match {
     case FunctionShape(_, f) => f(t, x)
-    case _ => throw new GeneticsException(s"ecoFitness does not implement functionType: $functionType")
+    case _ => throw GeneticsException(s"ecoFitness does not implement functionType: $functionType")
   }
 
   "apply" should "work" in {

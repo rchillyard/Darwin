@@ -31,14 +31,14 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
     //noinspection ComparingUnrelatedTypes
     def isDominant(a: Allele[G]) = gene.locus.dominant match {
       case Some(x) => x == a
-      case _ => throw new GeneticsException(s"gene does not define dominant")
+      case _ => throw GeneticsException(s"gene does not define dominant")
     }
 
     gene.distinct match {
       // XXX it would be nice to avoid these instanceOf operators. Maybe we should give up on Product and just use Seq
       case Product1(x) => x.asInstanceOf[Allele[G]]
       case Product2(x, y) => val a = x.asInstanceOf[Allele[G]]; if (isDominant(a)) a else y.asInstanceOf[Allele[G]]
-      case _ => throw new GeneticsException(s"Mendelian logic problem with gene $gene")
+      case _ => throw GeneticsException(s"Mendelian logic problem with gene $gene")
     }
   }
 
