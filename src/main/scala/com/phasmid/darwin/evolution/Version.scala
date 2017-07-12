@@ -44,7 +44,7 @@ trait Subversionable[T] {
   * @tparam V the underlying type of this Subversioned object.
   *           Typically, this will be a String or an integral value such as Long.
   */
-trait Subversioned[V] extends (() => V) with Ordered[Subversioned[V]] {
+trait Subversioned[V] extends (() => V) with Ordering[Subversioned[V]] {
 
   /**
     * Method to get the subversion of this Subversioned, if any.
@@ -82,6 +82,7 @@ abstract class BaseVersion[V: Ordering](v: V) extends Subversioned[V] {
   def compare(x: Subversioned[V], y: Subversioned[V]): Int = implicitly[Ordering[V]].compare(x(), y())
 
   protected val cf: (Subversioned[V], Subversioned[V]) => Int = compare
+
 
   def compare(that: Subversioned[V]): Int = FP.map2(this.subversion, that.subversion)(cf).getOrElse(if (subversion.isDefined) -1 else 1)
 }

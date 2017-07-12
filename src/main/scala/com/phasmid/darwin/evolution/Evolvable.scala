@@ -110,12 +110,10 @@ abstract class BaseEvolvable[V: Incrementable, X, Y, Repr](members: Iterable[X],
     */
   def next(isSnapshot: Boolean = false): Try[Repr] = for (v <- version.next(isSnapshot)) yield next(v)
 
-  private def next(v: Version[V]): Repr = {
-    val (s, n) = (buildInternal(survivors, v), buildInternal(nonSurvivors, v))
-    // TODO need to fix this because, currently, sexual reproduction will be from pairs
-    // chosen from two different populations: survivors and non-survivors.
-    val nextGeneration = (s.iterator ++ s.offspring ++ buildInternal(n * k, v).offspring).toSeq.distinct
-    build(nextGeneration.iterator, v)
+
+  def compare(that: Sequential[Repr]): Int = that match {
+    case e: BaseEvolvable[V, X, Y, Repr] => this.version.compare(e.getVersion)
+    case _ => throw EvolutionException(s"cannot compare $that with $this")
   }
 
   /**
@@ -132,7 +130,17 @@ abstract class BaseEvolvable[V: Incrementable, X, Y, Repr](members: Iterable[X],
     */
   def random: RNG[Y]
 
+  private def next(v: Version[V]): Repr = {
+    val (s, n) = (buildInternal(survivors, v), buildInternal(nonSurvivors, v))
+    // TODO need to fix this because, currently, sexual reproduction will be from pairs
+    // chosen from two different populations: survivors and non-survivors.
+    val nextGeneration = (s.iterator ++ s.offspring ++ buildInternal(n * k, v).offspring).toSeq.distinct
+    build(nextGeneration.iterator, v)
+  }
+
   private def buildInternal(xs: Iterator[X], v: Version[V]): BaseEvolvable[V, X, Y, Repr] = build(xs, v).asInstanceOf[BaseEvolvable[V, X, Y, Repr]]
+
+  private def getVersion: Version[V] = version
 }
 
 case class EvolvableException(s: String) extends Exception(s)
