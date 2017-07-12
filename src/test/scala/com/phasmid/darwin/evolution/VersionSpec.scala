@@ -12,7 +12,7 @@ class VersionSpec extends FlatSpec with Matchers {
   behavior of "next"
   it should "work" in {
     val v = Version(0, None)
-    v.next should matchPattern { case Success(Version(1, None)) => }
+    v.next() should matchPattern { case Success(Version(1, None, false)) => }
   }
 
   behavior of "subversions"

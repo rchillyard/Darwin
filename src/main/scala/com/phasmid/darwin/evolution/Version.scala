@@ -10,8 +10,8 @@ import scala.util.{Success, Try}
   *
   * Created by scalaprof on 7/11/17.
   */
-case class Version[V: Incrementable](v: V, subversion: Option[Subversioned[V]]) extends BaseVersion(v) with Sequential[Version[V]] with Subversionable[Version[V]] {
-  def next: Try[Version[V]] = for (x <- implicitly[Incrementable[V]].increment(v)) yield Version(x, None)
+case class Version[V: Incrementable](v: V, subversion: Option[Subversioned[V]], isSnapshot: Boolean = false) extends BaseVersion(v) with Sequential[Version[V]] with Subversionable[Version[V]] {
+  def next(isSnapshot: Boolean): Try[Version[V]] = for (x <- implicitly[Incrementable[V]].increment(v)) yield Version(x, None)
 
   def subversions: Stream[Version[V]] = {
     def s(v: V): Stream[V] = implicitly[Incrementable[V]].increment(v) match {
@@ -76,7 +76,7 @@ trait Subversioned[V] extends (() => V) with Ordered[Subversioned[V]] {
   * @param v the value of this Subversioned
   * @tparam V the underlying type of the Subversioned, which is defined to implement Ordering
   */
-abstract class BaseVersion[V: Ordering](v: V) extends Subversioned[V] with Ordering[Subversioned[V]] {
+abstract class BaseVersion[V: Ordering](v: V) extends Subversioned[V] {
   def apply(): V = v
 
   def compare(x: Subversioned[V], y: Subversioned[V]): Int = implicitly[Ordering[V]].compare(x(), y())

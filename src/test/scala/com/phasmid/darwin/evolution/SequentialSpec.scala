@@ -12,10 +12,10 @@ class SequentialSpec extends FlatSpec with Matchers {
   behavior of "next"
   it should "work for Int" in {
     val x = IncrementableSequential(0)
-    x.next should matchPattern { case Success(IncrementableSequential(1)) => }
+    x.next() should matchPattern { case Success(IncrementableSequential(1, false)) => }
   }
   it should "work for String" in {
     val x = IncrementableSequential("A")
-    x.next should matchPattern { case Success(IncrementableSequential("B")) => }
+    x.next() should matchPattern { case Success(IncrementableSequential("B", false)) => }
   }
 }

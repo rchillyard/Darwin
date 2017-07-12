@@ -8,7 +8,7 @@ import scala.util.Try
 /**
   * Created by scalaprof on 7/27/16.
   */
-trait Evolvable[X] extends Sequential[Evolvable[X]] {
+trait Evolvable[X, Repr] extends Sequential[Repr] {
 
   /**
     * TODO make this an implicit function in Evolvable sub-class
@@ -40,21 +40,21 @@ trait Evolvable[X] extends Sequential[Evolvable[X]] {
   * This abstract base class for Evolvable represents a Seq of X objects which, together, are Evolvable.
   *
   * @param members an unsorted collection of objects which, together, are Evolvable
-  * @param vo      an optional Version (Evolvables which are not complete generations use None here)
+  * @param version a Version (Evolvables which are not complete generations use a snapshot here)
   * @tparam V the version type (defined to be Incrementable)
-  * @tparam X the underlying type of the members (defined to be Fit)
+  * @tparam X the underlying type of the xs
   */
-abstract class BaseEvolvable[V: Incrementable, X, Y](members: Iterable[X], vo: Option[Version[V]]) extends Evolvable[X] with Iterable[X] {
+abstract class BaseEvolvable[V: Incrementable, X, Y, Repr](members: Iterable[X], version: Version[V]) extends Evolvable[X, Repr] with Iterable[X] {
 
   /**
-    * @return an Iterator based on the members of this Evolvable
+    * @return an Iterator based on the xs of this Evolvable
     */
   def iterator: Iterator[X] = members.iterator
 
   /**
     * This method yields an iterator from the elements of xs which survive this generation.
-    * Note that, although the default implementation simply culls all the unfit members
-    * and keeps all of the fit members, sub-classes may redefine this method to allow a random choice
+    * Note that, although the default implementation simply culls all the unfit xs
+    * and keeps all of the fit xs, sub-classes may redefine this method to allow a random choice
     * of survivors which is only partially guided by fitness.
     *
     * CONSIDER do we really need this method, as opposed to survivors()?
@@ -64,7 +64,7 @@ abstract class BaseEvolvable[V: Incrementable, X, Y](members: Iterable[X], vo: O
   def survivors(xs: Iterator[X]): Iterator[X] = xs filter evaluateFitness
 
   /**
-    * This method yields an iterator of members which survive this generation.
+    * This method yields an iterator of xs which survive this generation.
     * It invokes survivors(iterator) to do its work
     *
     * @return an Iterator containing the elements of xs who survive this generation.
@@ -87,8 +87,8 @@ abstract class BaseEvolvable[V: Incrementable, X, Y](members: Iterable[X], vo: O
   /**
     * This method randomly selects a fraction of this Evolvable
     *
-    * @param fraction the fraction of members that will be randomly selected.
-    * @return an Iterator containing a randomly chosen fraction of the members of this.
+    * @param fraction the fraction of xs that will be randomly selected.
+    * @return an Iterator containing a randomly chosen fraction of the xs of this.
     */
   def *(fraction: Rational[Long]): Iterator[X] = shuffle.take((fraction * members.size).floor.toInt).toIterator
 
@@ -97,30 +97,31 @@ abstract class BaseEvolvable[V: Incrementable, X, Y](members: Iterable[X], vo: O
     *
     * CONSIDER using CanBuildFrom
     *
-    * @param members the members to be included in this BaseEvolvable
-    * @param vo      an optional Subversioned: complete generations have Some(g) but incomplete generations have None
+    * @param xs the xs to be included in this BaseEvolvable
+    * @param v  a Version
     * @return a concrete instance of BaseEvolvable corresponding to the same type as this
     */
-  def build(members: Iterator[X], vo: Option[Subversioned[V]]): BaseEvolvable[V, X, Y]
+  def build(xs: Iterator[X], v: Version[V]): Repr
 
   /**
-    * By default, this implementation of next allows k non-survivors to reproduce (before they are killed, presumably).
+    * By default, this implementation of next allows k non-survivors to mate (before they are killed, presumably).
     *
-    * @return a new Generation of X
+    * @return a new generation of this Evolvable
     */
-  def next: Try[Evolvable[X]] = {
-    val (s, n) = (build(survivors, None), build(nonSurvivors, None))
+  def next(isSnapshot: Boolean = false): Try[Repr] = for (v <- version.next(isSnapshot)) yield next(v)
+
+  private def next(v: Version[V]): Repr = {
+    val (s, n) = (buildInternal(survivors, v), buildInternal(nonSurvivors, v))
     // TODO need to fix this because, currently, sexual reproduction will be from pairs
     // chosen from two different populations: survivors and non-survivors.
-    val nextGeneration = (s.iterator ++ s.offspring ++ build(n * k, None).offspring).toSeq.distinct
-    val result = build(nextGeneration.iterator, for (v <- vo; q <- v.next.toOption) yield q)
-    null // FIXME
+    val nextGeneration = (s.iterator ++ s.offspring ++ buildInternal(n * k, v).offspring).toSeq.distinct
+    build(nextGeneration.iterator, v)
   }
 
   /**
     * Method to shuffle the order of this Evolvable
     *
-    * @return a randomly-shuffled iterable on the members
+    * @return a randomly-shuffled iterable on the xs
     */
   def shuffle: Iterable[X]
 
@@ -131,6 +132,7 @@ abstract class BaseEvolvable[V: Incrementable, X, Y](members: Iterable[X], vo: O
     */
   def random: RNG[Y]
 
+  private def buildInternal(xs: Iterator[X], v: Version[V]): BaseEvolvable[V, X, Y, Repr] = build(xs, v).asInstanceOf[BaseEvolvable[V, X, Y, Repr]]
 }
 
 case class EvolvableException(s: String) extends Exception(s)
