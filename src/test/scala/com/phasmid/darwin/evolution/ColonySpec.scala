@@ -23,25 +23,20 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.genetics._
+import com.phasmid.laScala.values.Rational
+import com.phasmid.laScala.{LongRNG, RNG, Version}
+import org.scalatest.{FlatSpec, Inside, Matchers}
+
+import scala.util.Success
 
 /**
-  * Created by scalaprof on 7/27/16.
+  * Created by scalaprof on 7/25/16.
   */
-trait Organism[B, P, G, T, X] {
+class ColonySpec extends FlatSpec with Matchers with Inside {
 
-  def genome: Genome[B, P, G]
+  implicit val random: RNG[Long] = LongRNG(0)
 
-  def phenome: Phenome[P, G, T]
-
-  def ecology: Ecology[T, X]
-
-  def nucleus: Nucleus[B]
-
-  def genotype: Genotype[P, G] = genome(nucleus)
-
-  def phenotype: Phenotype[T] = phenome(genotype)
-
-  def adaptatype: Adaptatype[X] = ecology(phenotype)
-
+  behavior of "Colony"
+  it should "evolve" in {
+  }
 }
