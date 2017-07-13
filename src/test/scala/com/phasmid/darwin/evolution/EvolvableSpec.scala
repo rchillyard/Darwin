@@ -1,7 +1,7 @@
 package com.phasmid.darwin.evolution
 
 import com.phasmid.laScala.values.Rational
-import com.phasmid.laScala.{LongRNG, RNG, Shuffle, Version}
+import com.phasmid.laScala.{LongRNG, RNG, Version}
 import org.scalatest.{FlatSpec, Inside, Matchers}
 
 /**
@@ -9,31 +9,33 @@ import org.scalatest.{FlatSpec, Inside, Matchers}
   */
 class EvolvableSpec extends FlatSpec with Matchers with Inside {
 
-  case class MockEvolvable(members: Iterable[Int], v: Version[Int]) extends BaseEvolvable[Int, Int, Long, MockEvolvable](members, v) {
+  implicit val random: RNG[Long] = LongRNG(0)
+
+  case class MockEvolvable(members: Iterable[Int], v: Version[Int]) extends BaseEvolvable[Int, Int, MockEvolvable](members, v) {
 
     def evaluateFitness(x: Int): Boolean = x % 2 == 0
 
-    def random: RNG[Long] = LongRNG(0)
-
     def offspring: Iterator[Int] = members.toIterator filter ( _ > 3 ) map ( _ + 100 )
 
-    def get: Int = v.v
+    def build(xs: Iterator[Int], v: Version[Int]): MockEvolvable = MockEvolvable(xs.toSeq, v)
 
-    def shuffle: Iterable[Int] = Shuffle(random())(iterator.toSeq)
+    override def survivors: Iterator[Int] = super.survivors
 
-    def build(xs: Iterator[Int], v: Version[Int]): MockEvolvable = MockEvolvable(members.toSeq, v)
+    override def -(i: Iterator[Int]): Iterator[Int] = super.-(i)
+
+    override def *(fraction: Rational[Long])(implicit random: RNG[Long]): Iterator[Int] = super.*(fraction)
   }
 
   "MockEvolvable" should "shuffle properly" in {
     val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
-    evolvable.shuffle shouldBe Stream(1, 1, 3, 2, 13, 5, 8)
+    evolvable.permute.toSeq shouldBe Stream(1, 1, 3, 2, 13, 5, 8)
   }
-  //  it should "build properly" in {
-  //    val evolvable = MockEvolvable(Seq(), None)
-  //    val x = evolvable.build(Seq(1, 1, 3, 2, 13, 5, 8).iterator,Some(NumberedGeneration(0)))
-  //    x.iterator.toSeq shouldBe Seq(1, 1, 3, 2, 13, 5, 8)
-  //    x.get shouldBe 0
-  //  }
+  it should "build properly" in {
+    val evolvable = MockEvolvable(Seq(), Version(0, None))
+    val x = evolvable.build(Seq(1, 1, 3, 2, 13, 5, 8).iterator, Version(1, None))
+    x.iterator.toSeq shouldBe Seq(1, 1, 3, 2, 13, 5, 8)
+    x() shouldBe 0
+  }
   it should "yield 3 offspring" in {
     val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
     evolvable.offspring.toSeq shouldBe Seq(105, 108, 113)
@@ -50,10 +52,6 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
     val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13, 21), Version(0, None))
     val x = evolvable * Rational(2, 3)
     (evolvable - x).toSeq shouldBe Seq(2, 8)
-  }
-  it should "get random value 0" in {
-    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
-    evolvable.random() shouldBe 0L
   }
   //  it should "evolve" in {
   //    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Some(NumberedGeneration(0)))
