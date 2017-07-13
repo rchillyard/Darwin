@@ -49,14 +49,23 @@ class EcologySpec extends FlatSpec with Matchers {
   "apply" should "work" in {
     val height = Characteristic("height")
     val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
-    val elephantGrass = Factor("elephant grass")
-    val ecology: Ecology[Double, Double] = Ecology("test", Map("height" -> elephantGrass), fitnessFunction, adapter)
+    val elephantGrass: Factor = Factor("elephant grass")
+    val factorMap = Map("height" -> elephantGrass)
+    val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
     val adaptatype: Adaptatype[Double] = ecology(phenotype)
     val adaptations = adaptatype.adaptations
     adaptations.size shouldBe 1
-    adaptations.head should matchPattern { case Adaptation(Factor("elephant grass"), _) => }
-    val fitness = adaptations.head.ecoFitness(EcoFactor(elephantGrass, 1.6))
+    val adaptation: Adaptation[Double] = adaptations.head
+    adaptation should matchPattern { case Adaptation(Factor("elephant grass"), _) => }
+    val ff: EcoFactor[Double] => Try[Fitness] = adaptation.ecoFitness
+    val efElephantGrass = EcoFactor(elephantGrass, 1.6)
+    val fitness = ff(efElephantGrass)
     fitness should matchPattern { case Success(Fitness(_)) => }
     fitness.get.x shouldBe 0.0
+    val ecosystem = Map("elephant grass" -> efElephantGrass)
+    val blendedFitness: Try[Fitness] = adaptatype.fitness(ecosystem)
+    blendedFitness should matchPattern { case Success(Fitness(_)) => }
+    blendedFitness.get.x shouldBe 0.0
+
   }
 }

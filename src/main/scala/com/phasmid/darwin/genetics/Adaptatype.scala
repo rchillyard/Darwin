@@ -23,13 +23,29 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.laScala.fp.FP
+
+import scala.util.Try
+
 /**
-  * This class represents the Adaptation of an Organism for an Environment (EcoSystem). The Adaptation is "adapted" from the Phenotype with respect to
-  * an "Ecology"
+  * This class represents the Adaptations of an Organism.
   *
   * Created by scalaprof on 5/9/16.
   */
-case class Adaptatype[X](adaptations: Seq[Adaptation[X]])
+case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) {
+  /**
+    * Method to evaluate and blend the fitness of each adaptation into a single fitness, wrapped in Try
+    *
+    * @param ecology a map of factor keys to EcoFactor instances
+    * @param blend   an (implicit) method to reduce a sequence of Fitness objects into a single Fitness
+    * @return a Fitness, wrapped in Try
+    */
+  def fitness(ecology: Map[String, EcoFactor[X]])(implicit blend: Seq[Fitness] => Fitness): Try[Fitness] = {
+    val ts: Seq[(Adaptation[X], EcoFactor[X])] = for (a <- adaptations; f <- ecology.get(a.factor.name)) yield (a, f)
+    assert(ts.nonEmpty, s"the ecology map did not match any adaptations: map keys: ${ecology.keys}; adaptations: $adaptations")
+    for (fs <- FP.sequence(for ((a, e) <- ts) yield a(e))) yield blend(fs)
+  }
+}
 
 /**
   * This class represents a particular Adaptation of an Organism for an Environment (EcoSystem). The Adaptation is "adapted" from a Trait.
@@ -38,5 +54,10 @@ case class Adaptatype[X](adaptations: Seq[Adaptation[X]])
   *
   * CONSIDER simply extending the fitness function
   */
-case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X])
+case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X]) extends EcoFitness[X] {
+
+  def apply(x: EcoFactor[X]): Try[Fitness] = ecoFitness(x)
+
+  override def toString(): String = s"Adaptation($factor, $ecoFitness)"
+}
 

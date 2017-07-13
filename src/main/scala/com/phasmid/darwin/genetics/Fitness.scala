@@ -23,6 +23,8 @@
 
 package com.phasmid.darwin.genetics
 
+import scala.language.implicitConversions
+
 /**
   * Fitness is a measure of the viability of an organism's phenotype adapting to an environment.
   * It's a Double value and should be in the range 0..1
@@ -48,4 +50,6 @@ case class FunctionShape[T, X](shape: String, f: (T, X) => Fitness)
 object Fitness {
   val delta: FunctionShape[Double, Double] = FunctionShape[Double, Double]("delta", { (t, x) => if (t >= x) Fitness(1) else Fitness(0) })
   val inverseDelta: FunctionShape[Double, Double] = FunctionShape[Double, Double]("delta-inv", { (t, x) => if (t < x) Fitness(1) else Fitness(0) })
+
+  implicit def blendMean(fs: Seq[Fitness]): Fitness = Fitness((fs map (_.x) sum) / fs.length)
 }

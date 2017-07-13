@@ -122,9 +122,7 @@ package object genetics {
 
   /**
     * This function type is the type of a parameter of an Adaptation. In the context of an Adapter, this function
-    * will yield, for a given EcoType, an optional Fitness.
-    *
-    * CONSIDER making the result a Try instead of an Option
+    * will yield, for a given EcoType, its Fitness (wrapped in Try)
     *
     * @tparam EcoType the underlying type of the ecological types such as Environment
     */
