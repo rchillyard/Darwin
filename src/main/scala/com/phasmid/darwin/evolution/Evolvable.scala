@@ -1,6 +1,6 @@
 package com.phasmid.darwin.evolution
 
-import com.phasmid.laScala.RNG
+import com.phasmid.laScala.{RNG, Sequential, Version}
 import com.phasmid.laScala.values.{Incrementable, Rational}
 
 import scala.util.Try
@@ -8,7 +8,7 @@ import scala.util.Try
 /**
   * Created by scalaprof on 7/27/16.
   */
-trait Evolvable[X, Repr] extends Sequential[Repr] {
+trait Evolvable[X, Repr] extends Sequential[Repr] with Ordered[Evolvable[X, Repr]] {
 
   /**
     * TODO make this an implicit function in Evolvable sub-class
@@ -111,7 +111,13 @@ abstract class BaseEvolvable[V: Incrementable, X, Y, Repr](members: Iterable[X],
   def next(isSnapshot: Boolean = false): Try[Repr] = for (v <- version.next(isSnapshot)) yield next(v)
 
 
-  def compare(that: Sequential[Repr]): Int = that match {
+  /**
+    * Method to compare this Evolvable with that Evolvable.
+    *
+    * @param that the Evolvable we want to compare with (must extend BaseEvolvable).
+    * @return the result of comparing this version with that version. All other attributes are ignored.
+    */
+  def compare(that: Evolvable[X, Repr]): Int = that match {
     case e: BaseEvolvable[V, X, Y, Repr] => this.version.compare(e.getVersion)
     case _ => throw EvolutionException(s"cannot compare $that with $this")
   }

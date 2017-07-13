@@ -1,7 +1,7 @@
 package com.phasmid.darwin.evolution
 
 import com.phasmid.laScala.values.Rational
-import com.phasmid.laScala.{LongRNG, RNG, Shuffle}
+import com.phasmid.laScala.{LongRNG, RNG, Shuffle, Version}
 import org.scalatest.{FlatSpec, Inside, Matchers}
 
 /**

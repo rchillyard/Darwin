@@ -1,6 +1,6 @@
 package com.phasmid.darwin.evolution
 
-import com.phasmid.laScala.RNG
+import com.phasmid.laScala.{RNG, Version}
 import com.phasmid.laScala.values.Incrementable
 
 /**
