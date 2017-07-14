@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.eco.Ecology
 import com.phasmid.darwin.genetics._
 
 /**

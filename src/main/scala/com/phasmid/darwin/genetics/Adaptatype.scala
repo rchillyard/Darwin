@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.eco._
 import com.phasmid.laScala.fp.FP
 
 import scala.util.Try
@@ -37,13 +38,12 @@ case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) {
     * Method to evaluate and blend the fitness of each adaptation into a single fitness, wrapped in Try
     *
     * @param ecology a map of factor keys to EcoFactor instances
-    * @param blend   an (implicit) method to reduce a sequence of Fitness objects into a single Fitness
     * @return a Fitness, wrapped in Try
     */
-  def fitness(ecology: Map[String, EcoFactor[X]])(implicit blend: Seq[Fitness] => Fitness): Try[Fitness] = {
-    val ts: Seq[(Adaptation[X], EcoFactor[X])] = for (a <- adaptations; f <- ecology.get(a.factor.name)) yield (a, f)
+  def fitness(ecology: Map[String, EcoFactor[X]]): Try[Fitness] = {
+    val ts = for (a <- adaptations; f <- ecology.get(a.factor.name)) yield (a, f)
     assert(ts.nonEmpty, s"the ecology map did not match any adaptations: map keys: ${ecology.keys}; adaptations: $adaptations")
-    for (fs <- FP.sequence(for ((a, e) <- ts) yield a(e))) yield blend(fs)
+    for (fs <- FP.sequence(for ((a, e) <- ts) yield a(e))) yield Viability(fs)()
   }
 }
 

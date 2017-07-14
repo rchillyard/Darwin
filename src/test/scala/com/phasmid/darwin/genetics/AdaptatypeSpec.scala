@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.eco._
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util._
@@ -30,42 +31,50 @@ import scala.util._
 /**
   * Created by scalaprof on 5/6/16.
   */
-class EcologySpec extends FlatSpec with Matchers {
+class AdaptatypeSpec extends FlatSpec with Matchers {
+
+  private val sElephantGrass = "elephant grass"
+  private val elephantGrass: Factor = Factor(sElephantGrass)
+  private val factorMap = Map("height" -> elephantGrass)
+  private val efElephantGrass = EcoFactor(elephantGrass, 1.6)
+  private val ecosystem = Map("elephant grass" -> efElephantGrass)
 
   val adapter: Adapter[Double, Double] = new AbstractAdapter[Double, Double] {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, FunctionShape[Double, Double])] = f match {
-      case Factor("elephant grass") => t.characteristic.name match {
-        case "height" => Success(t.value, Fitness.inverseDelta)
+      case `elephantGrass` => t.characteristic.name match {
+        case "height" => Success(t.value, FunctionShape.inverseDelta)
         case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
   }
 
   def fitnessFunction(t: Double, functionType: FunctionShape[Double, Double], x: Double): Fitness = functionType match {
-    case FunctionShape(_, f) => f(t, x)
+    case FunctionShape(_, f) => f(x)(t)
     case _ => throw GeneticsException(s"ecoFitness does not implement functionType: $functionType")
   }
 
-  "apply" should "work" in {
+  behavior of "adaptation"
+  it should "yield appropriate fitness" in {
     val height = Characteristic("height")
     val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
-    val elephantGrass: Factor = Factor("elephant grass")
-    val factorMap = Map("height" -> elephantGrass)
     val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
     val adaptatype: Adaptatype[Double] = ecology(phenotype)
     val adaptations = adaptatype.adaptations
-    adaptations.size shouldBe 1
     val adaptation: Adaptation[Double] = adaptations.head
-    adaptation should matchPattern { case Adaptation(Factor("elephant grass"), _) => }
+    adaptation should matchPattern { case Adaptation(`elephantGrass`, _) => }
     val ff: EcoFactor[Double] => Try[Fitness] = adaptation.ecoFitness
-    val efElephantGrass = EcoFactor(elephantGrass, 1.6)
-    val fitness = ff(efElephantGrass)
-    fitness should matchPattern { case Success(Fitness(_)) => }
-    fitness.get.x shouldBe 0.0
-    val ecosystem = Map("elephant grass" -> efElephantGrass)
-    val blendedFitness: Try[Fitness] = adaptatype.fitness(ecosystem)
-    blendedFitness should matchPattern { case Success(Fitness(_)) => }
-    blendedFitness.get.x shouldBe 0.0
-
+    val fy = ff(efElephantGrass)
+    fy should matchPattern { case Success(Fitness(_)) => }
+    fy.get.x shouldBe 0.0
+  }
+  behavior of "adaptatype"
+  it should "yield appropriate fitness" in {
+    val height = Characteristic("height")
+    val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
+    val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
+    val adaptatype: Adaptatype[Double] = ecology(phenotype)
+    val fy: Try[Fitness] = adaptatype.fitness(ecosystem)
+    fy should matchPattern { case Success(Fitness(_)) => }
+    fy.get.x shouldBe 0.0
   }
 }

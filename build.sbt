@@ -18,6 +18,9 @@ libraryDependencies ++= Seq(
 	"com.phasmid" %% "lascala" % "1.0.8-SNAPSHOT",
 //	"org.scala-lang.modules" %% "scala-xml" % "1.0.4",
 //	"org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
+	"com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
+	"com.typesafe.scala-logging" %% "scala-logging" % "3.4.0",
+	"ch.qos.logback" %  "logback-classic" % "1.1.7" % "runtime",
 	"org.scalatest" %% "scalatest" % scalaTestVersion % "test"
 //	akkaGroup %% "akka-actor" % akkaVersion,
 //	"org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1"

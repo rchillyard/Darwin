@@ -21,29 +21,22 @@
  *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.phasmid.darwin.genetics
+package com.phasmid.darwin.eco
 
-import com.phasmid.laScala.fp.FP._
-
+import com.phasmid.darwin.genetics.Identifier
 
 /**
-  * Created by scalaprof on 5/9/16.
+  * An Environment is where the fitness of phenotypes (or organisms) is evaluated to determine viability.
+  * An Environment is essentially the intersection of a number of EcoFactors, for each of which an organism
+  * is evaluated. The fitness of the various eco factors are then combined to generate the overall fitness
+  * for the environment.
+  *
+  * @tparam X underlying type of Environment
+  *
+  *           Created by scalaprof on 5/5/16.
   */
-case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Ecological[T, X] with Identifier {
+case class Environment[X](name: String, factors: EcoFactor[X]) extends Identifier
 
-  /**
-    * The apply method for this Ecology. For each Trait in the given Phenotype, we look up its corresponding Factor
-    * and invoke the Adapter to create an Adaptation.
-    *
-    * Note that if the lookup fails, we simply ignore the trait without warning.
-    *
-    * @param phenotype the phenotype for which we want to measure the adaptation to this ecology
-    * @return an Adaptatype
-    */
-  def apply(phenotype: Phenotype[T]): Adaptatype[X] = {
-    val xats = for (t <- phenotype.traits; f <- factors.get(t.characteristic.name)) yield for (a <- adapter(f, t, fitness)) yield a
-    Adaptatype(sequence(xats).get)
-  }
+case class EcoFactor[X](factor: Factor, x: X) extends Identifier {
+  val name: String = factor.name
 }
-
-case class Factor(name: String) extends Identifier

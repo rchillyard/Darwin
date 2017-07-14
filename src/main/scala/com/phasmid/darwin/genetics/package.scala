@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin
 
+import com.phasmid.darwin.eco.{Factor, FitnessFunction}
 import com.phasmid.darwin.genetics.dna.Base
 
 import scala.util.Try
@@ -108,35 +109,6 @@ package object genetics {
     * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
     */
   type Phenomic[Ploidy, GeneType, TraitType] = Genotype[Ploidy, GeneType] => Phenotype[TraitType]
-
-  /**
-    * No... I think what we want to do is to create another model from the Phenotype: an adaptation.
-    * This adaptation can then be crossed with an Environment to determine the fitness function.
-    *
-    * This type models the evaluation of adaptation for a specific Phenotype in an Environment
-    *
-    * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
-    * @tparam EcoType   the underlying type of the ecological types such as Environment
-    */
-  type Ecological[TraitType, EcoType] = Phenotype[TraitType] => Adaptatype[EcoType]
-
-  /**
-    * This function type is the type of a parameter of an Adaptation. In the context of an Adapter, this function
-    * will yield, for a given EcoType, its Fitness (wrapped in Try)
-    *
-    * @tparam EcoType the underlying type of the ecological types such as Environment
-    */
-  type EcoFitness[EcoType] = EcoFactor[EcoType] => Try[Fitness]
-
-  /**
-    * This function type is the type of a parameter of an Adapter. For a tuple of trait value, function "type", and eco factor value.
-    *
-    * TODO need to rename FunctionShape
-    *
-    * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
-    * @tparam EcoType   the underlying type of the ecological types such as Environment
-    */
-  type FitnessFunction[TraitType, EcoType] = (TraitType, FunctionShape[TraitType, EcoType], EcoType) => Fitness
 
   /**
     * This function type is a mapper between a Characteristic/Allele pair and an (optional) Trait. It is used by implementers
