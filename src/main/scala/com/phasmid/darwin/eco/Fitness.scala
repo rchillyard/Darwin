@@ -78,7 +78,7 @@ class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitnes
   }
 
   override def equals(obj: scala.Any): Boolean = obj match {
-    case Fitness(y) => x == y
+    case Fitness(y) => math.abs(x - y) < 1E-10
     case _ => false
   }
 
@@ -149,13 +149,13 @@ object FunctionShape {
     * Generic method to construct a FunctionShape based on two parametric types: X and T.
     *
     * @param f    a function which, given two Double values, yields a Fitness (examples are Dirac delta function or logistic function)
-    * @param h    a function which, given a Fitness, yields a Fitness (examples are identity and the negation method)
+    * @param g    a function which, given a Fitness, yields a Fitness (examples are identity and the negation method)
     * @param name the name of the shape
     * @tparam X the underlying eco factor type
     * @tparam T the underlying trait type
     * @return FunctionShape object
     */
-  def apply[X: Numeric, T: Numeric](f: (Double, Double) => Fitness, h: Fitness => Fitness, name: String): FunctionShape[X, T] = FunctionShape[X, T](name, { x: X => t: T => h(f(implicitly[Numeric[T]].toDouble(t), implicitly[Numeric[X]].toDouble(x))) })
+  def apply[X: Numeric, T: Numeric](f: (Double, Double) => Fitness, g: Fitness => Fitness, name: String): FunctionShape[X, T] = FunctionShape[X, T](name, { x: X => t: T => g(f(implicitly[Numeric[T]].toDouble(t), implicitly[Numeric[X]].toDouble(x))) })
 
   /**
     * Following are the "usual" four shape functions: Dirac and Logistic (regular and inverted).
