@@ -86,15 +86,17 @@ class FitnessSpec extends FlatSpec with Matchers {
 
   behavior of "FunctionShape"
   it should "have correct shape names" in {
-    FunctionShape.delta.shape shouldBe "delta"
-    FunctionShape.inverseDelta.shape shouldBe "delta-inv"
-    FunctionShape.logistic.shape shouldBe "logistic"
-    FunctionShape.inverseLogistic.shape shouldBe "logistic-inv"
+    FunctionShape.shapeDirac.shape shouldBe "shapeDirac"
+    FunctionShape.shapeDiracInv.shape shouldBe "shapeDirac-i"
+    FunctionShape.shapeLogistic.shape shouldBe "shapeLogistic"
+    FunctionShape.shapeLogisticInv.shape shouldBe "shapeLogistic-i"
   }
   it should "have correct function operation" in {
-    FunctionShape.deltaInt.f(0)(1.0) shouldBe viable
-    FunctionShape.inverseDeltaInt.f(0)(1.0) shouldBe nonViable
-    FunctionShape.logisticInt.f(1)(2.0) === 0.7310585786300049 +- 1E-13
-    FunctionShape.inverseLogisticInt.f(1)(2.0) === 0.2689414213699951 +- 1E-13
+    val x = 1
+    val t = 2.0
+    FunctionShape.shapeDirac_I.f(x)(t) shouldBe viable
+    FunctionShape.shapeDiracInv_I.f(x)(t) shouldBe nonViable
+    FunctionShape.shapeLogistic_I.f(x)(t) === 0.7310585786300049 +- 1E-13
+    FunctionShape.shapeLogisticInv_I.f(x)(t) === 0.2689414213699951 +- 1E-13
   }
 }

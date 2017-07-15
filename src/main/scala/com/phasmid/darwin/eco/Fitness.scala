@@ -41,7 +41,7 @@ package com.phasmid.darwin.eco
   *
   * Created by scalaprof on 5/5/16.
   */
-class Fitness private(val x: Double) extends (() => Double) {
+class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitness] {
 
   /**
     * Method to yield the underlying value of this Fitness as a Double
@@ -86,6 +86,7 @@ class Fitness private(val x: Double) extends (() => Double) {
 
   override def toString(): String = s"Fitness($x)"
 
+  def compare(f1: Fitness, f2: Fitness): Int = f1.x compareTo f2.x
 }
 
 case class Viability(fs: Seq[Fitness]) extends (() => Fitness) {
@@ -141,21 +142,59 @@ object Fitness {
 object FunctionShape {
 
   import Fitness.{nonViable, viable}
-  //  implicit val spyLogger = Spy.getLogger(getClass)
-  // TODO make these more generic
+
+  import Numeric.IntIsIntegral
+
   /**
-    * Delta function: if x >= t then viable else nonViable
+    * Generic method to construct a FunctionShape based on two parametric types: X and T.
+    *
+    * @param f    a function which, given two Double values, yields a Fitness (examples are Dirac delta function or logistic function)
+    * @param h    a function which, given a Fitness, yields a Fitness (examples are identity and the negation method)
+    * @param name the name of the shape
+    * @tparam X the underlying eco factor type
+    * @tparam T the underlying trait type
+    * @return FunctionShape object
     */
-  val delta: FunctionShape[Double, Double] = FunctionShape[Double, Double]("delta", { x => t => if (t >= x) viable else nonViable })
-  val inverseDelta: FunctionShape[Double, Double] = FunctionShape[Double, Double]("delta-inv", { x => t => if (t < x) viable else nonViable })
-  val logistic: FunctionShape[Double, Double] = FunctionShape[Double, Double]("logistic", { x => t => Fitness(fLogistic(t - x)) })
-  val inverseLogistic: FunctionShape[Double, Double] = FunctionShape[Double, Double]("logistic-inv", { x => t => Fitness(fLogistic(x - t)) })
+  def apply[X: Numeric, T: Numeric](f: (Double, Double) => Fitness, h: Fitness => Fitness, name: String): FunctionShape[X, T] = FunctionShape[X, T](name, { x: X => t: T => h(f(implicitly[Numeric[T]].toDouble(t), implicitly[Numeric[X]].toDouble(x))) })
 
-  val deltaInt: FunctionShape[Int, Double] = FunctionShape[Int, Double]("delta-I", { x => t => if (t >= x) viable else nonViable })
-  val inverseDeltaInt: FunctionShape[Int, Double] = FunctionShape[Int, Double]("delta-inv-I", { x => t => if (t < x) viable else nonViable })
-  val logisticInt: FunctionShape[Int, Double] = FunctionShape[Int, Double]("logistic-I", { x => t => Fitness(fLogistic(t - x)) })
-  val inverseLogisticInt: FunctionShape[Int, Double] = FunctionShape[Int, Double]("logistic-inv-I", { x => t => Fitness(fLogistic(x - t)) })
+  /**
+    * Following are the "usual" four shape functions: Dirac and Logistic (regular and inverted).
+    * They are "usual" because the FunctionShape is based on Double, Double.
+    * If you need other shapes, simply build a FunctionShape in a similar manner to here.
+    */
+  val shapeDirac: FunctionShape[Double, Double] = FunctionShape(dirac, identity, "shapeDirac")
+  val shapeDiracInv: FunctionShape[Double, Double] = FunctionShape(dirac, _.-, "shapeDirac-i")
+  val shapeLogistic: FunctionShape[Double, Double] = FunctionShape(logistic, identity, "shapeLogistic")
+  val shapeLogisticInv: FunctionShape[Double, Double] = FunctionShape(logistic, _.-, "shapeLogistic-i")
 
-  private def fLogistic(x: Double): Double = 1 / (1 + math.exp(-x))
+  /**
+    * Following are the Int/Double values of the four shape functions: Dirac and Logistic (regular and inverted).
+    */
+  val shapeDirac_I: FunctionShape[Int, Double] = FunctionShape(dirac, identity, "shapeDirac")
+  val shapeDiracInv_I: FunctionShape[Int, Double] = FunctionShape(dirac, _.-, "shapeDirac-i")
+  val shapeLogistic_I: FunctionShape[Int, Double] = FunctionShape(logistic, identity, "shapeLogistic")
+  val shapeLogisticInv_I: FunctionShape[Int, Double] = FunctionShape(logistic, _.-, "shapeLogistic-i")
+
+  /**
+    * Method to compare x1 with x2 and determine viability.
+    * The shape of this function is a Dirac "delta" function.
+    *
+    * @param x1 the first parameter
+    * @param x2 the second parameter
+    * @return viable if x1>=x2 otherwise, nonViable
+    */
+  def dirac(x1: Double, x2: Double): Fitness = if (x1 >= x2) viable else nonViable
+
+  /**
+    * Method to compare x1 with x2 using a shapeLogistic function.
+    * The shape of this function is a sigmoid function.
+    *
+    * @param x1 the first parameter
+    * @param x2 the second parameter
+    * @return approximately 1 if x1 >> x2, approximately 0 if x1 << x2, and exactly 1/2 if x1--x2
+    */
+  def logistic(x1: Double, x2: Double): Fitness = Fitness(logistic(x1 - x2))
+
+  private def logistic(x: Double): Double = 1 / (1 + math.exp(-x))
 
 }

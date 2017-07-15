@@ -40,7 +40,7 @@ class EcologySpec extends FlatSpec with Matchers {
   val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int] {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, FunctionShape[Int, Double])] = f match {
       case `elephantGrass` => t.characteristic.name match {
-        case "height" => Success((t.value, FunctionShape.inverseDeltaInt))
+        case "height" => Success((t.value, FunctionShape.shapeDiracInv_I))
         case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }

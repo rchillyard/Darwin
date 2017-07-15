@@ -42,7 +42,7 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
   val adapter: Adapter[Double, Double] = new AbstractAdapter[Double, Double] {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, FunctionShape[Double, Double])] = f match {
       case `elephantGrass` => t.characteristic.name match {
-        case "height" => Success(t.value, FunctionShape.inverseDelta)
+        case "height" => Success(t.value, FunctionShape.shapeDiracInv)
         case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
