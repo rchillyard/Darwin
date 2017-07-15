@@ -85,6 +85,8 @@ class FitnessSpec extends FlatSpec with Matchers {
   }
 
   behavior of "FunctionShape"
+  private val logistic1 = 0.7310585786300049
+  private val logistic_1 = 0.2689414213699951
   it should "have correct shape names" in {
     FunctionShape.shapeDirac.shape shouldBe "shapeDirac"
     FunctionShape.shapeDiracInv.shape shouldBe "shapeDirac-i"
@@ -96,23 +98,36 @@ class FitnessSpec extends FlatSpec with Matchers {
     FunctionShape.dirac(0, 0) shouldBe viable
     FunctionShape.dirac(0, 1) shouldBe nonViable
   }
-  it should "implement Logistic properly" in {
-    FunctionShape.logistic(100, 0) shouldBe viable
-    FunctionShape.logistic(10, 0)() should ===(0.9999546021312976 +- 1E-13)
-    FunctionShape.logistic(2, 0)() should ===(0.8807970779778823 +- 1E-13)
-    FunctionShape.logistic(1, 0)() should ===(0.7310585786300049 +- 1E-13)
-    FunctionShape.logistic(0, 1)() should ===(0.2689414213699951 +- 1E-13)
-    FunctionShape.logistic(0, 2)() should ===(0.11920292202211755 +- 1E-13)
-    FunctionShape.logistic(0, 10)() should ===(4.5397868702434395E-5 +- 1E-20)
-    FunctionShape.logistic(0, 100) shouldBe nonViable
-    FunctionShape.logistic(0, 0) shouldBe tossup
+  it should "implement Logistic properly with unit k" in {
+    val k = 1.0
+    FunctionShape.logistic(k)(100, 0) shouldBe viable
+    FunctionShape.logistic(k)(10, 0)() should ===(0.9999546021312976 +- 1E-13)
+    FunctionShape.logistic(k)(2, 0)() should ===(0.8807970779778823 +- 1E-13)
+    FunctionShape.logistic(k)(1, 0)() should ===(logistic1 +- 1E-13)
+    FunctionShape.logistic(k)(0, 1)() should ===(logistic_1 +- 1E-13)
+    FunctionShape.logistic(k)(0, 2)() should ===(0.11920292202211755 +- 1E-13)
+    FunctionShape.logistic(k)(0, 10)() should ===(4.5397868702434395E-5 +- 1E-20)
+    FunctionShape.logistic(k)(0, 100) shouldBe nonViable
+    FunctionShape.logistic(k)(0, 0) shouldBe tossup
+  }
+  it should "implement Logistic properly with k" in {
+    val k = 2.0
+    FunctionShape.logistic(k)(100, 0) shouldBe viable
+    FunctionShape.logistic(k)(10, 0)() should ===(0.9933071490757153 +- 1E-13)
+    FunctionShape.logistic(k)(2, 0)() should ===(logistic1 +- 1E-13)
+    FunctionShape.logistic(k)(1, 0)() should ===(0.6224593312018546 +- 1E-13)
+    FunctionShape.logistic(k)(0, 1)() should ===(0.3775406687981454 +- 1E-13)
+    FunctionShape.logistic(k)(0, 2)() should ===(logistic_1 +- 1E-13)
+    FunctionShape.logistic(k)(0, 10)() should ===(0.0066928509242848554 +- 1E-20)
+    FunctionShape.logistic(k)(0, 100) shouldBe nonViable
+    FunctionShape.logistic(k)(0, 0) shouldBe tossup
   }
   it should "have correct function operation" in {
     val x = 1
     val t = 2.0
     FunctionShape.shapeDirac_I.f(x)(t) shouldBe viable
     FunctionShape.shapeDiracInv_I.f(x)(t) shouldBe nonViable
-    FunctionShape.shapeLogistic_I.f(x)(t)() should ===(0.7310585786300049 +- 1E-13)
-    FunctionShape.shapeLogisticInv_I.f(x)(t)() should ===(0.2689414213699951 +- 1E-13)
+    FunctionShape.shapeLogistic_I.f(x)(t)() should ===(logistic1 +- 1E-13)
+    FunctionShape.shapeLogisticInv_I.f(x)(t)() should ===(logistic_1 +- 1E-13)
   }
 }
