@@ -89,6 +89,19 @@ class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitnes
   def compare(f1: Fitness, f2: Fitness): Int = f1.x compareTo f2.x
 }
 
+/**
+  * Viability represents overall fitness when there are many individual fitness values for an Adaptatype.
+  * As discussed above, the basic model is that combined fitness is the product of each individual fitness.
+  * Thus viability is could be defined simply as the product of each fitness.
+  * Yet, this may result in some very small fitness values when an Adaptatype has many adaptations.
+  * Thus it is generally better to use the geometric mean, by taking the nth-root of the product.
+  *
+  * CONSIDER We could allow some variation on this theme by using implicits.
+  * However, in this particular situation, it's quite tricky because the Fitness and Viability both extend no-param
+  * functions which yield a result. The use of apply makes it very difficult to implement an implicit mechanism.
+  *
+  * @param fs a sequence of Fitness values
+  */
 case class Viability(fs: Seq[Fitness]) extends (() => Fitness) {
 
   /**
@@ -102,15 +115,17 @@ case class Viability(fs: Seq[Fitness]) extends (() => Fitness) {
   /**
     * Method to yield a Fitness value
     *
-    * @return the Fitness value which corresponds to applying all Fitness values together
+    * @return the Fitness value which corresponds to the geometric mean of all Fitness values.
     */
-  def apply: Fitness = fs.foldLeft(Fitness.viable)(_ & _)
+  def apply: Fitness = Viability.geometricMean(fs)
 
   override def toString(): String = s"Viability($fs)"
 }
 
 object Viability {
   def create(fs: Fitness*): Viability = Viability(fs)
+
+  private def geometricMean(fs: Seq[Fitness]) = Fitness(math.exp(math.log(fs.foldLeft(Fitness.viable)(_ & _)()) / fs.length))
 }
 
 /**
