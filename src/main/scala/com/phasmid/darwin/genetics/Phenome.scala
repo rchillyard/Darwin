@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.Identifier
 import com.phasmid.laScala.fp.FP._
 
 import scala.util.Try

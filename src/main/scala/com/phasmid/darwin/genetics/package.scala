@@ -23,7 +23,6 @@
 
 package com.phasmid.darwin
 
-import com.phasmid.darwin.eco.{Factor, FitnessFunction}
 import com.phasmid.darwin.genetics.dna.Base
 
 import scala.util.Try
@@ -38,15 +37,10 @@ import scala.util.Try
   * <dt>Genotype</dt>
   * <dd>This is the set of an organism's "genes" which are transcribed from the Sequences.</dd>
   * </dl>
+  *
   * Created by scalaprof on 5/5/16.
   */
 package object genetics {
-
-  trait Identifier {
-    def name: String
-
-    override def toString: String = name
-  }
 
   /**
     * The cardinality of this set is the same as the ploidy for the Genome that transcribes it.
@@ -141,11 +135,4 @@ package object genetics {
     */
   type ExpresserFunction[Ploidy, GeneType, TraitType] = (Characteristic, Gene[Ploidy, GeneType]) => Try[Trait[TraitType]]
 
-  /**
-    * This function type is the basis of the success of traits into adaptations. [Yes, I know this needs a better explanation].
-    *
-    * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
-    * @tparam EcoType   the underlying type of the ecological types such as Environment
-    */
-  type AdapterFunction[TraitType, EcoType] = (Factor, Trait[TraitType], FitnessFunction[TraitType, EcoType]) => Try[Adaptation[EcoType]]
 }

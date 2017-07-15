@@ -88,10 +88,10 @@ class FitnessSpec extends FlatSpec with Matchers {
   private val logistic1 = 0.7310585786300049
   private val logistic_1 = 0.2689414213699951
   it should "have correct shape names" in {
-    FunctionShape.shapeDirac.shape shouldBe "shapeDirac"
-    FunctionShape.shapeDiracInv.shape shouldBe "shapeDirac-i"
-    FunctionShape.shapeLogistic.shape shouldBe "shapeLogistic"
-    FunctionShape.shapeLogisticInv.shape shouldBe "shapeLogistic-i"
+    FunctionShape.shapeDirac.name shouldBe "shapeDirac"
+    FunctionShape.shapeDiracInv.name shouldBe "shapeDirac-i"
+    FunctionShape.shapeLogistic.name shouldBe "shapeLogistic"
+    FunctionShape.shapeLogisticInv.name shouldBe "shapeLogistic-i"
   }
   it should "implement Dirac properly" in {
     FunctionShape.dirac(1, 0) shouldBe viable

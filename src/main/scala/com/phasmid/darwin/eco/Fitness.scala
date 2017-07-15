@@ -23,6 +23,8 @@
 
 package com.phasmid.darwin.eco
 
+import com.phasmid.darwin.Identifier
+
 /**
   * Class to define the concept of Fitness.
   * Note that we do not make it a case class because we want to distinguish between creating new
@@ -134,12 +136,12 @@ object Viability {
   * against the eco value (x).
   * For the delta function, for instance, if t>x, then viable, otherwise nonViable.
   *
-  * @param shape the shape of the function
-  * @param f     the (T,X)=>Fitness
+  * @param name the name of the shape function
+  * @param f    the (T,X)=>Fitness
   * @tparam T the underlying type of the trait
   * @tparam X the underlying type of the ecofactor
   */
-case class FunctionShape[X, T](shape: String, f: X => T => Fitness)
+case class FunctionShape[X, T](name: String, f: X => T => Fitness) extends Identifier
 
 object Fitness {
   val viable: Fitness = new Fitness(1)

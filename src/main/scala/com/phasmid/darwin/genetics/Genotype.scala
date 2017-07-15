@@ -23,6 +23,8 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.Identifier
+
 /**
   * This class represents a genotype: the genes of a particular organism.
   *

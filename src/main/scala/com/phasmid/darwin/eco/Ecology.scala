@@ -24,6 +24,7 @@
 package com.phasmid.darwin.eco
 
 import com.phasmid.darwin.genetics._
+import com.phasmid.darwin.{Ecological, Identifier}
 import com.phasmid.laScala.fp.FP.sequence
 
 /**

@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.AdapterFunction
 import com.phasmid.darwin.eco._
 
 import scala.util.{Failure, Success, Try}

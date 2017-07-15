@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.genetics.Identifier
+import com.phasmid.darwin.Identifier
 
 /**
   * An Environment is where the fitness of phenotypes (or organisms) is evaluated to determine viability.

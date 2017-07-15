@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics.dna
 
-import com.phasmid.darwin.genetics.Identifier
+import com.phasmid.darwin.Identifier
 
 import scala.language.implicitConversions
 
