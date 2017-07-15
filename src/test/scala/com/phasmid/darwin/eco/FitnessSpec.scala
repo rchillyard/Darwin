@@ -82,6 +82,7 @@ class FitnessSpec extends FlatSpec with Matchers {
     Viability(Seq(viable, nonViable))()() shouldBe 0
     Viability(Seq(tossup, viable))()() should ===(0.7071067811865476 +- 1E-10)
     Viability(Seq(tossup, tossup))()() should ===(0.5 +- 1E-10)
+    Viability(Seq())() shouldBe viable
   }
 
   behavior of "FunctionShape"

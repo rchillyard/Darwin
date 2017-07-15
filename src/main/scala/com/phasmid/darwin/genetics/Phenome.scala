@@ -24,6 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.Identifier
+import com.phasmid.darwin.eco.{Fitness, Viability}
 import com.phasmid.laScala.fp.FP._
 
 import scala.util.Try
@@ -46,7 +47,7 @@ import scala.util.Try
   * @tparam G the underlying Gene value type, typically String
   * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
   */
-case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T]) extends Phenomic[P, G, T] with Identifier {
+case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T], attraction: (Trait[T], Trait[T]) => Fitness) extends Phenomic[P, G, T] with Identifier {
   /**
     * Method to express a Genotype with respect to this Phenome.
     * Note that if a Locus doesn't have a mapping in the characteristics map, we currently ignore it.
@@ -60,11 +61,26 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     val ttts: Seq[Try[Trait[T]]] = for (g <- genotype.genes; c <- characteristics.get(g.locus)) yield for (t <- expresser(c, g)) yield t
     Phenotype(sequence(ttts).get)
   }
+
+  /**
+    * Method to yield for two potential mates, the observer and her (usually her) observed candidate, the fitness of
+    * the match to produce a viable offspring. Thus we combine the attractiveness of observed to observer
+    * and also their genetic compatibility.
+    *
+    * @param observer the observer's Phenotype
+    * @param observed the observed's Phenotype
+    * @return the Fitness of the match
+    */
+  def attractiveness(observer: Phenotype[T], observed: Phenotype[T]): Fitness = {
+    val tts: Seq[(Trait[T], Trait[T])] = for (t1 <- observer.traits; t2 <- observed.traits; if t1.isSexuallySelective; if t2.isSexuallySelective) yield (t1, t2)
+    Viability(for ((t1, t2) <- tts) yield attraction(t1, t2))()
+  }
 }
 
 /**
   * This class defines a Characteristic, that's to say the "type" or "domain" of a Trait.
   *
-  * @param name the identifier of this Characteristic
+  * @param name                the identifier of this Characteristic
+  * @param isSexuallySelective (defaults to false) true if this characteristic is observable as a sexually selective trait
   */
-case class Characteristic(name: String) extends Identifier
+case class Characteristic(name: String, isSexuallySelective: Boolean = false) extends Identifier

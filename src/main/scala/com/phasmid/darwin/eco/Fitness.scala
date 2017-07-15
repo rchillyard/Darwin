@@ -26,11 +26,13 @@ package com.phasmid.darwin.eco
 import com.phasmid.darwin.Identifier
 
 /**
-  * Class to define the concept of Fitness.
+  * Class to define the concept of Fitness. Fitness applies in each of the two aspects of evolution:
+  * Survival of the Fittest and Sexual Selection.
+  *
   * Note that we do not make it a case class because we want to distinguish between creating new
   * instances of Fitness with/without checking the requirement.
   *
-  * Fitness is a measure of the viability of an organism's phenotype adapting to an environment.
+  * In Survival, fitness is a measure of the viability of an organism's phenotype adapting to an environment.
   * It's a Double value and should be in the range 0..1
   *
   * If a Fitness value is f, then the likelihood of an organism surviving one generation is f,
@@ -40,6 +42,8 @@ import com.phasmid.darwin.Identifier
   * is P(f1, f2, ..., fN) where P stands for the product.
   *
   * NOTE: this behavior is encoded in the & operator.
+  *
+  * In Sexual Selection, fitness is a measure of the probability of a mate being chosen from amongst other potential mates.
   *
   * Created by scalaprof on 5/5/16.
   */
@@ -98,6 +102,11 @@ class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitnes
   * Yet, this may result in some very small fitness values when an Adaptatype has many adaptations.
   * Thus it is generally better to use the geometric mean, by taking the nth-root of the product.
   *
+  * Viability can also be used in the case where there is more than one sexually-selective trait. However,
+  * in most simple systems, we typically stick to one such trait and thus Viability in that context will be
+  * based on one Fitness only. You can think of it then as the Viability of a pair as mates capable of producing live offspring.
+  * The probability of their progeny surviving is covered by environmental (survival) Fitness.
+  *
   * CONSIDER We could allow some variation on this theme by using implicits.
   * However, in this particular situation, it's quite tricky because the Fitness and Viability both extend no-param
   * functions which yield a result. The use of apply makes it very difficult to implement an implicit mechanism.
@@ -115,7 +124,8 @@ case class Viability(fs: Seq[Fitness]) extends (() => Fitness) {
   def +(f: Fitness) = Viability(fs :+ f)
 
   /**
-    * Method to yield a Fitness value
+    * Method to yield a Fitness value.
+    * If the Viability is empty, then we assume a perfectly fit (viable) result.
     *
     * @return the Fitness value which corresponds to the geometric mean of all Fitness values.
     */
@@ -127,7 +137,8 @@ case class Viability(fs: Seq[Fitness]) extends (() => Fitness) {
 object Viability {
   def create(fs: Fitness*): Viability = Viability(fs)
 
-  private def geometricMean(fs: Seq[Fitness]) = Fitness(math.exp(math.log(fs.foldLeft(Fitness.viable)(_ & _)()) / fs.length))
+  private def geometricMean(fs: Seq[Fitness]) = if (fs.isEmpty) Fitness.viable
+  else Fitness(math.exp(math.log(fs.foldLeft(Fitness.viable)(_ & _)()) / fs.length))
 }
 
 /**

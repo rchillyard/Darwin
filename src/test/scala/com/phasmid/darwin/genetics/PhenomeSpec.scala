@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.eco.Fitness
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util._
@@ -48,12 +49,25 @@ class PhenomeSpec extends FlatSpec with Matchers {
 
   val expresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](traitMapper)
 
-  "apply" should "work" in {
+  def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
+
+  behavior of "apply"
+  it should "work" in {
     val genotype = Genotype(Seq(gene1, gene2))
-    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locus1 -> height, locus2 -> girth), expresser)
+    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locus1 -> height, locus2 -> girth), expresser, attraction)
     val phenotype = phenome(genotype)
     phenotype.traits.length shouldBe 2
     phenotype.traits.head shouldBe Trait[Double](height, 1.6)
     phenotype.traits.tail.head shouldBe Trait[Double](height, 1.2)
+  }
+
+  behavior of ""
+  it should "work" in {
+    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locus1 -> height, locus2 -> girth), expresser, attraction)
+    val genotype1 = Genotype(Seq(gene1, gene2))
+    val genotype2 = Genotype(Seq(gene2, gene1))
+    val phenotype1 = phenome(genotype1)
+    val phenotype2 = phenome(genotype2)
+    phenome.attractiveness(phenotype1, phenotype2) shouldBe Fitness.viable
   }
 }

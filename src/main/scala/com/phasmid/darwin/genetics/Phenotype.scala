@@ -40,4 +40,6 @@ case class Phenotype[T](traits: Seq[Trait[T]])
   * @param value          the T value of this Trait
   * @tparam T the underlying type of the Trait
   */
-case class Trait[T](characteristic: Characteristic, value: T)
+case class Trait[T](characteristic: Characteristic, value: T) {
+  def isSexuallySelective: Boolean = characteristic.isSexuallySelective
+}

@@ -44,7 +44,6 @@ class EcologySpec extends FlatSpec with Matchers {
         case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
-
   }
 
   val ff: (Double, FunctionShape[Int, Double], Int) => Fitness = {
