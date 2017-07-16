@@ -41,7 +41,7 @@ class GeneSpec extends FlatSpec with Matchers {
 
     val name: String = location.name
 
-    override def distinct: Product = alleles._1
+    override def distinct: Seq[Allele[String]] = Seq(alleles._1)
 
     override def locus: Locus[String] = UnknownLocus(Location("test", 0, 0))
   }

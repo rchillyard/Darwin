@@ -44,7 +44,7 @@ class ExpresserSpec extends FlatSpec with Matchers {
 
       override def apply(b: Boolean): Allele[String] = if (b) Allele("T") else Allele("S")
 
-      override def distinct: Product = Allele("T")
+      override def distinct: Seq[Allele[String]] = Seq(Allele("T"))
 
       override def toString = s"gene $name at $locus with alleles: ${apply(true)} and ${apply(false)} and distinct: $distinct"
     }
@@ -64,7 +64,7 @@ class ExpresserSpec extends FlatSpec with Matchers {
     val ts = Set(Allele("T"), Allele("S"))
     val pq = Set(Allele("P"), Allele("Q"))
     val locus1 = PlainLocus(Location("height", 0, 0), ts, Some(Allele("S")))
-    val locus2 = PlainLocus(Location("girth", 0, 0), pq, Some(Allele("P")))
+    //    val locus2 = PlainLocus(Location("girth", 0, 0), pq, Some(Allele("P")))
     val gene1 = MendelianGene[Boolean, String](locus1, Seq(Allele("T"), Allele("S")))
     val girth = Characteristic("girth")
     val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
