@@ -72,7 +72,7 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     * @return the Fitness of the match
     */
   def attractiveness(observer: Phenotype[T], observed: Phenotype[T]): Fitness = {
-    val tts: Seq[(Trait[T], Trait[T])] = for (t1 <- observer.traits; t2 <- observed.traits; if t1.isSexuallySelective; if t2.isSexuallySelective) yield (t1, t2)
+    val tts: Seq[(Trait[T], Trait[T])] = for (t1 <- observer.traits; t2 <- observed.traits; if t1.isSexuallySelective && t2.isSexuallySelective) yield (t1, t2)
     Viability(for ((t1, t2) <- tts) yield attraction(t1, t2))()
   }
 }

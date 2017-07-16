@@ -111,7 +111,7 @@ class FitnessSpec extends FlatSpec with Matchers {
     FunctionShape.logistic(k)(0, 100) shouldBe nonViable
     FunctionShape.logistic(k)(0, 0) shouldBe tossup
   }
-  it should "implement Logistic properly with k" in {
+  it should "implement Logistic properly with k = 2" in {
     val k = 2.0
     FunctionShape.logistic(k)(100, 0) shouldBe viable
     FunctionShape.logistic(k)(10, 0)() should ===(0.9933071490757153 +- 1E-13)
@@ -121,6 +121,20 @@ class FitnessSpec extends FlatSpec with Matchers {
     FunctionShape.logistic(k)(0, 2)() should ===(logistic_1 +- 1E-13)
     FunctionShape.logistic(k)(0, 10)() should ===(0.0066928509242848554 +- 1E-20)
     FunctionShape.logistic(k)(0, 100) shouldBe nonViable
+    FunctionShape.logistic(k)(0, 0) shouldBe tossup
+  }
+  it should "implement Logistic properly with k = 0" in {
+    val k = 0.0
+    FunctionShape.logistic(k)(100, 0) shouldBe viable
+    FunctionShape.logistic(k)(1, 0) shouldBe viable
+    FunctionShape.logistic(k)(0, 1) shouldBe nonViable
+    FunctionShape.logistic(k)(0, 100) shouldBe nonViable
+    a[IllegalArgumentException] shouldBe thrownBy(FunctionShape.logistic(k)(0, 0))
+  }
+  it should "implement Logistic properly with k = +infinity" in {
+    val k = Double.PositiveInfinity
+    FunctionShape.logistic(k)(100, 0) shouldBe tossup
+    FunctionShape.logistic(k)(0, 100) shouldBe tossup
     FunctionShape.logistic(k)(0, 0) shouldBe tossup
   }
   it should "have correct function operation" in {

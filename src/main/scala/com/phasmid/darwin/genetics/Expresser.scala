@@ -59,8 +59,10 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
 
     gene.distinct match {
       // XXX it would be nice to avoid these instanceOf operators. Maybe we should give up on Product and just use Seq
-      case Product1(x) => x.asInstanceOf[Allele[G]]
-      case Product2(x, y) => val a = x.asInstanceOf[Allele[G]]; if (isDominant(a)) a else y.asInstanceOf[Allele[G]]
+      case Tuple1(x) => x.asInstanceOf[Allele[G]]
+      // TODO if not dominant then surely we should pick one??
+      case Tuple2(x, y) => val a = x.asInstanceOf[Allele[G]]; if (isDominant(a)) a else y.asInstanceOf[Allele[G]]
+      case Tuple3(_, _, _) => throw GeneticsException(s"Mendelian don't currently handle three-allele genes: $gene")
       case _ => throw GeneticsException(s"Mendelian logic problem with gene $gene")
     }
   }

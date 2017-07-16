@@ -135,7 +135,7 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
   def distinct: Product = {
     val x = as.distinct
     x.length match {
-      case 1 => x.head
+      case 1 => Tuple1(x.head)
       case 2 => (x.head, x.tail.head)
       case 3 => (x.head, x.tail.head, x.tail.tail.head)
       case _ => throw GeneticsException(s"unsupported number of distinct alleles: $x")

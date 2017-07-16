@@ -190,14 +190,19 @@ object FunctionShape {
     *
     * @param f    a function which, given two Double values, yields a Fitness (examples are Dirac delta function or logistic function)
     * @param g    a function which, given a Fitness, yields a Fitness (examples are identity and the negation method)
+    * @param k    the constant which, applied to a sigmoid function (such as logistic), varies its shape -- a value of zero would result in
+    *             the Dirac delta function; a value of +infinity would result in half for all inputs (i.e. no discrimination).
     * @param name the name of the shape
-    * @param k    the constant which, applied to a sigmoid function (such as logistic), varies its shape -- a value of infinity would result in
-    *             the Dirac delta function; a value of zero would result in zero for all inputs.
     * @tparam X the underlying eco factor type
     * @tparam T the underlying trait type
     * @return FunctionShape object
     */
   def apply[X: Numeric, T: Numeric](f: Double => (Double, Double) => Fitness, g: Fitness => Fitness, k: Double, name: String): FunctionShape[X, T] = FunctionShape[X, T](name, { x: X => t: T => g(f(k)(implicitly[Numeric[T]].toDouble(t), implicitly[Numeric[X]].toDouble(x))) })
+
+  /**
+    * This is the standard value for the logistic function.
+    */
+  val k = 1
 
   /**
     * Following are the "usual" four shape functions: Dirac and Logistic (regular and inverted).
@@ -206,16 +211,16 @@ object FunctionShape {
     */
   val shapeDirac: FunctionShape[Double, Double] = FunctionShape(dirac, identity, "shapeDirac")
   val shapeDiracInv: FunctionShape[Double, Double] = FunctionShape(dirac, _.-, "shapeDirac-i")
-  val shapeLogistic: FunctionShape[Double, Double] = FunctionShape(logistic, identity, 1, "shapeLogistic")
-  val shapeLogisticInv: FunctionShape[Double, Double] = FunctionShape(logistic, _.-, 1, "shapeLogistic-i")
+  val shapeLogistic: FunctionShape[Double, Double] = FunctionShape(logistic, identity, k, "shapeLogistic")
+  val shapeLogisticInv: FunctionShape[Double, Double] = FunctionShape(logistic, _.-, k, "shapeLogistic-i")
 
   /**
     * Following are the Int/Double values of the four shape functions: Dirac and Logistic (regular and inverted).
     */
   val shapeDirac_I: FunctionShape[Int, Double] = FunctionShape(dirac, identity, "shapeDirac")
   val shapeDiracInv_I: FunctionShape[Int, Double] = FunctionShape(dirac, _.-, "shapeDirac-i")
-  val shapeLogistic_I: FunctionShape[Int, Double] = FunctionShape(logistic, identity, 1, "shapeLogistic")
-  val shapeLogisticInv_I: FunctionShape[Int, Double] = FunctionShape(logistic, _.-, 1, "shapeLogistic-i")
+  val shapeLogistic_I: FunctionShape[Int, Double] = FunctionShape(logistic, identity, k, "shapeLogistic")
+  val shapeLogisticInv_I: FunctionShape[Int, Double] = FunctionShape(logistic, _.-, k, "shapeLogistic-i")
 
   /**
     * Method to compare x1 with x2 and determine viability.
@@ -231,6 +236,9 @@ object FunctionShape {
     * Method to compare x1 with x2 using a shapeLogistic function.
     * The shape of this function is a sigmoid function.
     *
+    * @param k  the scale factor for the logistic function: if k = 1, we get the "standard" logistic function;
+    *           if k = +infinity, then all results would be essentially one half, if k = 0, the logistic function behaves
+    *           identically with the dirac function.
     * @param x1 the first parameter
     * @param x2 the second parameter
     * @return approximately 1 if x1 >> x2, approximately 0 if x1 << x2, and exactly 1/2 if x1--x2

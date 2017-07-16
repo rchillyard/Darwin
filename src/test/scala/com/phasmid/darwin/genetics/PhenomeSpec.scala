@@ -23,7 +23,8 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.eco.Fitness
+import com.phasmid.darwin.eco.FunctionShape.logistic
+import com.phasmid.darwin.eco.{Fitness, FunctionShape}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util._
@@ -35,39 +36,68 @@ class PhenomeSpec extends FlatSpec with Matchers {
 
   val ts = Set(Allele("T"), Allele("S"))
   val pq = Set(Allele("P"), Allele("Q"))
-  val locus1 = PlainLocus(Location("height", 0, 0), ts, Some(Allele("S")))
-  val locus2 = PlainLocus(Location("girth", 1, 0), pq, Some(Allele("P")))
-  private val gene1 = MendelianGene[Boolean, String](locus1, Seq(Allele("T"), Allele("S")))
-  private val gene2 = MendelianGene[Boolean, String](locus2, Seq(Allele("P"), Allele("Q")))
+  val locusH = PlainLocus(Location("height", 0, 0), ts, Some(Allele("T")))
+  val locusG = PlainLocus(Location("girth", 1, 0), pq, Some(Allele("P")))
+  private val geneH1 = MendelianGene[Boolean, String](locusH, Seq(Allele("T"), Allele("S")))
+  private val geneH2 = MendelianGene[Boolean, String](locusH, Seq(Allele("S"), Allele("S")))
+  private val geneG1 = MendelianGene[Boolean, String](locusG, Seq(Allele("Q"), Allele("Q")))
+  private val geneG2 = MendelianGene[Boolean, String](locusG, Seq(Allele("P"), Allele("Q")))
   val height = Characteristic("height")
   val girth = Characteristic("girth")
   val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
     case (`height`, Allele(h)) => Success(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
     case (`girth`, Allele(g)) => Success(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
-    case (c, _) => Failure(GeneticsException(s"no trait traitMapper for $c"))
+    case (c, _) => Failure(GeneticsException(s"traitMapper: no trait for $c"))
   }
 
-  val expresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](traitMapper)
+  val expresser: Expresser[Boolean, String, Double] = ExpresserMendelian[Boolean, String, Double](traitMapper)
 
-  def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
 
   behavior of "apply"
   it should "work" in {
-    val genotype = Genotype(Seq(gene1, gene2))
-    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locus1 -> height, locus2 -> girth), expresser, attraction)
+    val genotype = Genotype(Seq(geneH1, geneG2))
+
+    def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
+
+    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
     val phenotype = phenome(genotype)
     phenotype.traits.length shouldBe 2
-    phenotype.traits.head shouldBe Trait[Double](height, 1.6)
+    phenotype.traits.head shouldBe Trait[Double](height, 2.0)
     phenotype.traits.tail.head shouldBe Trait[Double](height, 1.2)
   }
 
-  behavior of ""
-  it should "work" in {
-    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locus1 -> height, locus2 -> girth), expresser, attraction)
-    val genotype1 = Genotype(Seq(gene1, gene2))
-    val genotype2 = Genotype(Seq(gene2, gene1))
+  behavior of "attractiveness"
+  it should "work where there is no sexual selection" in {
+    def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
+
+    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
+    val genotype1 = Genotype(Seq(geneH1, geneG2))
+    val genotype2 = Genotype(Seq(geneG2, geneH1))
     val phenotype1 = phenome(genotype1)
     val phenotype2 = phenome(genotype2)
     phenome.attractiveness(phenotype1, phenotype2) shouldBe Fitness.viable
+  }
+
+  it should "work where there is sexual selection" in {
+    val mockHeight = Characteristic("height", isSexuallySelective = true)
+    val mockTraitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
+      case (Characteristic("height", _), Allele(h)) => println(s"mockHeight with allele $h"); Success(Trait(mockHeight, h match { case "T" => 2.0; case "S" => 1.6 }))
+      case (Characteristic("girth", _), Allele(g)) => println(s"girth with allele $g"); Success(Trait(girth, g match { case "Q" => 3.0; case "P" => 1.2 }))
+      case (c, _) => Failure(GeneticsException(s"traitMapper: no trait for $c"))
+    }
+    val mockExpresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](mockTraitMapper)
+    val mockFunctionShape: FunctionShape[Double, Double] = FunctionShape(logistic, identity, 0.1, "shapeLogistic")
+
+    def mockAttraction(observer: Trait[Double], observed: Trait[Double]): Fitness = {
+      (observer, observed) match {
+        case (Trait(ch1, x1), Trait(ch2, x2)) =>
+          if (ch1 == ch2) mockFunctionShape.f(x1)(x2) else Fitness.nonViable
+        case _ => Fitness.viable
+      }
+    }
+
+    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> mockHeight, locusG -> girth), mockExpresser, mockAttraction)
+    phenome.attractiveness(phenome(Genotype(Seq(geneG1, geneH2))), phenome(Genotype(Seq(geneG2, geneH1))))() should ===(0.9820137900379085 +- 1E-10)
+    phenome.attractiveness(phenome(Genotype(Seq(geneG2, geneH1))), phenome(Genotype(Seq(geneG1, geneH1))))() should ===(0.5 +- 1E-10)
   }
 }
