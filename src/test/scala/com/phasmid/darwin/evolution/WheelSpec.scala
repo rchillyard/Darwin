@@ -92,55 +92,25 @@ class WheelSpec extends FlatSpec with Matchers {
     def compare(that: Hand): Int = frequency - that.frequency
   }
 
-  case object RoyalFlush extends Hand {
-    val name = "Royal Flush";
-    val frequency = 4
-  }
+  case object RoyalFlush extends Hand { val name = "Royal Flush"; val frequency = 4 }
 
-  case object StraightFlush extends Hand {
-    val name = "Straight Flush";
-    val frequency = 36
-  }
+  case object StraightFlush extends Hand { val name = "Straight Flush"; val frequency = 36 }
 
-  case object Quads extends Hand {
-    val name = "Four of a kind";
-    val frequency = 624
-  }
+  case object Quads extends Hand { val name = "Four of a kind"; val frequency = 624 }
 
-  case object FullHouse extends Hand {
-    val name = "Full House";
-    val frequency = 3744
-  }
+  case object FullHouse extends Hand { val name = "Full House"; val frequency = 3744 }
 
-  case object Flush extends Hand {
-    val name = "Flush";
-    val frequency = 5108
-  }
+  case object Flush extends Hand { val name = "Flush"; val frequency = 5108 }
 
-  case object Straight extends Hand {
-    val name = "Straight";
-    val frequency = 10200
-  }
+  case object Straight extends Hand { val name = "Straight"; val frequency = 10200 }
 
-  case object Trips extends Hand {
-    val name = "Three of a kind";
-    val frequency = 54912
-  }
+  case object Trips extends Hand { val name = "Three of a kind"; val frequency = 54912 }
 
-  case object TwoPair extends Hand {
-    val name = "Two Pair";
-    val frequency = 123552
-  }
+  case object TwoPair extends Hand { val name = "Two Pair"; val frequency = 123552 }
 
-  case object Pair extends Hand {
-    val name = "Pair";
-    val frequency = 1098240
-  }
+  case object Pair extends Hand { val name = "Pair"; val frequency = 1098240 }
 
-  case object HighCard extends Hand {
-    val name = "High Card";
-    val frequency = 1302540
-  }
+  case object HighCard extends Hand { val name = "High Card"; val frequency = 1302540 }
 
   object Hand {
     val hands: Seq[Hand] = Seq(RoyalFlush, StraightFlush, Quads, FullHouse, Flush, Straight, Trips, TwoPair, Pair, HighCard)
@@ -155,30 +125,29 @@ class WheelSpec extends FlatSpec with Matchers {
     }
 
     implicit object RandomizableHand extends RandomizableHand
-
   }
 
   behavior of "poker game"
   it should "create proper Wheel" in {
     import Hand.RandomizableHand
     val wheel = Wheel(Hand.hands, Hand.hands map (_.frequency.toLong))(0L)
-    println(wheel)
-
+    wheel.revCumOdds shouldBe List(2598960, 1296420, 198180, 74628, 19716, 9516, 4408, 664, 40, 4, 0)
+    wheel.ts shouldBe List(RoyalFlush, StraightFlush, Quads, FullHouse, Flush, Straight, Trips, TwoPair, Pair, HighCard)
   }
 
   it should "give the appropriate frequencies of hands" in {
     import Hand.RandomizableHand
     val wheel = Wheel(Hand.hands, Hand.hands map (_.frequency.toLong))()
-    val hands: List[Hand] = (wheel.toStream take 2598960).toList
-    hands count (_.name == "Royal Flush") shouldBe (4 +- 4)
-    hands count (_.name == "Straight Flush") shouldBe (36 +- 13)
-    hands count (_.name == "Four of a kind") shouldBe (624 +- 70)
-    hands count (_.name == "Full House") shouldBe (3744 +- 150)
-    hands count (_.name == "Flush") shouldBe (5108 +- 200)
-    hands count (_.name == "Straight") shouldBe (10200 +- 300)
-    hands count (_.name == "Three of a kind") shouldBe (54912 +- 600)
-    hands count (_.name == "Two Pair") shouldBe (123552 +- 1000)
-    hands count (_.name == "Pair") shouldBe (1098240 +- 2000)
-    hands count (_.name == "High Card") shouldBe (1302540 +- 2500)
+    val hands: List[Hand] = (wheel.toStream take 649740).toList
+    hands count (_.name == "Royal Flush") shouldBe (1 +- 3)
+    hands count (_.name == "Straight Flush") shouldBe (9 +- 10)
+    hands count (_.name == "Four of a kind") shouldBe (156 +- 42)
+    hands count (_.name == "Full House") shouldBe (936 +- 72)
+    hands count (_.name == "Flush") shouldBe (1277 +- 100)
+    hands count (_.name == "Straight") shouldBe (2550 +- 150)
+    hands count (_.name == "Three of a kind") shouldBe (13728 +- 250)
+    hands count (_.name == "Two Pair") shouldBe (30888 +- 400)
+    hands count (_.name == "Pair") shouldBe (274560 +- 1000)
+    hands count (_.name == "High Card") shouldBe (325635 +- 1250)
   }
 }
