@@ -1,3 +1,5 @@
+organization := "com.phasmid"
+
 name := "Darwin"
 
 version := "1.0.0-SNAPSHOT"
@@ -16,6 +18,7 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 
 libraryDependencies ++= Seq(
 	"com.phasmid" %% "lascala" % "1.0.8-SNAPSHOT",
+  "org.clapper" %% "classutil" % "1.1.2",
 //	"org.scala-lang.modules" %% "scala-xml" % "1.0.4",
 //	"org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
 	"com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",

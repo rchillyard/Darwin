@@ -62,6 +62,7 @@ class ExpresserSpec extends FlatSpec with Matchers {
   }
   it should "work for Mendelian expression" in {
     val ts = Set(Allele("T"), Allele("S"))
+    // TODO use pq
     val pq = Set(Allele("P"), Allele("Q"))
     val locus1 = PlainLocus(Location("height", 0, 0), ts, Some(Allele("S")))
     //    val locus2 = PlainLocus(Location("girth", 0, 0), pq, Some(Allele("P")))
