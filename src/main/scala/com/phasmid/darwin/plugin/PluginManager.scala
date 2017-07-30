@@ -79,7 +79,7 @@ case class PluginManager[P <: Plugin : ClassTag](list: List[File], max: Option[I
       case _ => cs.toList
     }
     logger.debug(s"found ${cs_.size} classes which implement $pn")
-    val tuples: Seq[(String, P)] = for (info <- cs_; n = info.name; _ = logger.debug(s"registering plugin: $n found in ${info.location}"); _ = classLoader.loadClass(n).newInstance().asInstanceOf[P]) yield n -> classLoader.loadClass(n).newInstance().asInstanceOf[P]
+    val tuples: Seq[(String, P)] = for (info <- cs_; n = info.name; _ = logger.debug(s"registering plugin: $n found in ${info.location}")) yield n -> classLoader.loadClass(n).newInstance().asInstanceOf[P]
     pluginMap = tuples.toMap
     for (k <- pluginMap.keys) logger.info(s"found plugin $k with name: ${pluginMap(k).name}")
   }
