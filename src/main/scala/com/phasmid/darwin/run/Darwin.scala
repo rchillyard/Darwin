@@ -23,40 +23,40 @@
 
 package com.phasmid.darwin.run
 
-import java.net.URI
-import java.time.{Duration, LocalDateTime}
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
-import akka.actor.{ActorSystem, Scheduler}
+import akka.actor.ActorSystem
 import com.phasmid.darwin.plugin._
 import com.phasmid.laScala.fp.Args
 import org.slf4j.LoggerFactory
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
-import scala.reflect.ClassTag
+import scala.language.implicitConversions
 import scala.util.Try
 
 /**
   * Created by scalaprof on 7/27/17.
   */
-case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: String)(implicit ec: ExecutionContext) extends Listener {
+case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: String)(implicit ec: ExecutionContext) extends Listener with Pluggable {
   private val logger = LoggerFactory.getLogger(getClass)
-  private val pm = PluginManager[EvolvablePlugin]("src/test/resources/plugins/")
+  private val pm = PluginManager[EvolvablePlugin](plugins)
   private val ps: mutable.MutableList[EvolvablePlugin] = mutable.MutableList()
   for (k <- pm.plugins.toList; p <- pm.getPlugin(k)) addPlugin(p)
-  private var count: Option[Long] = max
-  def ok: Boolean =  (count getOrElse 1L) > 0
+  var sequence = 0L
 
-  val myRunnable = new Runnable {
+  def ok: Boolean = (for (l <- max) yield sequence <= l).getOrElse(true)
+
+  val evolutionEngine = new Runnable {
     override def run(): Unit = {
-      ps foreach (_.onTick(LocalDateTime.now()))
-      count = for (x <- count) yield x-1
+      sequence += 1
+      ps foreach (_.onTick(sequence, interval))
     }
   }
 
-  def addPlugin(p: EvolvablePlugin) = {
+  def addPlugin(p: EvolvablePlugin): Unit = {
     ps.+=(p)
     p.addListener(this)
   }
@@ -65,7 +65,7 @@ case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: 
     implicit def toFiniteDuration(d: java.time.Duration): FiniteDuration = FiniteDuration(d.toNanos,TimeUnit.NANOSECONDS)
 
     val actorSystem = ActorSystem.create(s"Darwin-${name replace(' ', '_')}")
-    actorSystem.scheduler.schedule(FiniteDuration(2,TimeUnit.SECONDS),interval,myRunnable)
+    actorSystem.scheduler.schedule(FiniteDuration(1, TimeUnit.SECONDS), interval, evolutionEngine)
     while (ok) Thread.sleep(100)
     logger.info(s"Darwin $name exiting")
     actorSystem.terminate()
@@ -85,4 +85,8 @@ object Darwin extends App {
   val (plugins: String, a4) = a3.get(classOf[String]).get
   val (max: String, a5) = a4.get(classOf[String]).get
   Darwin(name, Duration.parse(interval), Try(max.toLong).toOption, plugins).run()
+}
+
+trait Pluggable {
+  def addPlugin(p: EvolvablePlugin): Unit
 }

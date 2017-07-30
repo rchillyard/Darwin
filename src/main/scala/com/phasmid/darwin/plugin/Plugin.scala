@@ -131,7 +131,7 @@ abstract class AbstractPlugin(val name: String, val version: String) extends Plu
       marker = ""
       if (configuration_ == null)
         configuration_ = parameters
-      transition(Undefined, doInit _, "initialized", Initialized)
+      transition(Undefined, doInit, "initialized", Initialized)
     }
     else throw new RuntimeException("cannot reinitialize used Plugin")
   }
@@ -140,21 +140,21 @@ abstract class AbstractPlugin(val name: String, val version: String) extends Plu
     * Method to start this Plugin running. The actual code to be run is defined by doStart.
     */
   final def start(): Unit = {
-    transition(Initialized, doStart _, "started", Running)
+    transition(Initialized, doStart, "started", Running)
   }
 
   /**
     * Method to stop this Plugin running. The actual code to be run is defined by doStop.
     */
   final def stop(): Unit = {
-    transition(Running, doStop _, "stopped", Initialized)
+    transition(Running, doStop, "stopped", Initialized)
   }
 
   /**
     * Method to destroy this Plugin. The actual code to be run is defined by doDestroy.
     */
   final def destroy(): Unit = {
-    transition(Initialized, doDestroy _, "destroyed", Undefined)
+    transition(Initialized, doDestroy, "destroyed", Undefined)
     configuration_ = null
   }
 
@@ -201,15 +201,6 @@ abstract class AbstractPlugin(val name: String, val version: String) extends Plu
 }
 
 object Plugin {
-  def getArg[T](config: List[Any], clazz: Class[T]): (T, List[Any]) = {
-    config match {
-      case Nil => throw new PluginException("configuration is empty: this typically means you didn't provide sufficient arguments to the init method", null)
-      case h :: t =>
-        if (clazz.isInstance(h))
-          (h.asInstanceOf[T], t)
-        else throw new PluginException(s"configuration head is not of type: $clazz", null)
-    }
-  }
 }
 
 

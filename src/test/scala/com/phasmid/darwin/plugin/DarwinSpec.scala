@@ -26,7 +26,6 @@ package com.phasmid.darwin.plugin
 import java.time.{Duration, LocalDateTime}
 
 import com.phasmid.darwin.run.Darwin
-import com.phasmid.darwin.run.Darwin.args
 import com.phasmid.laScala.fp.Args
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -66,25 +65,26 @@ class DarwinSpec extends FlatSpec with Matchers {
     darwin.interval shouldBe Duration.ofMillis(100L)
     darwin.max shouldBe Some(2L)
     darwin.run()
-    plugin.count shouldBe 2
+    plugin.count shouldBe 1
   }
 
   class TestPlugin extends AbstractPlugin("Darwin Test plugin", "1.0") with EvolvablePlugin {
 
     var count = 0
 
-    protected def doInit: Unit = println(s"$name initialized")
+    protected def doInit(): Unit = println(s"$name initialized")
 
-    protected def doStart: Unit = println(s"$name started")
+    protected def doStart(): Unit = println(s"$name started")
 
-    protected def doStop: Unit = println(s"$name stopped")
+    protected def doStop(): Unit = println(s"$name stopped")
 
-    protected def doDestroy: Unit = println(s"$name destroyed")
+    protected def doDestroy(): Unit = println(s"$name destroyed")
 
-    def onTick(time: LocalDateTime): Unit = {
-      println(s"$name received tick at $time")
+    def actionDuration: Duration = Duration.ofMillis(200L)
+
+    def act(generation: Long): Unit = {
       count += 1
-      for (l <- listeners) l.receive(this, time)
+      for (l <- listeners) l.receive(this, s"generation $generation at ${LocalDateTime.now()}")
     }
 
     def addListener(x: Listener): Unit = listeners += x

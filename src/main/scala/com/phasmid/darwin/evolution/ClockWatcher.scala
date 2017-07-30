@@ -23,17 +23,37 @@
 
 package com.phasmid.darwin.evolution
 
-import java.time.LocalDateTime
+import java.time.Duration
 
 /**
   * Created by scalaprof on 7/26/17.
   */
 trait ClockWatcher {
+
   /**
-    * Report the given time.
+    * Method to determine the duration between successive actions (generations) of this ClockWatcher.
     *
-    * @param time the current time of this tick
+    * @return the duration between successive actions
     */
-  def onTick(time: LocalDateTime): Unit
+  def actionDuration: Duration
+
+  /**
+    * Method to react to a new tick of the clock.
+    *
+    * @param sequence the sequence # of this tick
+    * @param duration the time between successive ticks
+    */
+  def onTick(sequence: Long, duration: Duration): Unit = {
+    val elapsed: Duration = duration.multipliedBy(sequence)
+    val (x, y) = BigInt(elapsed.toNanos) /% actionDuration.toNanos
+    if (y == 0) act(x.longValue())
+  }
+
+  /**
+    * Method to react to a new generation.
+    *
+    * @param x Generation (action) sequence number
+    */
+  def act(x: Long): Unit
 
 }
