@@ -36,36 +36,42 @@ import scala.language.implicitConversions
   */
 trait Base extends Identifier {
   def pair: Base
-}
-
-case object Cytosine extends Base {
-  def pair = Guanine
-
-  val name = "C"
+  val i: Int
 }
 
 case object Guanine extends Base {
   def pair = Cytosine
 
   val name = "G"
+  val i = 0
+}
+
+case object Cytosine extends Base {
+  def pair = Guanine
+
+  val name = "C"
+  val i = 1
 }
 
 case object Adenine extends Base {
   def pair = Thymine
 
   val name = "A"
+  val i = 2
 }
 
 case object Thymine extends Base {
   def pair = Adenine
 
   val name = "T"
+  val i = 3
 }
 
 case class Invalid(x: Char) extends Base {
   def pair = Invalid(x)
 
   val name = s"<Invalid: $x>"
+  val i: Int = -1
 }
 
 object Base {

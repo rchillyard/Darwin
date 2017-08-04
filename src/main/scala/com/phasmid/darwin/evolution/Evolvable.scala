@@ -24,7 +24,7 @@
 package com.phasmid.darwin.evolution
 
 import com.phasmid.laScala.values.{Incrementable, Rational}
-import com.phasmid.laScala.{LongRNG, RNG, Sequential, Version}
+import com.phasmid.laScala.{Sequential, Version}
 
 import scala.language.implicitConversions
 import scala.util.Try
@@ -89,7 +89,7 @@ trait SequentialEvolvable[X, V, Repr] extends Evolvable[X] with Sequential[Repr]
     * @param v  a Version
     * @return a concrete instance of BaseEvolvable corresponding to the same type as this
     */
-  def build(xs: Iterator[X], v: Version[V]): Repr
+  def build(xs: Iterable[X], v: Version[V]): Repr
 
   /**
     * Method to get this object's version.
@@ -147,9 +147,9 @@ abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv
     *
     * CONSIDER do we really need this method, as opposed to survivors()?
     *
-    * @return an Iterator containing the elements of xs who survive this generation.
+    * @return an Iterable containing the elements of xs who survive this generation.
     */
-  protected def survivors(xs: Iterator[X]): Iterator[X] = xs filter evaluateFitness
+  protected def survivors(xs: Iterable[X]): Iterable[X] = xs filter evaluateFitness
 
   /**
     * This method yields an iterator of xs which survive this generation.
@@ -157,20 +157,20 @@ abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv
     *
     * @return an Iterator containing the elements of xs who survive this generation.
     */
-  protected def survivors: Iterator[X] = survivors(iterator)
+  protected def survivors: Iterable[X] = survivors(this)
 
   /**
     * This method yields the complement of survivors such that survivors + nonSurvivors = this
     *
     * @return
     */
-  protected def nonSurvivors: Iterator[X] = this - survivors(iterator)
+  protected def nonSurvivors: Iterable[X] = this - survivors(this)
 
   /**
     * @param i the iterator whose elements are to be removed
     * @return an Iterator composed from this but without any of the elements of i
     */
-  protected def -(i: Iterator[X]): Iterator[X] = iterator.filterNot(i.toSet)
+  protected def -(i: Iterable[X]): Iterable[X] = this.filterNot(i.toSet)
 
   /**
     * This method randomly selects a fraction of this Evolvable
@@ -178,7 +178,7 @@ abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv
     * @param fraction the fraction of xs that will be randomly selected.
     * @return an Iterator containing a randomly chosen fraction of the xs of this.
     */
-  protected def *(fraction: Rational[Long])(implicit random: RNG[Long]): Iterator[X] = permute.take((fraction * members.size).floor.toInt)
+  protected def *(fraction: Rational[Long])(implicit random: RNG[Long]): Iterable[X] = permute.take((fraction * members.size).floor.toInt).toSeq
 
   private def next(v: Version[V])(implicit k: Evolvable[X] => Rational[Long], r: Evolvable[X] => RNG[Long]): Repr = {
     val (s, n) = (buildInternal(survivors, v), buildInternal(nonSurvivors, v))
@@ -186,10 +186,10 @@ abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv
     // TODO need to fix this because, currently, sexual reproduction will be from pairs
     // chosen from two different populations: survivors and non-survivors.
     val nextGeneration = (s.iterator ++ s.offspring ++ buildInternal(n * k(this), v).offspring).toSeq.distinct
-    build(nextGeneration.iterator, v)
+    build(nextGeneration, v)
   }
 
-  private def buildInternal(xs: Iterator[X], v: Version[V]): BaseEvolvable[V, X, Repr] = build(xs, v).asInstanceOf[BaseEvolvable[V, X, Repr]]
+  private def buildInternal(xs: Iterable[X], v: Version[V]): BaseEvolvable[V, X, Repr] = build(xs, v).asInstanceOf[BaseEvolvable[V, X, Repr]]
 }
 
 object Evolvable {
@@ -198,10 +198,15 @@ object Evolvable {
     */
   implicit def k[X](e: Evolvable[X]): Rational[Long] = Rational.half
 
+  import com.phasmid.darwin.evolution.Random.RandomizableLong
+
   /**
     * This is the rate at which non-survivors can yet have offspring
+    *
+    * TODO Huh??
+    *
     */
-  implicit def random[X](e: Evolvable[X]): RNG[Long] = LongRNG(0L)
+  implicit def random[X](e: Evolvable[X]): RNG[Long] = RNG[Long](0L)
 }
 
 case class EvolvableException(s: String) extends Exception(s)

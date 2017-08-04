@@ -51,7 +51,8 @@ class GenotypeSpec extends FlatSpec with Matchers {
     val karyotype = Seq(Chromosome("test", isSex = false, Seq(hox)))
     val g = Genome("test", karyotype, true, transcriber, locusMap)
     val loci = g.loci
-    val bsss = Seq(Seq(Sequence(Seq(Cytosine, Guanine)), Sequence(Seq(Adenine, Guanine))))
+    val bsss: Seq[Seq[Sequence[Base]]] = Seq(Seq(Sequence(Seq(Cytosine, Guanine)), Sequence(Seq(Adenine, Guanine))))
+    println(s"bsss: $bsss")
     val gt: Genotype[Boolean, String] = g(bsss)
     gt.genes.size shouldBe loci
     val gene = gt.genes.head
@@ -68,6 +69,7 @@ class GenotypeSpec extends FlatSpec with Matchers {
     val g = Genome("test", karyotype, true, transcriber, locusMap)
     val loci = g.loci
     val bsss: Nucleus[Base] = Seq(Seq(Sequence("CG"), Sequence("AG")), Seq(Sequence("CT"), Sequence("AG")), Seq(Sequence("CGT"), Sequence("AGA")))
+    println(s"bsss: $bsss")
     val gt: Genotype[Boolean, String] = g(bsss)
     gt.genes.size shouldBe loci
     val gene = gt.genes.head

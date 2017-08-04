@@ -23,11 +23,17 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.genetics.dna.Base
+
+import scala.annotation.tailrec
+
 /**
   * Created by scalaprof on 7/19/17.
   */
 trait Random[X] extends (() => X) {
   def next: Random[X]
+
+  def toStream: Stream[X]
 }
 
 trait Randomizable[X] {
@@ -36,7 +42,7 @@ trait Randomizable[X] {
   def toLong(x: X): Long
 }
 
-abstract class RandomMonad[X: Randomizable, Repr](private val seed: Long) extends Random[X] {
+abstract class RandomMonad[X: Randomizable, Repr](private[evolution] val seed: Long) extends Random[X] {
   override def toString(): String = s"RandomMonad(${apply()})"
 
   def build(n: Long): Repr
@@ -66,15 +72,44 @@ abstract class RandomMonad[X: Randomizable, Repr](private val seed: Long) extend
   def flatMap[U](f: X => Random[U]): Random[U] = f(apply())
 
   /**
+    * CONSIDER implement in terms to streamTake
+    *
     * @return a stream of X values
     */
   def toStream: Stream[X] = Stream.cons[X](next.apply(), next.asInstanceOf[RandomMonad[X, Repr]].toStream)
+
+  /**
+    * Method to return a Seq of X values, together with a Random[X] from which more values can be taken.
+    *
+    * @param n the number of elements to take
+    * @return a tuple of (Repr, Seq[X])
+    */
+  def take(n: Int): (Repr, Seq[X])
 }
 
-abstract class RandomMonadJava[X: Randomizable, Repr](private val seed: Long) extends RandomMonad[X, Repr](seed) {
+abstract class RandomMonadJava[X: Randomizable, Repr](val s: Long) extends RandomMonad[X, Repr](s) {
 
   def next: Random[X] = build(new java.util.Random(seed).nextLong()).asInstanceOf[Random[X]]
 
+  def streamTake(n: Int): (Repr, Seq[X]) = {
+    @tailrec def inner(r: RandomMonad[X, Repr], s: Stream[X], n_ : Int): (RandomMonad[X,Repr], Stream[X]) = if (n_ == 0) (r, s)
+    else inner(r.next.asInstanceOf[RandomMonad[X,Repr]], Stream.cons[X](r(), s), n_ -1)
+    val (xr: RandomMonad[X,Repr], xs: Stream[X]) = inner(this, Stream.empty, n)
+    (build(xr.seed), xs)
+  }
+
+  def take(n: Int): (Repr, Seq[X]) = streamTake(n)
+
+}
+
+case class RNG[T: Randomizable](private val l: Long) extends RandomMonadJava[T, RNG[T]](l) {
+  override def apply(): T = super.apply()
+
+  def build(n: Long): RNG[T] = RNG(n)
+
+  def unit[U: Randomizable](u: U): Random[U] = {
+    new RNG[U](l)
+  }
 }
 
 object Random {
@@ -111,4 +146,11 @@ object Random {
 
   implicit object RandomizableString extends RandomizableString
 
+  trait RandomizableBase extends Randomizable[Base] {
+    def fromLong(l: Long): Base = Base(l.toInt)
+
+    def toLong(x: Base): Long = x.i
+  }
+
+  implicit object RandomizableBase extends RandomizableBase
 }

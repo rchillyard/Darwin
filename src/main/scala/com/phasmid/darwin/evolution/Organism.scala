@@ -35,14 +35,40 @@ trait Organism[B, P, G, T, X] {
 
   def phenome: Phenome[P, G, T]
 
-  def ecology: Ecology[T, X]
-
   def nucleus: Nucleus[B]
 
   def genotype: Genotype[P, G] = genome(nucleus)
 
   def phenotype: Phenotype[T] = phenome(genotype)
+}
+
+/**
+  * Created by scalaprof on 7/27/16.
+  */
+trait SedentaryOrganism[B, P, G, T, X] extends Organism[B, P, G, T, X] {
+
+  def ecology: Ecology[T, X]
 
   def adaptatype: Adaptatype[X] = ecology(phenotype)
+
+  def build(genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, P, G, T, X]
+}
+
+case class SexualSedentaryOrganism[B, G, T, X](genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends SedentaryOrganism[B, Boolean, G, T, X] {
+  def build(genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, Boolean, G, T, X] = SexualSedentaryOrganism(genome,phenome,nucleus,ecology)
+
+
+}
+
+object SexualSedentaryOrganism {
+
+
+
+//  def apply[B, G, T, X](genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], random: Stream[(B,B)], ecology: Ecology[T, X]): SexualSedentaryOrganism[B, G, T, X] = {
+//    val loci: Int = genome.loci
+//    val x: List[(B, B)] = random take loci toList
+//    val y: (Seq[B], Seq[B]) = x unzip
+//    apply(genome, phenome, Seq(y._1, y._2), ecology)
+//  }
 
 }

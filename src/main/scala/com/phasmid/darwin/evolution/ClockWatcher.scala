@@ -41,10 +41,10 @@ trait ClockWatcher {
     * Method to react to a new tick of the clock.
     *
     * @param sequence the sequence # of this tick
-    * @param duration the time between successive ticks
+    * @param interval the time between successive ticks
     */
-  def onTick(sequence: Long, duration: Duration): Unit = {
-    val elapsed: Duration = duration.multipliedBy(sequence)
+  def onTick(sequence: Long, interval: Duration): Unit = {
+    val elapsed: Duration = interval.multipliedBy(sequence)
     val (x, y) = BigInt(elapsed.toNanos) /% actionDuration.toNanos
     if (y == 0) act(x.longValue())
   }

@@ -24,12 +24,14 @@
 package com.phasmid.darwin.plugin
 
 import java.time.{Duration, LocalDateTime}
+import java.util.concurrent.TimeUnit
 
 import com.phasmid.darwin.run.Darwin
 import com.phasmid.laScala.fp.Args
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.collection.mutable
+import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
 
 /**
@@ -40,14 +42,14 @@ class DarwinSpec extends FlatSpec with Matchers {
   behavior of "Darwin"
   it should "work from plugins directory" in {
     import scala.concurrent.ExecutionContext.Implicits.global
-    val a1 = Args("Test Harness","PT0.5S", "src/test/resources/plugins/", "5")
+    val a1 = Args("Test Harness", "PT0.1S", "src/test/resources/plugins/", "5")
     val (name: String, a2) = a1.get(classOf[String]).get
     val (interval: String, a3) = a2.get(classOf[String]).get
     val (plugins: String, a4) = a3.get(classOf[String]).get
     val (max: String, a5) = a4.get(classOf[String]).get
     a5.isEmpty shouldBe true
     val darwin = Darwin(name,Duration.parse(interval), Try(max.toLong).toOption, plugins)
-    darwin.interval shouldBe Duration.ofMillis(500L)
+    darwin.interval shouldBe Duration.ofMillis(100L)
     darwin.max shouldBe Some(5L)
     darwin.run()
   }
@@ -59,7 +61,8 @@ class DarwinSpec extends FlatSpec with Matchers {
     val (plugins: String, a4) = a3.get(classOf[String]).get
     val (max: String, a5) = a4.get(classOf[String]).get
     a5.isEmpty shouldBe true
-    val darwin = Darwin(name,Duration.parse(interval), Try(max.toLong).toOption, plugins)
+    // TODO understand why changing the initialDelay affects the value of plugin.count
+    val darwin = Darwin(name, Duration.parse(interval), Try(max.toLong).toOption, plugins, FiniteDuration(1, TimeUnit.SECONDS))
     val plugin = new TestPlugin
     darwin.addPlugin(plugin)
     darwin.interval shouldBe Duration.ofMillis(100L)

@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.laScala.{RNG, Shuffle}
+import com.phasmid.laScala.Shuffle
 
 /**
   * Created by scalaprof on 7/13/17.

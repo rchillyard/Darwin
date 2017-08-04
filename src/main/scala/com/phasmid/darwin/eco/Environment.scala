@@ -26,6 +26,8 @@ package com.phasmid.darwin.eco
 import com.phasmid.darwin.Identifier
 
 /**
+  * TODO redefine this: it should be a pair (or collection) of Ecologies, where there are boundaries between pairs.
+  *
   * An Environment is where the fitness of phenotypes (or organisms) is evaluated to determine viability.
   * An Environment is essentially the intersection of a number of EcoFactors, for each of which an organism
   * is evaluated. The fitness of the various eco factors are then combined to generate the overall fitness
@@ -35,7 +37,11 @@ import com.phasmid.darwin.Identifier
   *
   *           Created by scalaprof on 5/5/16.
   */
-case class Environment[X](name: String, factors: EcoFactor[X]) extends Identifier
+case class Environment[X](name: String, factors: EcoFactor[X]*) extends Identifier
+
+trait Environmental[X] {
+  def environment: Environment[X]
+}
 
 case class EcoFactor[X](factor: Factor, x: X) extends Identifier {
   val name: String = factor.name

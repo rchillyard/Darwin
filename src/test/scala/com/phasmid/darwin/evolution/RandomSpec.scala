@@ -41,60 +41,57 @@ class RandomSpec extends FlatSpec with Matchers {
   }
 
   object MockRandom {
-
-    trait RandomizableBoolean extends Randomizable[Boolean] {
-      def fromLong(l: Long): Boolean = l % 2 == 0
-
-      def toLong(x: Boolean): Long = if (x) 0L else 1L
-    }
-
-    implicit object RandomizableBoolean extends RandomizableBoolean
-
-    trait RandomizableLong extends Randomizable[Long] {
-      def fromLong(l: Long): Long = l
-
-      def toLong(x: Long): Long = x
-    }
-
-    implicit object RandomizableLong extends RandomizableLong
-
-    trait RandomizableString extends Randomizable[String] {
-      def fromLong(l: Long): String = l.toString
-
-      def toLong(x: String): Long = x.toLong
-    }
-
-    implicit object RandomizableString extends RandomizableString
-
   }
 
-  behavior of "apply"
+  behavior of "MockRandom.apply"
   it should "work" in {
-    import MockRandom.RandomizableBoolean
+    import Random.RandomizableBoolean
     val coin = MockRandom(0L)
     coin() shouldBe true
   }
 
-  behavior of "toStream"
+  behavior of "MockRandom.toStream"
   it should "work for Long" in {
-    import MockRandom.RandomizableLong
+    import Random.RandomizableLong
     val coin = MockRandom(0L)
     coin.toStream take 5 shouldBe Seq(-4962768465676381896L, 4804307197456638271L, -1034601897293430941L, 7848011421992302230L, -8929183248358367000L)
   }
 
   it should "work for Boolean" in {
-    import MockRandom.RandomizableBoolean
+    import Random.RandomizableBoolean
     val coin = MockRandom(0L)
     coin.toStream take 5 shouldBe Seq(true, false, false, true, true)
   }
 
-  behavior of "map"
+  behavior of "MockRandom.map"
   it should "work for String" in {
-    import MockRandom.RandomizableString
+    import Random.RandomizableString
     val coin = MockRandom(0L)
     val x = coin.map(b => b.toString)
     x() shouldBe "0"
   }
+
+  behavior of "RNG.toStream"
+  it should "work for Long" in {
+    import Random.RandomizableLong
+    val coin = RNG(0L)
+    coin.toStream take 5 shouldBe Seq(-4962768465676381896L, 4804307197456638271L, -1034601897293430941L, 7848011421992302230L, -8929183248358367000L)
+  }
+
+  it should "work for Boolean" in {
+    import Random.RandomizableBoolean
+    val coin = RNG(0L)
+    coin.toStream take 5 shouldBe Seq(true, false, false, true, true)
+  }
+
+  behavior of "RNG.map"
+  it should "work for String" in {
+    import Random.RandomizableString
+    val coin = RNG(0L)
+    val x = coin.map(b => b.toString)
+    x() shouldBe "0"
+  }
+
 }
 
 

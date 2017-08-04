@@ -40,7 +40,7 @@ import scala.util.Try
 /**
   * Created by scalaprof on 7/27/17.
   */
-case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: String)(implicit ec: ExecutionContext) extends Listener with Pluggable {
+case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: String, initialDelay: FiniteDuration = FiniteDuration(100, TimeUnit.MILLISECONDS))(implicit ec: ExecutionContext) extends Listener with Pluggable {
   private val logger = LoggerFactory.getLogger(getClass)
   private val pm = PluginManager[EvolvablePlugin](plugins)
   private val ps: mutable.MutableList[EvolvablePlugin] = mutable.MutableList()
@@ -65,7 +65,7 @@ case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: 
     implicit def toFiniteDuration(d: java.time.Duration): FiniteDuration = FiniteDuration(d.toNanos,TimeUnit.NANOSECONDS)
 
     val actorSystem = ActorSystem.create(s"Darwin-${name replace(' ', '_')}")
-    actorSystem.scheduler.schedule(FiniteDuration(1, TimeUnit.SECONDS), interval, evolutionEngine)
+    actorSystem.scheduler.schedule(initialDelay, interval, evolutionEngine)
     while (ok) Thread.sleep(100)
     logger.info(s"Darwin $name exiting")
     actorSystem.terminate()

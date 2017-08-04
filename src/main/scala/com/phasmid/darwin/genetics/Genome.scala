@@ -24,6 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.Identifier
+import com.phasmid.darwin.evolution.{RNG, Random}
 import com.phasmid.laScala.fp.FP._
 
 
@@ -53,13 +54,13 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
   /**
     * @return the total number of loci (locations) on this Genome
     */
-  def loci: Int = (karyotype map (_.loci)).sum
+  lazy val loci: Int = (karyotype map (_.loci)).sum
 
   /**
     * method to transcribe a matrix of Sequences into a Genotype
     *
     * @param bsss the nucleus, i.e. the matrix of Sequences--the inner dimension should agree with ploidy (2 for diploid) of this genome--
-    *             while the outer dimension should match the ploidy (2 for diploid)
+    *             while the outer dimension should match the number of chromosomes
     * @return a new instance of Genotype[P]
     */
   def apply(bsss: Nucleus[B]): Genotype[P, G] = {
@@ -69,7 +70,22 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
   }
 
   /**
+    * TODO make loci variable, with a separate value for each chromosome
+    *
+    * Method to take a RNG[B] and yield a Nucleus[B], given the ploidy and the number of loci and chromosomes
+    *
+    * @param random an RNG[B]
+    * @return a tuple of Nucleus and Random[B]
+    */
+  def recombine(random: RNG[B]): (Nucleus[B], Random[B]) = {
+    val (br, bs) = random.take(ploidyVal * loci * chromosomes)
+    (recombineNucleus(bs), br)
+  }
+
+  /**
     * This is essentially a private method made public only for unit testing
+    *
+    * TODO make this private
     *
     * @param bss      a sequence of Sequences one for each ploidy (e.g. two for diploid)
     * @param location the location of the gene on the Sequence
@@ -80,6 +96,10 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     PGene(locusMap(location), sequence(as).get)
   }
 
+  def recombineSequenceSet(bs: Seq[B]): SequenceSet[B] = (for (x <- bs.grouped(bs.size / ploidyVal)) yield Sequence(x)).toSeq
+
+  def recombineNucleus(bs: Seq[B]): Nucleus[B] = (for (x <- bs.grouped(bs.size / loci)) yield recombineSequenceSet(x)).toSeq
+
   /**
     * This class defines a generic type of Gene that corresponds to Gene[P].
     *
@@ -87,6 +107,13 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @param as a sequence of Alleles. For a diploid system (P is Boolean), then the cardinality of as should be 2
     */
   case class PGene(l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as)
+
+  private lazy val ploidyVal: Int = ploidy match {
+    case _: Boolean => 2
+    case _: Unit => 1
+    case i: Int => i
+    case _ => throw GeneticsException(s"invalid Ploidy type: ${ploidy.getClass}")
+  }
 
 }
 

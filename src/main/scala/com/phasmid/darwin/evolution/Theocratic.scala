@@ -21,31 +21,33 @@
  *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.phasmid.darwin.eco
-
-import com.phasmid.darwin.genetics._
-import com.phasmid.darwin.{Ecological, Identifier}
-import com.phasmid.laScala.fp.FP.sequence
+package com.phasmid.darwin.evolution
 
 /**
-  * Created by scalaprof on 5/9/16.
+  * Defines the concept of a supreme being which has the power to create living
+  * objects out of nothing, and of course kill them at will.
+  *
+  * It's a convenient way to get our evolution simulations started, that is to
+  * say when we want to play "God".
+  *
+  * @author Robin Hillyard
+  *
+  * Created on Jan 5, 2010 as Theological
+  *
   */
-case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Ecological[T, X] with Identifier {
+trait Theocratic[B, Repr] {
 
   /**
-    * The apply method for this Ecology. For each Trait in the given Phenotype, we look up its corresponding Factor
-    * and invoke the Adapter to create an Adaptation.
-    *
-    * Note that if the lookup fails, we simply ignore the trait without warning.
-    *
-    * @param phenotype the phenotype for which we want to measure the adaptation to this ecology
-    * @return an Adaptatype
+    * Method to cull all members of an Evolvable so we can make a fresh start.
+    * The complementary method to
+    * {@link #seedMembers()}.
     */
-  def apply(phenotype: Phenotype[T]): Adaptatype[X] = {
-    val xats = for (t <- phenotype.traits; f <- factors.get(t.characteristic.name)) yield for (a <- adapter(f, t, fitness)) yield a
-    Adaptatype(sequence(xats).get)
-  }
+  def cullMembers(): Repr
+
+  /**
+    * Method to seed a this
+    * {@link Evolvable} which a certain number of
+    * members.
+    */
+  def seedMembers(size: Int, random: RNG[B]): Repr
 }
-
-case class Factor(name: String) extends Identifier
-
