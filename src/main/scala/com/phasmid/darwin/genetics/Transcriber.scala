@@ -23,6 +23,9 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.laScala.fp.Spy
+import org.slf4j.Logger
+
 /**
   * A Transcriber is the heart of the process for taking Sequence information and generating its corresponding Genotype.
   * There are two more or less independent phases, and one phase which combines the two others:
@@ -68,7 +71,11 @@ sealed trait Transcriber[B, G] extends TranscriberFunction[B, G] {
     * @param location the locus on the Chromosome at which we expect to find the gene we are interested in
     * @return Success(Allele) assuming that all went well, otherwise Failure
     */
-  def apply(bs: Sequence[B], location: Location): Option[Allele[G]] = for (bs <- locateBases(bs, location); ga <- transcribeBases(bs)) yield ga
+  def apply(bs: Sequence[B], location: Location): Option[Allele[G]] =
+    for (bq <- locateBases(bs, location);
+         _ = assert(bq.nonEmpty);
+         ga <- transcribeBases(bq)
+    ) yield ga
 }
 
 /**
@@ -79,6 +86,9 @@ sealed trait Transcriber[B, G] extends TranscriberFunction[B, G] {
   * @tparam G the gene type
   */
 abstract class AbstractTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends Transcriber[B, G] {
+
+  implicit private val spyLogger = Transcriber.logger
+
   /**
     * This method is required to be defined by sub-types (extenders) of Transcriber.
     * Given a Seq[B] corresponding to the location of a gene on a Chromosome, return the Allele that
@@ -87,7 +97,14 @@ abstract class AbstractTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends
     * @param bs the sequence of bases
     * @return an Allele
     */
-  def transcribeBases(bs: Seq[B]): Option[Allele[G]] = f(bs)
+  def transcribeBases(bs: Seq[B]): Option[Allele[G]] = if (bs.nonEmpty)
+    Spy.spy(s"transcribeBases($bs): ", f(bs))
+  else
+    None
 }
 
 case class PlainTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends AbstractTranscriber[B, G](f)
+
+object Transcriber {
+  val logger: Logger = Spy.getLogger(Transcriber.getClass)
+}

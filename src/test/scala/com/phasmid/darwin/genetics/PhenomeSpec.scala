@@ -36,8 +36,8 @@ class PhenomeSpec extends FlatSpec with Matchers {
 
   val ts = Set(Allele("T"), Allele("S"))
   val pq = Set(Allele("P"), Allele("Q"))
-  val locusH = PlainLocus(Location("height", 0, 0), ts, Some(Allele("T")))
-  val locusG = PlainLocus(Location("girth", 1, 0), pq, Some(Allele("P")))
+  val locusH = PlainLocus(Location("height", 0, 1), ts, Some(Allele("T")))
+  val locusG = PlainLocus(Location("girth", 1, 1), pq, Some(Allele("P")))
   private val geneH1 = MendelianGene[Boolean, String](locusH, Seq(Allele("T"), Allele("S")))
   private val geneH2 = MendelianGene[Boolean, String](locusH, Seq(Allele("S"), Allele("S")))
   private val geneG1 = MendelianGene[Boolean, String](locusG, Seq(Allele("Q"), Allele("Q")))

@@ -91,7 +91,7 @@ trait Evolver {
     * Increment the clock by one tick, firing new generations as appropriate.
     *
     * @return true if there is more evolution to do.
-    * @throws EvolutionException under some cicumstances
+    * @throws EvolutionException under some circumstances
     */
   @throws[EvolutionException]
   def next: Boolean

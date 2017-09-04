@@ -57,14 +57,14 @@ case class PluginManager[P <: Plugin : ClassTag](list: List[File], max: Option[I
   val classLoader = new URLClassLoader(list map { f => f.toURI.toURL }, getClass.getClassLoader)
 
   def getPlugin(name: String): Option[P] = {
-    ensure
+    ensure()
     logger.info(s"Fetching plugin $name.")
     pluginMap.get(name)
   }
 
-  def plugins: Iterator[String] = {ensure; pluginMap.keys.iterator}
+  def plugins: Iterator[String] = {ensure(); pluginMap.keys.iterator}
 
-  def clear() = {
+  def clear(): Unit = {
     pluginMap = null
   }
 

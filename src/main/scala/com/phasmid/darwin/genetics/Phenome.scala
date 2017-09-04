@@ -26,6 +26,7 @@ package com.phasmid.darwin.genetics
 import com.phasmid.darwin.Identifier
 import com.phasmid.darwin.eco.{Fitness, Viability}
 import com.phasmid.laScala.fp.FP._
+import com.phasmid.laScala.fp.Spy
 
 import scala.util.Try
 
@@ -48,6 +49,7 @@ import scala.util.Try
   * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
   */
 case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T], attraction: (Trait[T], Trait[T]) => Fitness) extends Phenomic[P, G, T] with Identifier {
+  implicit private val spyLogger = Spy.getLogger(getClass)
   /**
     * Method to express a Genotype with respect to this Phenome.
     * Note that if a Locus doesn't have a mapping in the characteristics map, we currently ignore it.
@@ -58,8 +60,12 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     * @return a Phenotype
     */
   def apply(genotype: Genotype[P, G]): Phenotype[T] = {
-    val ttts: Seq[Try[Trait[T]]] = for (g <- genotype.genes; c <- characteristics.get(g.locus)) yield for (t <- expresser(c, g)) yield t
-    Phenotype(sequence(ttts).get)
+    val ttts: Seq[Try[Trait[T]]] = for (g <- genotype.genes;
+                                        c <- Spy.spy(s"g: $g; charactistics: ", characteristics.get(g.locus)))
+      yield for (t <- expresser(c, g))
+        yield t
+    val result = Phenotype(sequence(ttts).get)
+    result
   }
 
   /**

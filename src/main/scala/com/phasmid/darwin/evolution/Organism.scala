@@ -23,8 +23,10 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.eco.Ecology
+import com.phasmid.darwin.eco.{EcoFactor, Ecology, Fitness}
 import com.phasmid.darwin.genetics._
+
+import scala.util.Try
 
 /**
   * Created by scalaprof on 7/27/16.
@@ -40,6 +42,15 @@ trait Organism[B, P, G, T, X] {
   def genotype: Genotype[P, G] = genome(nucleus)
 
   def phenotype: Phenotype[T] = phenome(genotype)
+
+  /**
+    * CONSIDER changing the parameters to this method if we can find them more simply
+    *
+    * @param ecology    the Ecology
+    * @param ecoFactors the local ecology
+    * @return the Fitness of this Organism in the ecology, wrapped in Try
+    */
+  def fitness(ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]]): Try[Fitness] = ecology(phenotype).fitness(ecoFactors)
 }
 
 /**

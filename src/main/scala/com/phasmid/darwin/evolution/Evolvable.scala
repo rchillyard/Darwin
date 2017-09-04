@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.eco.Fitness
 import com.phasmid.laScala.values.{Incrementable, Rational}
 import com.phasmid.laScala.{Sequential, Version}
 
@@ -108,6 +109,14 @@ trait SequentialEvolvable[X, V, Repr] extends Evolvable[X] with Sequential[Repr]
   * @tparam X the underlying type of the xs
   */
 abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv: Version[V]) extends SequentialEvolvable[X, V, Repr] {
+
+  /**
+    * Method which determines if a particular Fitness value will be considered sufficiently fit to survive this generation
+    *
+    * @param f a Fitness value
+    * @return true if f represents a sufficiently fit value to survive to the next generation
+    */
+  def isFit(f: Fitness): Boolean
 
   /**
     * Method to get the version

@@ -23,6 +23,8 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.laScala.fp.FP
+
 import scala.util.Try
 
 /**
@@ -57,10 +59,9 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
       case _ => throw GeneticsException(s"gene does not define dominant")
     }
 
-    val distinct = gene.distinct
-    distinct match {
-      case x :: Nil => x
-      case x :: y :: Nil => if (isDominant(x)) x else if (isDominant(y)) y else throw GeneticsException(s"Mendelian logic problem: neither allele is dominant: $distinct")
+    gene.distinct match {
+      case ga :: Nil => ga
+      case gas@ga1 :: ga2 :: Nil => if (isDominant(ga1)) ga1 else if (isDominant(ga2)) ga2 else throw GeneticsException(s"Mendelian logic problem: neither allele is dominant: $gas")
       case _ => throw GeneticsException(s"Mendelian logic problem with gene $gene")
     }
   }
@@ -82,4 +83,18 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
 
 abstract class AbstractExpresser[P, G, T] extends Expresser[P, G, T]
 
-case class ExpresserMendelian[P, G, T](traitMapper: TraitMapper[G, T]) extends AbstractExpresser[P, G, T]
+case class ExpresserMendelian[P, G, T](traitMapper: TraitMapper[G, T]) extends AbstractExpresser[P, G, T] {
+  override def toString(): String = s"ExpresserMendelian($traitMapper)"
+}
+
+case class TraitMapperMapped[G, T](map: Map[Characteristic, Map[G, T]]) extends TraitMapper[G, T] {
+  def apply(ch: Characteristic, ga: Allele[G]): Try[Trait[T]] = FP.optionToTry(
+    ga match {
+      case Allele(g) => for (m <- map.get(ch); t <- m.get(g)) yield Trait(ch, t)
+      case _ => None
+    },
+    GeneticsException(s"TraitMapperMapped: no trait defined for: $ch, $ga")
+  )
+
+  override def toString(): String = s"TraitMapperMapped($map)"
+}

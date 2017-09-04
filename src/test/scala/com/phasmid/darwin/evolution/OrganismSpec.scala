@@ -25,7 +25,7 @@ package com.phasmid.darwin.evolution
 
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
-import com.phasmid.darwin.genetics.dna.Base
+import com.phasmid.darwin.genetics.dna.{Base, Guanine}
 import org.scalatest.{FlatSpec, Inside, Matchers}
 
 import scala.util.{Failure, Success, Try}
@@ -33,7 +33,7 @@ import scala.util.{Failure, Success, Try}
 /**
   * Created by scalaprof on 7/25/16.
   */
-class ColonySpec extends FlatSpec with Matchers with Inside {
+class OrganismSpec extends FlatSpec with Matchers with Inside {
 
   import com.phasmid.darwin.evolution.Random.RandomizableLong
 
@@ -94,28 +94,64 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
   val girth = Characteristic("girth")
   val karyotype = Seq(Chromosome("test", isSex = false, Seq(locHeight)))
   val genome: Genome[Base, Boolean, String] = Genome("test", karyotype, true, transcriber, locusMap)
-  val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
-    case (`height`, Allele(h)) => Success(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
-    case (`girth`, Allele(g)) => Success(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
-    case (c, _) => Failure(GeneticsException(s"traitMapper: no trait for $c"))
-  }
+  val traitMapper = TraitMapperMapped(Map(height -> Map("T" -> 2.0, "S" -> 1.6), girth -> Map("Q" -> 3.0, "P" -> 1.2)))
+  val geneHGG = genome.PGene(locusH, Seq(Allele("G"), Allele("G")))
 
   def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
 
   val expresser: Expresser[Boolean, String, Double] = ExpresserMendelian[Boolean, String, Double](traitMapper)
   val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
 
-  behavior of "Colony"
+  behavior of "Organism"
 
-  it should "evolve" in {
+  it should "create random Organism correctly" in {
+    val random = RNG[Base](0L)
+    println(s"ecology: $ecology")
+    println(s"ecoFactors: $ecoFactors")
+    val (bn, _) = genome.recombine(random)
+    val organism = SexualSedentaryOrganism(genome, phenome, bn, ecology)
+    val dna = for (a <- organism.nucleus; b <- a) yield b.bases
+    dna.flatten shouldBe List(Guanine, Guanine)
+  }
+
+  it should "calculate genotype correctly" in {
+    val random = RNG[Base](0L)
+    println(s"ecology: $ecology")
+    println(s"ecoFactors: $ecoFactors")
+    val (bn, _) = genome.recombine(random)
+    val organism = SexualSedentaryOrganism(genome, phenome, bn, ecology)
+    val actual = organism.genotype
+    actual shouldBe Genotype(Seq(geneHGG))
+  }
+
+  it should "calculate phenotype correctly" in {
     val random = RNG[Base](3L)
     println(s"ecology: $ecology")
     println(s"ecoFactors: $ecoFactors")
-    val colony = Colony("test colony", ecology, ecoFactors, genome, phenome).seedMembers(10, random)
-    println(colony)
-    // FIXME rework this test
-    //    val cy = colony.next()
-    //    cy should matchPattern { case Success(_) => }
-    //    for (c <- cy) println(c)
+    val (bn, _) = genome.recombine(random)
+    val organism = SexualSedentaryOrganism(genome, phenome, bn, ecology)
+    organism.phenotype shouldBe Phenotype(List(Trait(height, 2.0)))
+  }
+
+  it should "calculate adaptatype" in {
+    val random = RNG[Base](3L)
+    println(s"ecology: $ecology")
+    println(s"ecoFactors: $ecoFactors")
+    val (bn, _) = genome.recombine(random)
+    val organism = SexualSedentaryOrganism(genome, phenome, bn, ecology)
+    val z: Adaptatype[Int] = ecology(organism.phenotype)
+    z should matchPattern { case Adaptatype(List(Adaptation(`elephantGrass`, _))) => }
+  }
+
+  it should "calculate fitness" in {
+    val random = RNG[Base](3L)
+    println(s"ecology: $ecology")
+    println(s"ecoFactors: $ecoFactors")
+    val (bn, _) = genome.recombine(random)
+    val organism = SexualSedentaryOrganism(genome, phenome, bn, ecology)
+    val fy: Try[Fitness] = organism.fitness(ecology, ecoFactors)
+    fy should matchPattern { case Success(_) => }
+    // TODO ensure that this is really correct
+    fy.get.x shouldBe 0.0 +- 0.001
   }
 }

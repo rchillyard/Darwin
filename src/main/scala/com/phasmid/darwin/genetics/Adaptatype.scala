@@ -31,6 +31,8 @@ import scala.util.Try
 /**
   * This class represents the Adaptations of an Organism.
   *
+  * CONSIDER fitness should take an Ecology instead of a Map[String, EcoFactor]
+  *
   * Created by scalaprof on 5/9/16.
   */
 case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) {

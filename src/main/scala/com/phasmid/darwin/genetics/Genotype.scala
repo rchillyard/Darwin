@@ -133,6 +133,8 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
     * @return a sequence of Allele[G]
     */
   def distinct: Seq[Allele[G]] = as.distinct
+
+  override def toString: String = s"$name:$as"
 }
 
 /**

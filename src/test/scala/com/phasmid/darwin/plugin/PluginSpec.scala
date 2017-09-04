@@ -76,7 +76,7 @@ class PluginSpec extends FlatSpec with Matchers {
     pm.pluginMap shouldBe null
     val po = pm.getPlugin("TestPlugin")
     pm.plugins.size shouldBe 1
-    pm.clear
+    pm.clear()
     pm.pluginMap shouldBe null
     // Apparently, this will carry on working as before
     for (p <- po) {
@@ -92,19 +92,19 @@ class PluginSpec extends FlatSpec with Matchers {
 
 class MockPlugin extends AbstractPlugin("MockPlugin", "1.0") {
 
-  def doStop: Unit = {
+  def doStop(): Unit = {
     println("MockPlugin stopping")
   }
 
-  def doStart: Unit = {
+  def doStart(): Unit = {
     println("MockPlugin starting")
   }
 
-  def doDestroy: Unit = {
+  def doDestroy(): Unit = {
     println("MockPlugin being destroyed")
   }
 
-  def doInit: Unit = {
+  def doInit(): Unit = {
     println(s"MockPlugin initializing with configuration $configuration")
     configuration.foreach(p => println("additional init parameter: $p"))
   }

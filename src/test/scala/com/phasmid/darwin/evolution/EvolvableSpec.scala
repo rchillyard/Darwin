@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.eco.Fitness
 import com.phasmid.laScala.Version
 import com.phasmid.laScala.values.Rational
 import org.scalatest.{FlatSpec, Inside, Matchers}
@@ -51,6 +52,8 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
     protected[EvolvableSpec] override def -(i: Iterable[Int]): Iterable[Int] = super.-(i)
 
     protected[EvolvableSpec] override def *(fraction: Rational[Long])(implicit random: RNG[Long]): Iterable[Int] = super.*(fraction)
+
+    def isFit(f: Fitness): Boolean = f.x >= 0.5
   }
 
   "MockEvolvable" should "shuffle properly" in {

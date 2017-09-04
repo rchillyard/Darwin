@@ -45,6 +45,8 @@ case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: Fi
     val xats = for (t <- phenotype.traits; f <- factors.get(t.characteristic.name)) yield for (a <- adapter(f, t, fitness)) yield a
     Adaptatype(sequence(xats).get)
   }
+
+  override def toString: String = s"Ecology($name, $factors, $fitness, $adapter"
 }
 
 case class Factor(name: String) extends Identifier

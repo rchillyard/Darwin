@@ -43,11 +43,11 @@ class GeneSpec extends FlatSpec with Matchers {
 
     override def distinct: Seq[Allele[String]] = Seq(alleles._1)
 
-    override def locus: Locus[String] = UnknownLocus(Location("test", 0, 0))
+    override def locus: Locus[String] = UnknownLocus(Location("test", 0, 1))
   }
 
   "Gene" should "have 2 Alleles" in {
-    val location = Location("hox", 0, 0)
+    val location = Location("hox", 0, 1)
     val x = GeneDiploidString(location, (Allele("x"), Allele("y")))
     x(true) shouldBe Allele("x")
   }

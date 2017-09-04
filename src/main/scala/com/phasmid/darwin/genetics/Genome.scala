@@ -26,6 +26,7 @@ package com.phasmid.darwin.genetics
 import com.phasmid.darwin.Identifier
 import com.phasmid.darwin.evolution.{RNG, Random}
 import com.phasmid.laScala.fp.FP._
+import com.phasmid.laScala.fp.Spy
 
 
 /**
@@ -51,6 +52,8 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     */
   def chromosomes: Int = karyotype.size
 
+  implicit private val spyLogger = Spy.getLogger(getClass)
+
   /**
     * @return the total number of loci (locations) on this Genome
     */
@@ -65,7 +68,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     */
   def apply(bsss: Nucleus[B]): Genotype[P, G] = {
     require(bsss.size == chromosomes, s"size of outer Sequences dimension (${bsss.size}) should equal the karyotype ($chromosomes)")
-    val genes = for ((bss, k) <- bsss zip karyotype; l <- k.ls) yield transcribe(bss, l)
+    val genes = for ((bss, k) <- bsss zip karyotype; l <- Spy.spy(s"l for $k: ", k.ls)) yield Spy.spy(s"yield for $bss, $l: ", transcribe(bss, l))
     Genotype[P, G](genes)
   }
 
@@ -93,6 +96,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     */
   def transcribe(bss: SequenceSet[B], location: Location): Gene[P, G] = {
     val as = for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g
+    Spy.log("transcribe: as = $as")
     PGene(locusMap(location), sequence(as).get)
   }
 
@@ -106,7 +110,9 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @param l  the Locus of the Gene
     * @param as a sequence of Alleles. For a diploid system (P is Boolean), then the cardinality of as should be 2
     */
-  case class PGene(l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as)
+  case class PGene(l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as) {
+    override def toString: String = "PGene:" + super.toString
+  }
 
   private lazy val ploidyVal: Int = ploidy match {
     case _: Boolean => 2
@@ -143,4 +149,6 @@ case class Chromosome(name: String, isSex: Boolean, ls: Seq[Location]) extends I
   * @param offset the offset at which the gene starts in the sequence for this Chromosome
   * @param length the length of the gene in terms of the sequence
   */
-case class Location(name: String, offset: Int, length: Int) extends Identifier
+case class Location(name: String, offset: Int, length: Int) extends Identifier {
+  override def toString: String = s"L:$name:$offset:$length"
+}
