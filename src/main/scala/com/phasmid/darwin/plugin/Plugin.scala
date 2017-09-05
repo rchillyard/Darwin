@@ -93,8 +93,9 @@ trait Plugin {
 trait Listener {
   /**
     * Receive a message
+    *
     * @param sender the sender
-    * @param msg the message
+    * @param msg    the message
     */
   def receive(sender: AnyRef, msg: Any): Unit
 }

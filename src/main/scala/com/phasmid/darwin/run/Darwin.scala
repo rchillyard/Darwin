@@ -62,7 +62,7 @@ case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: 
   }
 
   def run(): Unit = {
-    implicit def toFiniteDuration(d: java.time.Duration): FiniteDuration = FiniteDuration(d.toNanos,TimeUnit.NANOSECONDS)
+    implicit def toFiniteDuration(d: java.time.Duration): FiniteDuration = FiniteDuration(d.toNanos, TimeUnit.NANOSECONDS)
 
     val actorSystem = ActorSystem.create(s"Darwin-${name replace(' ', '_')}")
     actorSystem.scheduler.schedule(initialDelay, interval, evolutionEngine)
@@ -78,7 +78,9 @@ case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: 
 }
 
 object Darwin extends App {
+
   import scala.concurrent.ExecutionContext.Implicits.global
+
   val a1 = Args(args)
   val (name: String, a2) = a1.get(classOf[String]).get
   val (interval: String, a3) = a2.get(classOf[String]).get

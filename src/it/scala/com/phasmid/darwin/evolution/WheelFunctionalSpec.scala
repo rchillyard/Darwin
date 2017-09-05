@@ -23,8 +23,6 @@
 
 package com.phasmid.darwin.evolution
 
-import org.scalatest.{FlatSpec, Matchers}
-
 /**
   * Created by scalaprof on 7/20/17.
   */

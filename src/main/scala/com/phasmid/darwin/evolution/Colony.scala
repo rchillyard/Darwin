@@ -82,9 +82,13 @@ abstract class AbstractColony[B, P, G, T, V: Incrementable, X, OrganismType <: O
     *
     * @return a new Evolvable
     */
-  override def offspring: Iterator[OrganismType] = ??? // FIXME implement me
+  override def offspring: Iterator[OrganismType] =
+//    if (genome.sexual)
+//    throw GeneticsException("offspring not implemented") // FIXME implement me
+//  else // TODO implement me properly
+    (organisms filter {o: OrganismType => o.fitness(ecology, ecoFactors).get.x>=0}).toIterator
 
-//  def build(xs: Iterator[OrganismType], v: Version[V]): AbstractColony[B, P, G, T, V, X, OrganismType]
+  //  def build(xs: Iterator[OrganismType], v: Version[V]): AbstractColony[B, P, G, T, V, X, OrganismType]
 
   def cullMembers(): Repr = (for (v <- generation.next()) yield build(Nil, v)).get
 
@@ -93,8 +97,9 @@ abstract class AbstractColony[B, P, G, T, V: Incrementable, X, OrganismType <: O
       if (n == 0) (bns, br)
       else {
         val (bn, br_) = genome.recombine(random)
-        inner(bns :+ bn, br_, n-1)
+        inner(bns :+ bn, br_, n - 1)
       }
+
     val (bns, _) = inner(Nil, random, size)
     build(bns map createOrganism, generation)
   }
@@ -111,7 +116,7 @@ case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterabl
 
   def createOrganism(nucleus: Nucleus[B]): SexualSedentaryOrganism[B, G, T, X] = SexualSedentaryOrganism(genome, phenome, nucleus, ecology)
 
-  override def apply(phenotype: Phenotype[T]): Adaptatype[X] = ??? // FIXME implement me (??)
+  def apply(phenotype: Phenotype[T]): Adaptatype[X] = throw GeneticsException("apply not implemented") // FIXME implement me (??)
 
   override def toString: String = s"$name generation $generation with ${organisms.size} organisms"
 }

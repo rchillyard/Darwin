@@ -46,11 +46,18 @@ import com.phasmid.laScala.fp.Spy
   */
 case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
                            // CONSIDER combining transcriber and locusMap
-                           transcriber: Transcriber[B, G], locusMap: (Location) => Locus[G]) extends Genomic[B, P, G] with Identifier {
+                           transcriber: Transcriber[B, G], locusMap: (Location) => Locus[G]) extends Sexual[P] with Genomic[B, P, G] with Identifier {
   /**
     * @return the the number of chromosomes (pairs, actually) defined for this Genome. Synonymous with "karyotype"
     */
   def chromosomes: Int = karyotype.size
+
+  /**
+    * Determine if this Genome uses sexual reproduction.
+    *
+    * @return true of diploid or polyploid genomes
+    */
+  def sexual: Boolean = sexual(ploidy)
 
   implicit private val spyLogger = Spy.getLogger(getClass)
 
@@ -95,9 +102,8 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @return a new instance of Gene[P]
     */
   def transcribe(bss: SequenceSet[B], location: Location): Gene[P, G] = {
-    val as = for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g
-    Spy.log("transcribe: as = $as")
-    PGene(locusMap(location), sequence(as).get)
+    val gaos: Seq[Option[Allele[G]]] = Spy.spy(s"transcribe($bss, $location): gaos=", for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g)
+    PGene(locusMap(location), sequence(gaos).get)
   }
 
   def recombineSequenceSet(bs: Seq[B]): SequenceSet[B] = (for (x <- bs.grouped(bs.size / ploidyVal)) yield Sequence(x)).toSeq
@@ -151,4 +157,22 @@ case class Chromosome(name: String, isSex: Boolean, ls: Seq[Location]) extends I
   */
 case class Location(name: String, offset: Int, length: Int) extends Identifier {
   override def toString: String = s"L:$name:$offset:$length"
+}
+
+/**
+  * This trait defines reproductive style.
+  * @tparam P the Ploidy type
+  */
+trait Sexual[P] {
+  /**
+    * Determine if this reproduction style is sexual
+    *
+    * @return true for diploid or polyploid genomes
+    */
+  def sexual(p: P): Boolean = p match {
+    case p: Int => true
+    case p: Boolean => true
+    case _ => false
+  }
+
 }

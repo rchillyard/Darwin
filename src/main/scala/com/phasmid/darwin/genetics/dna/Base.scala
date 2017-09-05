@@ -36,6 +36,7 @@ import scala.language.implicitConversions
   */
 trait Base extends Identifier {
   def pair: Base
+
   val i: Int
 }
 

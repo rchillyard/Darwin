@@ -42,7 +42,7 @@ import scala.util.Try
   *
   * @tparam X the underlying type of the members of this Evolvable
   *
-  * Created by scalaprof on 7/27/16.
+  *           Created by scalaprof on 7/27/16.
   */
 trait Evolvable[X] extends Ordered[Evolvable[X]] with Permutable[X] {
 

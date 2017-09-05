@@ -92,9 +92,10 @@ abstract class RandomMonadJava[X: Randomizable, Repr](val s: Long) extends Rando
   def next: Random[X] = build(new java.util.Random(seed).nextLong()).asInstanceOf[Random[X]]
 
   def streamTake(n: Int): (Repr, Seq[X]) = {
-    @tailrec def inner(r: RandomMonad[X, Repr], s: Stream[X], n_ : Int): (RandomMonad[X,Repr], Stream[X]) = if (n_ == 0) (r, s)
-    else inner(r.next.asInstanceOf[RandomMonad[X,Repr]], Stream.cons[X](r(), s), n_ -1)
-    val (xr: RandomMonad[X,Repr], xs: Stream[X]) = inner(this, Stream.empty, n)
+    @tailrec def inner(r: RandomMonad[X, Repr], s: Stream[X], n_ : Int): (RandomMonad[X, Repr], Stream[X]) = if (n_ == 0) (r, s)
+    else inner(r.next.asInstanceOf[RandomMonad[X, Repr]], Stream.cons[X](r(), s), n_ - 1)
+
+    val (xr: RandomMonad[X, Repr], xs: Stream[X]) = inner(this, Stream.empty, n)
     (build(xr.seed), xs)
   }
 
@@ -153,4 +154,5 @@ object Random {
   }
 
   implicit object RandomizableBase extends RandomizableBase
+
 }

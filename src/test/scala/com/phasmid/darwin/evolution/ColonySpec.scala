@@ -113,9 +113,9 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
     println(s"ecoFactors: $ecoFactors")
     val colony = Colony("test colony", ecology, ecoFactors, genome, phenome).seedMembers(10, random)
     println(colony)
-    // FIXME rework this test
-    //    val cy = colony.next()
-    //    cy should matchPattern { case Success(_) => }
-    //    for (c <- cy) println(c)
+    // TODO rework this test
+        val cy = colony.next()
+        cy should matchPattern { case Success(_) => }
+        for (c <- cy) println(c)
   }
 }

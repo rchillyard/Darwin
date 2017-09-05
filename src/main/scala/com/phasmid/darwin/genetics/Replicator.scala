@@ -57,7 +57,7 @@ trait Replicator[B] {
 case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Replicator[B] {
   // NOTE: a variable.
   var i = 0
-  private val rmnopc = RNG.values(r) map ( _ % mnopc )
+  private val rmnopc = RNG.values(r) map (_ % mnopc)
 
   def random: Int = {i = i + 1; rmnopc(i)}
 

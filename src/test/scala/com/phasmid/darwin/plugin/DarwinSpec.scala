@@ -48,14 +48,14 @@ class DarwinSpec extends FlatSpec with Matchers {
     val (plugins: String, a4) = a3.get(classOf[String]).get
     val (max: String, a5) = a4.get(classOf[String]).get
     a5.isEmpty shouldBe true
-    val darwin = Darwin(name,Duration.parse(interval), Try(max.toLong).toOption, plugins)
+    val darwin = Darwin(name, Duration.parse(interval), Try(max.toLong).toOption, plugins)
     darwin.interval shouldBe Duration.ofMillis(100L)
     darwin.max shouldBe Some(5L)
     darwin.run()
   }
   it should "work by adding plugin directly" in {
     import scala.concurrent.ExecutionContext.Implicits.global
-    val a1 = Args("Test Harness","PT0.1S", "src/test/resources/", "2")
+    val a1 = Args("Test Harness", "PT0.1S", "src/test/resources/", "2")
     val (name: String, a2) = a1.get(classOf[String]).get
     val (interval: String, a3) = a2.get(classOf[String]).get
     val (plugins: String, a4) = a3.get(classOf[String]).get

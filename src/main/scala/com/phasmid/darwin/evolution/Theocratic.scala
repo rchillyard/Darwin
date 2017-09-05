@@ -32,7 +32,7 @@ package com.phasmid.darwin.evolution
   *
   * @author Robin Hillyard
   *
-  * Created on Jan 5, 2010 as Theological
+  *         Created on Jan 5, 2010 as Theological
   *
   */
 trait Theocratic[B, Repr] {

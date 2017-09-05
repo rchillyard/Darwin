@@ -43,7 +43,7 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
 
     def evaluateFitness(x: Int): Boolean = x % 2 == 0
 
-    def offspring: Iterator[Int] = members.toIterator filter ( _ > 3 ) map ( _ + 100 )
+    def offspring: Iterator[Int] = members.toIterator filter (_ > 3) map (_ + 100)
 
     def build(xs: Iterable[Int], v: Version[Int]): MockEvolvable = MockEvolvable(xs.toSeq, v)
 

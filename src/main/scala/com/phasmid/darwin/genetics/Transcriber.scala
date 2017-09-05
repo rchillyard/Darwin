@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.laScala.fp.Spy
+import com.phasmid.laScala.fp.{FP, Spy}
 import org.slf4j.Logger
 
 /**
@@ -96,11 +96,10 @@ abstract class AbstractTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends
     *
     * @param bs the sequence of bases
     * @return an Allele
+    *
+    * CONSIDER just using a normal if clause here
     */
-  def transcribeBases(bs: Seq[B]): Option[Allele[G]] = if (bs.nonEmpty)
-    Spy.spy(s"transcribeBases($bs): ", f(bs))
-  else
-    None
+  def transcribeBases(bs: Seq[B]): Option[Allele[G]] = FP.which(bs.nonEmpty)(f(bs), None)
 }
 
 case class PlainTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends AbstractTranscriber[B, G](f)
