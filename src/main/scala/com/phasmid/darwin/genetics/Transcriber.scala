@@ -97,7 +97,7 @@ abstract class AbstractTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends
     * @param bs the sequence of bases
     * @return an Allele
     *
-    * CONSIDER just using a normal if clause here
+    *         CONSIDER just using a normal if clause here
     */
   def transcribeBases(bs: Seq[B]): Option[Allele[G]] = FP.which(bs.nonEmpty)(f(bs), None)
 }

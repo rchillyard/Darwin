@@ -54,7 +54,7 @@ trait Evolver {
   /**
     * Add a listener to the evolution process.
     *
-    * @param listener
+    * @param listener the listener
     * @return true if the listener was added
     */
   def addListener(listener: Listener): Boolean

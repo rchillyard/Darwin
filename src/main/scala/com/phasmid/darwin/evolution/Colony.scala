@@ -83,10 +83,10 @@ abstract class AbstractColony[B, P, G, T, V: Incrementable, X, OrganismType <: O
     * @return a new Evolvable
     */
   override def offspring: Iterator[OrganismType] =
-//    if (genome.sexual)
-//    throw GeneticsException("offspring not implemented") // FIXME implement me
-//  else // TODO implement me properly
-    (organisms filter {o: OrganismType => o.fitness(ecology, ecoFactors).get.x>=0}).toIterator
+  //    if (genome.sexual)
+  //    throw GeneticsException("offspring not implemented") // FIXME implement me
+  //  else // TODO implement me properly
+    (organisms filter { o: OrganismType => o.fitness(ecology, ecoFactors).get.x >= 0 }).toIterator
 
   //  def build(xs: Iterator[OrganismType], v: Version[V]): AbstractColony[B, P, G, T, V, X, OrganismType]
 

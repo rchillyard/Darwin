@@ -161,6 +161,7 @@ case class Location(name: String, offset: Int, length: Int) extends Identifier {
 
 /**
   * This trait defines reproductive style.
+  *
   * @tparam P the Ploidy type
   */
 trait Sexual[P] {
@@ -170,8 +171,8 @@ trait Sexual[P] {
     * @return true for diploid or polyploid genomes
     */
   def sexual(p: P): Boolean = p match {
-    case p: Int => true
-    case p: Boolean => true
+    case _: Int => true
+    case _: Boolean => true
     case _ => false
   }
 
