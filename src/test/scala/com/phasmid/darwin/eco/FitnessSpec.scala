@@ -32,6 +32,10 @@ class FitnessSpec extends FlatSpec with Matchers {
 
   import Fitness.{nonViable, tossup, viable}
 
+  "render" should "work" in {
+    Fitness(1).render() shouldBe "Fitness(1.0)"
+  }
+
   behavior of "apply"
   it should "work for Fitness(1), etc." in {
     Fitness(1)() shouldBe 1

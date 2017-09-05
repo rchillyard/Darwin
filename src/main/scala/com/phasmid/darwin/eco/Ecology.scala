@@ -23,14 +23,16 @@
 
 package com.phasmid.darwin.eco
 
+import com.phasmid.darwin.Ecological
+import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.genetics._
-import com.phasmid.darwin.{Ecological, Identifier}
 import com.phasmid.laScala.fp.FP.sequence
+import com.phasmid.laScala.{Prefix, Renderable}
 
 /**
   * Created by scalaprof on 5/9/16.
   */
-case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Ecological[T, X] with Identifier {
+case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Ecological[T, X] with Identifiable {
 
   /**
     * The apply method for this Ecology. For each Trait in the given Phenotype, we look up its corresponding Factor
@@ -47,7 +49,16 @@ case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: Fi
   }
 
   override def toString: String = s"Ecology($name, $factors, $fitness, $adapter"
+
+  override def render(indent: Int)(implicit tab: (Int) => Prefix): String = {
+    val sb = new StringBuilder(s"Ecology($name")
+    sb.append(nl(indent + 1) + "factors:" + Renderable.renderElem(factors, indent + 2))
+    sb.append(nl(indent + 1) + "fitnessFunction:" + Renderable.renderElem(fitness, indent + 2))
+    sb.append(nl(indent + 1) + "adapter:" + Renderable.renderElem(adapter, indent + 2))
+    sb.append(")")
+    sb.toString()
+  }
 }
 
-case class Factor(name: String) extends Identifier
+case class Factor(name: String) extends Identifiable
 

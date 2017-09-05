@@ -54,10 +54,15 @@ class EcologySpec extends FlatSpec with Matchers {
       }
   }
 
+  "render" should "work" in {
+    val ecology = Ecology[Double, Int]("test", factorMap, ff, adapter)
+    ecology.render() shouldBe "Ecology(test\n  factors:((height,elephant grass))\n  fitnessFunction:<function3>\n  adapter:<function3>)"
+  }
+
   "apply" should "create adaptatype" in {
+    val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test", factorMap, ff, adapter)
     val height = Characteristic("height")
     val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
-    val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test", factorMap, ff, adapter)
     val adaptatype: Adaptatype[Int] = ecology(phenotype)
     val adaptations = adaptatype.adaptations
     adaptations.size shouldBe 1

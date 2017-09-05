@@ -107,10 +107,14 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
 
   behavior of "Colony"
 
+  it should "render" in {
+    val random = RNG[Base](3L)
+    val colony = Colony("test colony", ecology, ecoFactors, genome, phenome).seedMembers(10, random)
+    colony.render() shouldBe "Colony(test colony\n  organisms:(\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n        SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>)\n      )\n  generation:0\n  ecology:Ecology(test\n        factors:((height,elephant grass))\n        fitnessFunction:<function3>\n        adapter:<function3>)\n  ecoFactors:((elephant grass,elephant grass))\n  genome:test\n  phenome:test)"
+  }
+
   it should "evolve" in {
     val random = RNG[Base](3L)
-    println(s"ecology: $ecology")
-    println(s"ecoFactors: $ecoFactors")
     val colony = Colony("test colony", ecology, ecoFactors, genome, phenome).seedMembers(10, random)
     println(colony)
     // TODO rework this test

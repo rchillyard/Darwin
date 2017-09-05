@@ -24,8 +24,8 @@
 package com.phasmid.darwin.evolution
 
 import com.phasmid.darwin.eco.Fitness
-import com.phasmid.laScala.Version
 import com.phasmid.laScala.values.Rational
+import com.phasmid.laScala.{Prefix, Renderable, Version}
 import org.scalatest.{FlatSpec, Inside, Matchers}
 
 import scala.util.Success
@@ -54,12 +54,34 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
     protected[EvolvableSpec] override def *(fraction: Rational[Long])(implicit random: RNG[Long]): Iterable[Int] = super.*(fraction)
 
     def isFit(f: Fitness): Boolean = f.x >= 0.5
+
+    /**
+      * This method should normally be overridden
+      *
+      * @param indent the indentation
+      * @param tab    the tabulator
+      * @return the result
+      */
+    def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = {
+      val sb = new StringBuilder(s"MockEvolvable(")
+      sb.append(nl(indent + 1) + "version:" + Renderable.renderElem(version, indent + 2))
+      sb.append(nl(indent + 1) + "members:" + Renderable.renderElem(members, indent + 2))
+      sb.append(")")
+      sb.toString()
+    }
+
+
   }
 
   "MockEvolvable" should "shuffle properly" in {
     val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
     evolvable.permute.toSeq shouldBe Stream(1, 1, 3, 2, 13, 5, 8)
   }
+  it should "render" in {
+    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
+    evolvable.render() shouldBe "MockEvolvable(\n  version:0\n  members:(\n        1,\n        1,\n        2,\n        3,\n        5,\n        8,\n        13\n      ))"
+  }
+
   it should "build properly" in {
     val evolvable = MockEvolvable(Seq(), Version(0, None))
     val x = evolvable.build(Seq(1, 1, 3, 2, 13, 5, 8), Version(1, None))

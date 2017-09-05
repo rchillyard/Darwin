@@ -140,15 +140,15 @@ class WheelSpec extends FlatSpec with Matchers {
     import Hand.RandomizableHand
     val wheel = Wheel(Hand.hands, Hand.hands map (_.frequency.toLong))()
     val hands: List[Hand] = (wheel.toStream take 649740).toList
-    hands count (_.name == "Royal Flush") shouldBe (1 +- 3)
-    hands count (_.name == "Straight Flush") shouldBe (9 +- 10)
-    hands count (_.name == "Four of a kind") shouldBe (156 +- 42)
-    hands count (_.name == "Full House") shouldBe (936 +- 72)
-    hands count (_.name == "Flush") shouldBe (1277 +- 100)
-    hands count (_.name == "Straight") shouldBe (2550 +- 150)
-    hands count (_.name == "Three of a kind") shouldBe (13728 +- 300)
-    hands count (_.name == "Two Pair") shouldBe (30888 +- 400)
-    hands count (_.name == "Pair") shouldBe (274560 +- 1100)
-    hands count (_.name == "High Card") shouldBe (325635 +- 1250)
+    hands count (_.name == "Royal Flush") shouldBe (1 +- 3) // 3
+    hands count (_.name == "Straight Flush") shouldBe (9 +- 10) // 1.11
+    hands count (_.name == "Four of a kind") shouldBe (156 +- 42) // 0.27
+    hands count (_.name == "Full House") shouldBe (936 +- 94) // 0.1
+    hands count (_.name == "Flush") shouldBe (1277 +- 100) // 0.078
+    hands count (_.name == "Straight") shouldBe (2550 +- 150) // 0.059
+    hands count (_.name == "Three of a kind") shouldBe (13728 +- 300) // 0.0219
+    hands count (_.name == "Two Pair") shouldBe (30888 +- 400) // // 0.013
+    hands count (_.name == "Pair") shouldBe (274560 +- 1500) // 0.0055
+    hands count (_.name == "High Card") shouldBe (325635 +- 1628) // 0.005
   }
 }

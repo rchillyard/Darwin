@@ -23,11 +23,12 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.Ecological
+import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
-import com.phasmid.darwin.{Ecological, Identifier}
-import com.phasmid.laScala.Version
 import com.phasmid.laScala.values.Incrementable
+import com.phasmid.laScala.{Prefix, Renderable, Version}
 
 import scala.annotation.tailrec
 
@@ -49,7 +50,7 @@ import scala.annotation.tailrec
   * @tparam OrganismType the Organism type
   * @tparam Repr         the Representation type for this Colony
   */
-abstract class AbstractColony[B, P, G, T, V: Incrementable, X, OrganismType <: Organism[B, P, G, T, X], Repr](organisms: Iterable[OrganismType], generation: Version[V], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]], genome: Genome[B, P, G], phenome: Phenome[P, G, T]) extends BaseEvolvable[V, OrganismType, Repr](organisms, generation) with Ecological[T, X] with Theocratic[B, Repr] with Identifier {
+abstract class AbstractColony[B, P, G, T, V: Incrementable, X, OrganismType <: Organism[B, P, G, T, X], Repr](organisms: Iterable[OrganismType], generation: Version[V], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]], genome: Genome[B, P, G], phenome: Phenome[P, G, T]) extends BaseEvolvable[V, OrganismType, Repr](organisms, generation) with Ecological[T, X] with Theocratic[B, Repr] with Identifiable {
 
   /**
     * Default implementation of isFit for any AbstractColony
@@ -102,6 +103,18 @@ abstract class AbstractColony[B, P, G, T, V: Incrementable, X, OrganismType <: O
 
     val (bns, _) = inner(Nil, random, size)
     build(bns map createOrganism, generation)
+  }
+
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = {
+    val sb = new StringBuilder(s"Colony($name")
+    sb.append(nl(indent + 1) + "organisms:" + Renderable.renderElem(organisms, indent + 2))
+    sb.append(nl(indent + 1) + "generation:" + Renderable.renderElem(generation, indent + 2))
+    sb.append(nl(indent + 1) + "ecology:" + Renderable.renderElem(ecology, indent + 2))
+    sb.append(nl(indent + 1) + "ecoFactors:" + Renderable.renderElem(ecoFactors, indent + 2))
+    sb.append(nl(indent + 1) + "genome:" + Renderable.renderElem(genome, indent + 2))
+    sb.append(nl(indent + 1) + "phenome:" + Renderable.renderElem(phenome, indent + 2))
+    sb.append(")")
+    sb.toString()
   }
 }
 

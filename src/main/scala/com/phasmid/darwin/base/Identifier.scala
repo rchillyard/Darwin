@@ -21,28 +21,26 @@
  *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.phasmid.darwin.eco
+package com.phasmid.darwin.base
 
-import com.phasmid.darwin.base.Identifiable
+import com.phasmid.laScala.{Prefix, Renderable}
 
-/**
-  * TODO redefine this: it should be a pair (or collection) of Ecologies, where there are boundaries between pairs.
-  *
-  * An Environment is where the fitness of phenotypes (or organisms) is evaluated to determine viability.
-  * An Environment is essentially the intersection of a number of EcoFactors, for each of which an organism
-  * is evaluated. The fitness of the various eco factors are then combined to generate the overall fitness
-  * for the environment.
-  *
-  * @tparam X underlying type of Environment
-  *
-  *           Created by scalaprof on 5/5/16.
-  */
-case class Environment[X](name: String, factors: EcoFactor[X]*) extends Identifiable
+trait Identifier {
+  /**
+    * Provide the name of an object, primarily for rendering/debugging purposes.
+    *
+    * @return the name
+    */
+  def name: String
 
-trait Environmental[X] {
-  def environment: Environment[X]
+  override def toString: String = name
 }
 
-case class EcoFactor[X](factor: Factor, x: X) extends Identifiable {
-  val name: String = factor.name
+trait Identifiable extends Renderable with Identifier {
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = name
+}
+
+trait Plain extends Renderable {
+  // NOTE: it's OK for render to invoke toString but it's never OK for toString to invoke render!!
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = toString
 }

@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.Identifier
+import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.eco.{Fitness, Viability}
 import com.phasmid.laScala.fp.FP._
 import com.phasmid.laScala.fp.Spy
@@ -48,7 +48,7 @@ import scala.util.Try
   * @tparam G the underlying Gene value type, typically String
   * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
   */
-case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T], attraction: (Trait[T], Trait[T]) => Fitness) extends Phenomic[P, G, T] with Identifier {
+case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T], attraction: (Trait[T], Trait[T]) => Fitness) extends Phenomic[P, G, T] with Identifiable {
   implicit private val spyLogger = Spy.getLogger(getClass)
 
   /**
@@ -62,7 +62,9 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     */
   def apply(genotype: Genotype[P, G]): Phenotype[T] = {
     val ttts: Seq[Try[Trait[T]]] = for (g <- genotype.genes;
-                                        c <- Spy.spy(s"g: $g; charactistics: ", characteristics.get(g.locus)))
+                                        //                                        c <- Spy.spy(s"g: $g; charactistics: ", characteristics.get(g.locus))
+                                        c <- characteristics.get(g.locus)
+    )
       yield for (t <- expresser(c, g))
         yield t
     val result = Phenotype(sequence(ttts).get)
@@ -90,4 +92,4 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
   * @param name                the identifier of this Characteristic
   * @param isSexuallySelective (defaults to false) true if this characteristic is observable as a sexually selective trait
   */
-case class Characteristic(name: String, isSexuallySelective: Boolean = false) extends Identifier
+case class Characteristic(name: String, isSexuallySelective: Boolean = false) extends Identifiable

@@ -35,17 +35,6 @@ import scala.util.Try
   */
 package object darwin {
 
-  trait Identifier {
-    /**
-      * Provide the name of an object, primarily for rendering/debugging purposes.
-      *
-      * @return the name
-      */
-    def name: String
-
-    override def toString: String = name
-  }
-
   /**
     * No... I think what we want to do is to create another model from the Phenotype: an adaptation.
     * This adaptation can then be crossed with an Environment to determine the fitness function.

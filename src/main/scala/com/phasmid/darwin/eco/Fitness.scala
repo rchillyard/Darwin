@@ -23,7 +23,8 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.Identifier
+import com.phasmid.darwin.base.{Identifiable, Plain}
+
 
 /**
   * Class to define the concept of Fitness. Fitness applies in each of the two aspects of evolution:
@@ -47,7 +48,7 @@ import com.phasmid.darwin.Identifier
   *
   * Created by scalaprof on 5/5/16.
   */
-class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitness] {
+class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitness] with Plain {
 
   /**
     * Method to yield the underlying value of this Fitness as a Double
@@ -90,9 +91,15 @@ class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitnes
 
   override def hashCode(): Int = x.hashCode()
 
+  /**
+    * Used by render()
+    *
+    * @return a String based on x
+    */
   override def toString(): String = s"Fitness($x)"
 
   def compare(f1: Fitness, f2: Fitness): Int = f1.x compareTo f2.x
+
 }
 
 /**
@@ -152,7 +159,7 @@ object Viability {
   * @tparam T the underlying type of the trait
   * @tparam X the underlying type of the ecofactor
   */
-case class FunctionShape[X, T](name: String, f: X => T => Fitness) extends Identifier
+case class FunctionShape[X, T](name: String, f: X => T => Fitness) extends Identifiable
 
 object Fitness {
   val viable: Fitness = new Fitness(1)

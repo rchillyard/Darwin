@@ -25,7 +25,7 @@ package com.phasmid.darwin.evolution
 
 import com.phasmid.darwin.eco.Fitness
 import com.phasmid.laScala.values.{Incrementable, Rational}
-import com.phasmid.laScala.{Sequential, Version}
+import com.phasmid.laScala.{Renderable, Sequential, Version}
 
 import scala.language.implicitConversions
 import scala.util.Try
@@ -108,7 +108,7 @@ trait SequentialEvolvable[X, V, Repr] extends Evolvable[X] with Sequential[Repr]
   * @tparam V the version type (defined to be Incrementable)
   * @tparam X the underlying type of the xs
   */
-abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv: Version[V]) extends SequentialEvolvable[X, V, Repr] {
+abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv: Version[V]) extends SequentialEvolvable[X, V, Repr] with Renderable {
 
   /**
     * Method which determines if a particular Fitness value will be considered sufficiently fit to survive this generation
@@ -199,6 +199,7 @@ abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv
   }
 
   private def buildInternal(xs: Iterable[X], v: Version[V]): BaseEvolvable[V, X, Repr] = build(xs, v).asInstanceOf[BaseEvolvable[V, X, Repr]]
+
 }
 
 object Evolvable {

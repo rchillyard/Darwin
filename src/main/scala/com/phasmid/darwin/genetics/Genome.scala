@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.Identifier
+import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.evolution.{RNG, Random}
 import com.phasmid.laScala.fp.FP._
 import com.phasmid.laScala.fp.Spy
@@ -46,7 +46,7 @@ import com.phasmid.laScala.fp.Spy
   */
 case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
                            // CONSIDER combining transcriber and locusMap
-                           transcriber: Transcriber[B, G], locusMap: (Location) => Locus[G]) extends Sexual[P] with Genomic[B, P, G] with Identifier {
+                           transcriber: Transcriber[B, G], locusMap: (Location) => Locus[G]) extends Sexual[P] with Genomic[B, P, G] with Identifiable {
   /**
     * @return the the number of chromosomes (pairs, actually) defined for this Genome. Synonymous with "karyotype"
     */
@@ -75,7 +75,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     */
   def apply(bsss: Nucleus[B]): Genotype[P, G] = {
     require(bsss.size == chromosomes, s"size of outer Sequences dimension (${bsss.size}) should equal the karyotype ($chromosomes)")
-    val genes = for ((bss, k) <- bsss zip karyotype; l <- Spy.spy(s"l for $k: ", k.ls)) yield Spy.spy(s"yield for $bss, $l: ", transcribe(bss, l))
+    val genes = Spy.spy(s"genes for $bsss: ", for ((bss, k) <- bsss zip karyotype; l <- k.ls) yield transcribe(bss, l))
     Genotype[P, G](genes)
   }
 
@@ -102,7 +102,8 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @return a new instance of Gene[P]
     */
   def transcribe(bss: SequenceSet[B], location: Location): Gene[P, G] = {
-    val gaos: Seq[Option[Allele[G]]] = Spy.spy(s"transcribe($bss, $location): gaos=", for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g)
+    //    val gaos = Spy.spy(s"transcribe($bss, $location): gaos=", for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g)
+    val gaos = for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g
     PGene(locusMap(location), sequence(gaos).get)
   }
 
@@ -140,7 +141,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
   * @param isSex if true then this is an allosome (i.e. is sex-linked) otherwise an autosome.
   * @param ls    the gene loci on this Chromosome
   */
-case class Chromosome(name: String, isSex: Boolean, ls: Seq[Location]) extends Identifier {
+case class Chromosome(name: String, isSex: Boolean, ls: Seq[Location]) extends Identifiable {
   /**
     * @return the number of locations (loci) in this Chromosome
     */
@@ -155,7 +156,7 @@ case class Chromosome(name: String, isSex: Boolean, ls: Seq[Location]) extends I
   * @param offset the offset at which the gene starts in the sequence for this Chromosome
   * @param length the length of the gene in terms of the sequence
   */
-case class Location(name: String, offset: Int, length: Int) extends Identifier {
+case class Location(name: String, offset: Int, length: Int) extends Identifiable {
   override def toString: String = s"L:$name:$offset:$length"
 }
 

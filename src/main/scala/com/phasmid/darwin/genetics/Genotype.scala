@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.Identifier
+import com.phasmid.darwin.base.Identifiable
 
 /**
   * This class represents a genotype: the genes of a particular organism.
@@ -50,7 +50,7 @@ case class Genotype[P, G](genes: Seq[Gene[P, G]])
   *           Otherwise, P will be Int.
   * @tparam G the underlying Gene type
   */
-trait Gene[P, G] extends (P => Allele[G]) with Identifier {
+trait Gene[P, G] extends (P => Allele[G]) with Identifiable {
   def locus: Locus[G]
 
   /**
@@ -143,6 +143,6 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
   * @param t the value of this Allele
   * @tparam G the type of the value
   */
-case class Allele[G](t: G) extends Identifier {
+case class Allele[G](t: G) extends Identifiable {
   override def name: String = t.toString
 }

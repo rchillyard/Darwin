@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics.dna
 
-import com.phasmid.darwin.Identifier
+import com.phasmid.darwin.base.Identifiable
 
 import scala.language.implicitConversions
 
@@ -34,7 +34,7 @@ import scala.language.implicitConversions
   *
   * @author scalaprof
   */
-trait Base extends Identifier {
+trait Base extends Identifiable {
   def pair: Base
 
   val i: Int
