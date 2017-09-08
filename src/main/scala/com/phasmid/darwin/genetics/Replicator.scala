@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.laScala.RNG
+import com.phasmid.laScala.{Prefix, RNG, Renderable, RenderableCaseClass}
 
 /**
   * Created by scalaprof on 7/31/16.
@@ -54,7 +54,7 @@ trait Replicator[B] {
   * @param r     a random number generator (of Int)
   * @tparam B the base type
   */
-case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Replicator[B] {
+case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Replicator[B] with Renderable {
   // NOTE: a variable.
   var i = 0
   private val rmnopc = RNG.values(r) map (_ % mnopc)
@@ -66,6 +66,9 @@ case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Repl
     for (b <- bs) yield
       if (random == 0) implicitly[Ordinal[B]].fromInt(random)
       else b
+
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[ImperfectReplicator[Any]]).render(indent)(tab)
+
 }
 
 /**
@@ -73,6 +76,8 @@ case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Repl
   *
   * @tparam B the base type
   */
-case class PerfectReplicator[B]() extends Replicator[B] {
+case class PerfectReplicator[B]() extends Replicator[B] with Renderable {
   def replicate(bs: Seq[B]): Seq[B] = bs
+
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[PerfectReplicator[Any]]).render(indent)(tab)
 }

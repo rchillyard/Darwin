@@ -54,6 +54,13 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
   }
 
   behavior of "adaptation"
+  it should "render correctly" in {
+    val height = Characteristic("height")
+    val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
+    val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
+    val adaptatype: Adaptatype[Double] = ecology(phenotype)
+    adaptatype.render() shouldBe "Adaptatype(\n  adaptations:(Adaptation(\n        factor:Factor(\n            name:\"elephant grass\"\n            )\n        ecoFitness:<function1>\n        ))\n  )"
+  }
   it should "yield appropriate fitness" in {
     val height = Characteristic("height")
     val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))

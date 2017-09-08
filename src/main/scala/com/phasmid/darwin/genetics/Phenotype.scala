@@ -23,6 +23,8 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
+
 /**
   * This class represents the Phenotype for an Organism. The Phenotype is "expressed" from the Genotype with respect to
   * the Phenome of the Organism.
@@ -40,6 +42,8 @@ case class Phenotype[T](traits: Seq[Trait[T]])
   * @param value          the T value of this Trait
   * @tparam T the underlying type of the Trait
   */
-case class Trait[T](characteristic: Characteristic, value: T) {
+case class Trait[T](characteristic: Characteristic, value: T) extends Renderable {
   def isSexuallySelective: Boolean = characteristic.isSexuallySelective
+
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Trait[Any]]).render(indent)(tab)
 }

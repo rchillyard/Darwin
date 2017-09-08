@@ -37,10 +37,25 @@ trait Identifier {
 }
 
 trait Identifiable extends Renderable with Identifier {
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = name
+  /**
+    * This method will normally be overridden, especially if the concrete class is a case class.
+    *
+    * @param indent the indent
+    * @param tab    the tabulator
+    * @return the rendered String
+    */
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = {
+    val prefix = this match {
+      case p: Product => p.productPrefix
+      case _ => getClass.getSimpleName
+    }
+    s"$prefix:$name"
+  }
 }
 
 trait Plain extends Renderable {
   // NOTE: it's OK for render to invoke toString but it's never OK for toString to invoke render!!
   def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = toString
 }
+
+

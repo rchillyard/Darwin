@@ -28,7 +28,7 @@ import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
 import com.phasmid.laScala.values.Incrementable
-import com.phasmid.laScala.{Prefix, Renderable, Version}
+import com.phasmid.laScala.{Prefix, RenderableCaseClass, Version}
 
 import scala.annotation.tailrec
 
@@ -104,18 +104,6 @@ abstract class AbstractColony[B, P, G, T, V: Incrementable, X, OrganismType <: O
     val (bns, _) = inner(Nil, random, size)
     build(bns map createOrganism, generation)
   }
-
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = {
-    val sb = new StringBuilder(s"Colony($name")
-    sb.append(nl(indent + 1) + "organisms:" + Renderable.renderElem(organisms, indent + 2))
-    sb.append(nl(indent + 1) + "generation:" + Renderable.renderElem(generation, indent + 2))
-    sb.append(nl(indent + 1) + "ecology:" + Renderable.renderElem(ecology, indent + 2))
-    sb.append(nl(indent + 1) + "ecoFactors:" + Renderable.renderElem(ecoFactors, indent + 2))
-    sb.append(nl(indent + 1) + "genome:" + Renderable.renderElem(genome, indent + 2))
-    sb.append(nl(indent + 1) + "phenome:" + Renderable.renderElem(phenome, indent + 2))
-    sb.append(")")
-    sb.toString()
-  }
 }
 
 /**
@@ -132,6 +120,10 @@ case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterabl
   def apply(phenotype: Phenotype[T]): Adaptatype[X] = throw GeneticsException("apply not implemented") // FIXME implement me (??)
 
   override def toString: String = s"$name generation $generation with ${organisms.size} organisms"
+
+  // CONSIDER removing the parameter tab from the invocation: it isn't really needed (in all defs of render)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Colony[Any, Any, Any, Any, Any]]).render(indent)(tab)
+
 }
 
 object Colony {

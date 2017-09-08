@@ -24,6 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.Identifiable
+import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 
 /**
   * This class represents a genotype: the genes of a particular organism.
@@ -35,7 +36,11 @@ import com.phasmid.darwin.base.Identifiable
   * @tparam G the underlying Gene type
   * @author scalaprof
   */
-case class Genotype[P, G](genes: Seq[Gene[P, G]])
+case class Genotype[P, G](genes: Seq[Gene[P, G]]) extends Renderable {
+
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Genotype[Any, Any]]).render(indent)(tab)
+
+}
 
 /**
   * This trait defines the function to take a selector (a P) and return the particular Allele that corresponds to
@@ -83,11 +88,14 @@ trait Locus[G] extends (() => Set[Allele[G]]) {
   override def toString = s"Locus at $location with dominant: $dominant and possible alleles: ${apply()}"
 }
 
-case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: Option[Allele[G]]) extends Locus[G] {
+case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: Option[Allele[G]]) extends Locus[G] with Renderable {
   /**
     * @return the actual Alleles present at this Locus
     */
   def apply(): Set[Allele[G]] = alleles
+
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[PlainLocus[Any]]).render(indent)(tab)
+
 }
 
 /**
@@ -103,6 +111,8 @@ case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: 
   */
 case class MendelianGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as) {
   override def toString = s"""MendelianGene: at $l with alleles: ${as.mkString(", ")}"""
+
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[MendelianGene[Any, Any]]).render(indent)(tab)
 }
 
 abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[P, G] {
@@ -145,4 +155,6 @@ abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
   */
 case class Allele[G](t: G) extends Identifiable {
   override def name: String = t.toString
+
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Allele[Any]]).render(indent)(tab)
 }

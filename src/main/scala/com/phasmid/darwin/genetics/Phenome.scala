@@ -27,6 +27,7 @@ import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.eco.{Fitness, Viability}
 import com.phasmid.laScala.fp.FP._
 import com.phasmid.laScala.fp.Spy
+import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 import scala.util.Try
 
@@ -84,6 +85,9 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     val tts: Seq[(Trait[T], Trait[T])] = for (t1 <- observer.traits; t2 <- observed.traits; if t1.isSexuallySelective && t2.isSexuallySelective) yield (t1, t2)
     Viability(for ((t1, t2) <- tts) yield attraction(t1, t2))()
   }
+
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Phenome[Any, Any, Any]]).render(indent)(tab)
+
 }
 
 /**
@@ -92,4 +96,6 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
   * @param name                the identifier of this Characteristic
   * @param isSexuallySelective (defaults to false) true if this characteristic is observable as a sexually selective trait
   */
-case class Characteristic(name: String, isSexuallySelective: Boolean = false) extends Identifiable
+case class Characteristic(name: String, isSexuallySelective: Boolean = false) extends Identifiable {
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
+}

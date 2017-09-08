@@ -27,6 +27,7 @@ import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.evolution.{RNG, Random}
 import com.phasmid.laScala.fp.FP._
 import com.phasmid.laScala.fp.Spy
+import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 
 /**
@@ -119,6 +120,8 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     */
   case class PGene(l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as) {
     override def toString: String = "PGene:" + super.toString
+
+    override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
   }
 
   private lazy val ploidyVal: Int = ploidy match {
@@ -146,6 +149,8 @@ case class Chromosome(name: String, isSex: Boolean, ls: Seq[Location]) extends I
     * @return the number of locations (loci) in this Chromosome
     */
   def loci: Int = ls.size
+
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
 }
 
 /**
@@ -158,6 +163,8 @@ case class Chromosome(name: String, isSex: Boolean, ls: Seq[Location]) extends I
   */
 case class Location(name: String, offset: Int, length: Int) extends Identifiable {
   override def toString: String = s"L:$name:$offset:$length"
+
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
 }
 
 /**

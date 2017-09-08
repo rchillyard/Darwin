@@ -25,6 +25,7 @@ package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.eco._
 import com.phasmid.laScala.fp.FP
+import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 
 import scala.util.Try
 
@@ -35,7 +36,8 @@ import scala.util.Try
   *
   * Created by scalaprof on 5/9/16.
   */
-case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) {
+
+case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) extends Renderable {
   /**
     * Method to evaluate and blend the fitness of each adaptation into a single fitness, wrapped in Try
     *
@@ -47,6 +49,9 @@ case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) {
     assert(ts.nonEmpty, s"the ecology map did not match any adaptations: map keys: ${ecology.keys}; adaptations: $adaptations")
     for (fs <- FP.sequence(for ((a, e) <- ts) yield a(e))) yield Viability(fs)()
   }
+
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Adaptatype[Any]]).render(indent)(tab)
+
 }
 
 /**
@@ -56,10 +61,12 @@ case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) {
   *
   * CONSIDER simply extending the fitness function
   */
-case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X]) extends EcoFitness[X] {
+case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X]) extends Renderable with EcoFitness[X] {
 
   def apply(x: EcoFactor[X]): Try[Fitness] = ecoFitness(x)
 
   override def toString(): String = s"Adaptation($factor, $ecoFitness)"
+
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Adaptation[Any]]).render(indent)(tab)
 }
 
