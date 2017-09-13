@@ -104,13 +104,59 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
 
   val expresser: Expresser[Boolean, String, Double] = ExpresserMendelian[Boolean, String, Double](traitMapper)
   val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
+  private val sUuid = """(\p{XDigit}{8})-(\p{XDigit}{4})-(\p{XDigit}{4})-(\p{XDigit}{4})-(\p{XDigit}{12})"""
+  private val uuidR = sUuid.r
 
   behavior of "Colony"
 
   it should "render" in {
     val random = RNG[Base](3L)
     val colony = Colony("test colony", ecology, ecoFactors, genome, phenome).seedMembers(10, random)
-    colony.render() shouldBe "Colony(\n  name:\"test colony\"\n  organisms:(\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>),\n      SexualSedentaryOrganism(test,test,Stream(Stream(G, ?), ?),Ecology(test, Map(height -> elephant grass), <function3>, <function3>)\n    )\n  generation:0\n  ecology:Ecology(test\n      factors:((height,elephant grass))\n      fitnessFunction:<function3>\n      adapter:<function3>)\n  ecoFactors:((elephant grass,elephant grass))\n  genome:Genome:test\n  phenome:Phenome(\n      name:\"test\"\n      characteristics:(\n          (Locus at L:height:0:1 with dominant: Some(T) and possible alleles: Set(T, S),height),\n          (Locus at L:girth:1:1 with dominant: Some(P) and possible alleles: Set(P, Q),girth)\n        )\n      expresser:ExpresserMendelian(\n          traitMapper:<function2>\n          )\n      attraction:<function2>\n      )\n  )"
+    val filtered = colony.render().replaceAll(sUuid, "<UUID>")
+    println(filtered)
+    filtered shouldBe
+      """Colony(
+  name:"test colony"
+  organisms:(
+      SexualSedentaryOrganism:<UUID>,
+      SexualSedentaryOrganism:<UUID>,
+      SexualSedentaryOrganism:<UUID>,
+      SexualSedentaryOrganism:<UUID>,
+      SexualSedentaryOrganism:<UUID>,
+      SexualSedentaryOrganism:<UUID>,
+      SexualSedentaryOrganism:<UUID>,
+      SexualSedentaryOrganism:<UUID>,
+      SexualSedentaryOrganism:<UUID>,
+      SexualSedentaryOrganism:<UUID>
+    )
+  generation:0
+  ecology:test
+  ecoFactors:((elephant grass,elephant grass))
+  genome:Genome:test
+  phenome:Phenome(
+      name:"test"
+      characteristics:(
+          (Locus at L:height:0:1 with dominant: Some(T) and possible alleles: Set(T, S),height),
+          (Locus at L:girth:1:1 with dominant: Some(P) and possible alleles: Set(P, Q),girth)
+        )
+      expresser:ExpresserMendelian(
+          traitMapper:<function2>
+          )
+      attraction:<function2>
+      )
+  )"""
+  }
+
+  it should "create an organism" in {
+    val random = RNG[Base](3L)
+    val colony = Colony("test colony", ecology, ecoFactors, genome, phenome)
+    val (bn, _) = genome.recombine(random)
+    val organism = colony.createOrganism(bn)
+    organism.nucleus should matchPattern { case _ => }
+    organism.name match {
+      case uuidR(b, c, d, e, f) => println(s"$b-$c-$d-$e-$f")
+      case x => fail(s"invalid UUID: $x")
+    }
   }
 
   it should "evolve" in {

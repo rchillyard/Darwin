@@ -24,6 +24,7 @@
 package com.phasmid.darwin.eco
 
 import com.phasmid.darwin.base.Identifiable
+import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 /**
   * TODO redefine this: it should be a pair (or collection) of Ecologies, where there are boundaries between pairs.
@@ -37,7 +38,9 @@ import com.phasmid.darwin.base.Identifiable
   *
   *           Created by scalaprof on 5/5/16.
   */
-case class Environment[X](name: String, factors: EcoFactor[X]*) extends Identifiable
+case class Environment[X](name: String, factors: EcoFactor[X]*) extends Identifiable {
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Environment[Any]]).render(indent)(tab)
+}
 
 trait Environmental[X] {
   def environment: Environment[X]
@@ -45,4 +48,6 @@ trait Environmental[X] {
 
 case class EcoFactor[X](factor: Factor, x: X) extends Identifiable {
   val name: String = factor.name
+
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[EcoFactor[Any]]).render(indent)(tab)
 }

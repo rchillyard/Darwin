@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.base
 
-import com.phasmid.laScala.{Prefix, Renderable}
+import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 
 trait Identifier {
   /**
@@ -51,6 +51,15 @@ trait Identifiable extends Renderable with Identifier {
     }
     s"$prefix:$name"
   }
+}
+
+trait CaseIdentifiable[T] extends Identifiable {
+
+  import scala.reflect.runtime.universe._
+
+  def render(indent: Int)(implicit tab: (Int) => Prefix, typeTag: TypeTag[T]): String =
+    if (indent > 0) super.render(indent)(tab)
+    else RenderableCaseClass(this.asInstanceOf[T]).render(indent)(tab)
 }
 
 trait Plain extends Renderable {

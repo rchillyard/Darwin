@@ -27,7 +27,7 @@ import com.phasmid.darwin.Ecological
 import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.genetics._
 import com.phasmid.laScala.fp.FP.sequence
-import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
+import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 /**
   * Created by scalaprof on 5/9/16.
@@ -50,17 +50,12 @@ case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: Fi
 
   override def toString: String = s"Ecology($name, $factors, $fitness, $adapter"
 
-  override def render(indent: Int)(implicit tab: (Int) => Prefix): String = {
-    val sb = new StringBuilder(s"Ecology($name")
-    sb.append(nl(indent + 1) + "factors:" + Renderable.renderElem(factors, indent + 2))
-    sb.append(nl(indent + 1) + "fitnessFunction:" + Renderable.renderElem(fitness, indent + 2))
-    sb.append(nl(indent + 1) + "adapter:" + Renderable.renderElem(adapter, indent + 2))
-    sb.append(")")
-    sb.toString()
-  }
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = if (indent > 0) name
+  else RenderableCaseClass(this.asInstanceOf[Ecology[Any, Any]]).render(indent)(tab)
 }
 
 case class Factor(name: String) extends Identifiable {
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = if (indent > 0) name
+  else RenderableCaseClass(this).render(indent)(tab)
 }
 

@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.base.CaseIdentifiable
 import com.phasmid.darwin.eco.{EcoFactor, Ecology, Fitness}
 import com.phasmid.darwin.genetics._
 
@@ -65,9 +66,10 @@ trait SedentaryOrganism[B, P, G, T, X] extends Organism[B, P, G, T, X] {
   def build(genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, P, G, T, X]
 }
 
-case class SexualSedentaryOrganism[B, G, T, X](genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends SedentaryOrganism[B, Boolean, G, T, X] {
-  def build(genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, Boolean, G, T, X] = SexualSedentaryOrganism(genome, phenome, nucleus, ecology)
+case class SexualSedentaryOrganism[B, G, T, X](name: String, genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends SedentaryOrganism[B, Boolean, G, T, X] with CaseIdentifiable[SexualSedentaryOrganism[Any, Any, Any, Any]] {
+  def build(genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, Boolean, G, T, X] = SexualSedentaryOrganism(name, genome, phenome, nucleus, ecology)
 
+  //  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[SexualSedentaryOrganism[Any,Any,Any,Any]]).render(indent)(tab)
 
 }
 

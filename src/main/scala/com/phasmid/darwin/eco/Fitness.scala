@@ -24,6 +24,7 @@
 package com.phasmid.darwin.eco
 
 import com.phasmid.darwin.base.{Identifiable, Plain}
+import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 
 
 /**
@@ -120,7 +121,7 @@ class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitnes
   *
   * @param fs a sequence of Fitness values
   */
-case class Viability(fs: Seq[Fitness]) extends (() => Fitness) {
+case class Viability(fs: Seq[Fitness]) extends (() => Fitness) with Renderable {
 
   /**
     * Method to add a Fitness to this Viability
@@ -139,6 +140,9 @@ case class Viability(fs: Seq[Fitness]) extends (() => Fitness) {
   def apply: Fitness = Viability.geometricMean(fs)
 
   override def toString(): String = s"Viability($fs)"
+
+  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
+
 }
 
 object Viability {

@@ -115,7 +115,7 @@ case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterabl
 
   def build(xs: Iterable[SexualSedentaryOrganism[B, G, T, X]], v: Version[V]): Colony[B, G, T, V, X] = new Colony(name, xs, v, ecology, ecoFactors, genome, phenome)
 
-  def createOrganism(nucleus: Nucleus[B]): SexualSedentaryOrganism[B, G, T, X] = SexualSedentaryOrganism(genome, phenome, nucleus, ecology)
+  def createOrganism(nucleus: Nucleus[B]): SexualSedentaryOrganism[B, G, T, X] = SexualSedentaryOrganism(java.util.UUID.randomUUID.toString, genome, phenome, nucleus, ecology)
 
   def apply(phenotype: Phenotype[T]): Adaptatype[X] = throw GeneticsException("apply not implemented") // FIXME implement me (??)
 
