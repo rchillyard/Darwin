@@ -36,6 +36,34 @@ trait Random[X] extends (() => X) {
   def toStream: Stream[X]
 }
 
+//trait RandomStream[X, Repr] extends Random[X] with Randoms[X, Repr]
+//
+//abstract class BaseRandomStream[X, Repr](private var random: Random[X]) {
+//  // TODO need to update the random value
+//
+//  def take: X = take(1).head
+//
+//  def take(n: Int): Seq[X] = {
+//    val (r: Random[X], xs: Seq[X]) = random.take(n)
+//    random = r.asInstanceOf[Random[X] with Randoms[RNG[X]]] // CHECK
+//    xs
+//  }
+//
+//}
+//
+//
+//case class ConcreteRandomStream[X : Randomizable](private var random: RNG[X]) extends BaseRandomStream[X, RNG[X]](random){
+//  // TODO need to update the random value
+//
+//  def take: X = take(1).head
+//
+//  def take(n: Int): Seq[X] = {
+//    val (r: Random[X], xs: Seq[X]) = random.take(n)
+//    random = r.asInstanceOf[Random[X] with Randoms[RNG[X]]] // CHECK
+//    xs
+//  }
+//
+//}
 trait Randomizable[X] {
   def fromLong(l: Long): X
 
@@ -78,14 +106,18 @@ abstract class RandomMonad[X: Randomizable, Repr](private[evolution] val seed: L
     */
   def toStream: Stream[X] = Stream.cons[X](next.apply(), next.asInstanceOf[RandomMonad[X, Repr]].toStream)
 
-  /**
-    * Method to return a Seq of X values, together with a Random[X] from which more values can be taken.
-    *
-    * @param n the number of elements to take
-    * @return a tuple of (Repr, Seq[X])
-    */
-  def take(n: Int): (Repr, Seq[X])
 }
+
+//trait Randoms[X, Repr] {
+//  /**
+//    * Method to return a Seq of X values, together with a Random[X] from which more values can be taken.
+//    *
+//    * @param n the number of elements to take
+//    * @return a tuple of (Repr, Seq[X])
+//    */
+//  def take(n: Int): (Repr, Seq[X])
+//}
+
 
 abstract class RandomMonadJava[X: Randomizable, Repr](val s: Long) extends RandomMonad[X, Repr](s) {
 
@@ -99,6 +131,7 @@ abstract class RandomMonadJava[X: Randomizable, Repr](val s: Long) extends Rando
     (build(xr.seed), xs)
   }
 
+  // CONSIDER why do we need this method as well as streamTake?
   def take(n: Int): (Repr, Seq[X]) = streamTake(n)
 
 }
@@ -108,9 +141,7 @@ case class RNG[T: Randomizable](private val l: Long) extends RandomMonadJava[T, 
 
   def build(n: Long): RNG[T] = RNG(n)
 
-  def unit[U: Randomizable](u: U): Random[U] = {
-    new RNG[U](l)
-  }
+  def unit[U: Randomizable](u: U): Random[U] = new RNG[U](l)
 }
 
 object Random {

@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.base.Auditable
 import com.phasmid.darwin.eco._
 import com.phasmid.laScala.fp.FP
 import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
@@ -37,7 +38,7 @@ import scala.util.Try
   * Created by scalaprof on 5/9/16.
   */
 
-case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) extends Renderable {
+case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) extends Auditable {
   /**
     * Method to evaluate and blend the fitness of each adaptation into a single fitness, wrapped in Try
     *
@@ -61,7 +62,7 @@ case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) extends Renderable {
   *
   * CONSIDER simply extending the fitness function
   */
-case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X]) extends Renderable with EcoFitness[X] {
+case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X]) extends Auditable with EcoFitness[X] {
 
   def apply(x: EcoFactor[X]): Try[Fitness] = ecoFitness(x)
 

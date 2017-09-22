@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.laScala.fp.{FP, Spy}
+import com.phasmid.laScala.fp.{FP, Audit}
 import org.slf4j.Logger
 
 /**
@@ -105,5 +105,5 @@ abstract class AbstractTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends
 case class PlainTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends AbstractTranscriber[B, G](f)
 
 object Transcriber {
-  val logger: Logger = Spy.getLogger(Transcriber.getClass)
+  val logger: Logger = Audit.getLogger(Transcriber.getClass)
 }

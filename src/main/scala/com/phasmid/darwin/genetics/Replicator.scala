@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.base.Auditable
 import com.phasmid.laScala.{Prefix, RNG, Renderable, RenderableCaseClass}
 
 /**
@@ -54,7 +55,7 @@ trait Replicator[B] {
   * @param r     a random number generator (of Int)
   * @tparam B the base type
   */
-case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Replicator[B] with Renderable {
+case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Replicator[B] with Auditable {
   // NOTE: a variable.
   var i = 0
   private val rmnopc = RNG.values(r) map (_ % mnopc)
@@ -76,7 +77,7 @@ case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Repl
   *
   * @tparam B the base type
   */
-case class PerfectReplicator[B]() extends Replicator[B] with Renderable {
+case class PerfectReplicator[B]() extends Replicator[B] with Auditable {
   def replicate(bs: Seq[B]): Seq[B] = bs
 
   def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[PerfectReplicator[Any]]).render(indent)(tab)

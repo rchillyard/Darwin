@@ -24,7 +24,7 @@
 package com.phasmid.darwin.eco
 
 import com.phasmid.darwin.Ecological
-import com.phasmid.darwin.base.Identifiable
+import com.phasmid.darwin.base.{Identifiable, Identifying}
 import com.phasmid.darwin.genetics._
 import com.phasmid.laScala.fp.FP.sequence
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
@@ -32,7 +32,7 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 /**
   * Created by scalaprof on 5/9/16.
   */
-case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Ecological[T, X] with Identifiable {
+case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Identifying with Ecological[T, X] with Identifiable {
 
   /**
     * The apply method for this Ecology. For each Trait in the given Phenotype, we look up its corresponding Factor

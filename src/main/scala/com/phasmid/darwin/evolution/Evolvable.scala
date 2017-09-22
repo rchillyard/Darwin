@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.base.Auditable
 import com.phasmid.darwin.eco.Fitness
 import com.phasmid.laScala.values.{Incrementable, Rational}
 import com.phasmid.laScala.{Renderable, Sequential, Version}
@@ -108,7 +109,7 @@ trait SequentialEvolvable[X, V, Repr] extends Evolvable[X] with Sequential[Repr]
   * @tparam V the version type (defined to be Incrementable)
   * @tparam X the underlying type of the xs
   */
-abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv: Version[V]) extends SequentialEvolvable[X, V, Repr] with Renderable {
+abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv: Version[V]) extends SequentialEvolvable[X, V, Repr] with Auditable {
 
   /**
     * Method which determines if a particular Fitness value will be considered sufficiently fit to survive this generation

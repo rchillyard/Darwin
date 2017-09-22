@@ -23,9 +23,11 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.base.CaseIdentifiable
+import com.phasmid.darwin.base.{CaseIdentifiable, Identified, Identifier, RandomName}
 import com.phasmid.darwin.eco.{EcoFactor, Ecology, Fitness}
 import com.phasmid.darwin.genetics._
+import com.phasmid.laScala.Version
+import com.phasmid.laScala.fp.Streamer
 
 import scala.util.Try
 
@@ -63,11 +65,11 @@ trait SedentaryOrganism[B, P, G, T, X] extends Organism[B, P, G, T, X] {
 
   def adaptatype: Adaptatype[X] = ecology(phenotype)
 
-  def build(genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, P, G, T, X]
+  def build(d: Identifier, genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, P, G, T, X]
 }
 
-case class SexualSedentaryOrganism[B, G, T, X](name: String, genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends SedentaryOrganism[B, Boolean, G, T, X] with CaseIdentifiable[SexualSedentaryOrganism[Any, Any, Any, Any]] {
-  def build(genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, Boolean, G, T, X] = SexualSedentaryOrganism(name, genome, phenome, nucleus, ecology)
+case class SexualSedentaryOrganism[B, G, T, X](id: Identifier, genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with SedentaryOrganism[B, Boolean, G, T, X] with CaseIdentifiable[SexualSedentaryOrganism[Any, Any, Any, Any]] {
+  def build(d: Identifier, genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, Boolean, G, T, X] = SexualSedentaryOrganism(id, genome, phenome, nucleus, ecology)
 
   //  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[SexualSedentaryOrganism[Any,Any,Any,Any]]).render(indent)(tab)
 
@@ -75,6 +77,7 @@ case class SexualSedentaryOrganism[B, G, T, X](name: String, genome: Genome[B, B
 
 object SexualSedentaryOrganism {
 
+  def apply[B, G, T, X, V](generation: Version[V], genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X])(implicit streamer: Streamer[Long]): SexualSedentaryOrganism[B, G, T, X] = new SexualSedentaryOrganism[B, G, T, X](RandomName("sso", generation, streamer), genome, phenome, nucleus, ecology)
 
   //  def apply[B, G, T, X](genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], random: Stream[(B,B)], ecology: Ecology[T, X]): SexualSedentaryOrganism[B, G, T, X] = {
   //    val loci: Int = genome.loci

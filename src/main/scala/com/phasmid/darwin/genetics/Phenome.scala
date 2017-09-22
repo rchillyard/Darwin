@@ -26,7 +26,7 @@ package com.phasmid.darwin.genetics
 import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.eco.{Fitness, Viability}
 import com.phasmid.laScala.fp.FP._
-import com.phasmid.laScala.fp.Spy
+import com.phasmid.laScala.fp.Audit
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 import scala.util.Try
@@ -50,7 +50,7 @@ import scala.util.Try
   * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
   */
 case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T], attraction: (Trait[T], Trait[T]) => Fitness) extends Phenomic[P, G, T] with Identifiable {
-  implicit private val spyLogger = Spy.getLogger(getClass)
+  implicit private val spyLogger = Audit.getLogger(getClass)
 
   /**
     * Method to express a Genotype with respect to this Phenome.

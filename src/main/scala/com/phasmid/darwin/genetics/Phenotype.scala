@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.base.Auditable
 import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 
 /**
@@ -42,7 +43,7 @@ case class Phenotype[T](traits: Seq[Trait[T]])
   * @param value          the T value of this Trait
   * @tparam T the underlying type of the Trait
   */
-case class Trait[T](characteristic: Characteristic, value: T) extends Renderable {
+case class Trait[T](characteristic: Characteristic, value: T) extends Auditable {
   def isSexuallySelective: Boolean = characteristic.isSexuallySelective
 
   def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Trait[Any]]).render(indent)(tab)

@@ -26,7 +26,7 @@ package com.phasmid.darwin.genetics
 import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.evolution.{RNG, Random}
 import com.phasmid.laScala.fp.FP._
-import com.phasmid.laScala.fp.Spy
+import com.phasmid.laScala.fp.Audit
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 
@@ -60,7 +60,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     */
   def sexual: Boolean = sexual(ploidy)
 
-  implicit private val spyLogger = Spy.getLogger(getClass)
+  implicit private val spyLogger = Audit.getLogger(getClass)
 
   /**
     * @return the total number of loci (locations) on this Genome
@@ -76,7 +76,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     */
   def apply(bsss: Nucleus[B]): Genotype[P, G] = {
     require(bsss.size == chromosomes, s"size of outer Sequences dimension (${bsss.size}) should equal the karyotype ($chromosomes)")
-    val genes = Spy.spy(s"genes for $bsss: ", for ((bss, k) <- bsss zip karyotype; l <- k.ls) yield transcribe(bss, l))
+    val genes = Audit.audit(s"genes for $bsss: ", for ((bss, k) <- bsss zip karyotype; l <- k.ls) yield transcribe(bss, l))
     Genotype[P, G](genes)
   }
 

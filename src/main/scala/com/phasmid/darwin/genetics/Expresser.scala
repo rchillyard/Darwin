@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.base.Auditable
 import com.phasmid.laScala.fp.FP
 import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 
@@ -84,13 +85,13 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
 
 abstract class AbstractExpresser[P, G, T] extends Expresser[P, G, T]
 
-case class ExpresserMendelian[P, G, T](traitMapper: TraitMapper[G, T]) extends AbstractExpresser[P, G, T] with Renderable {
+case class ExpresserMendelian[P, G, T](traitMapper: TraitMapper[G, T]) extends AbstractExpresser[P, G, T] with Auditable {
   override def toString(): String = s"ExpresserMendelian($traitMapper)"
 
   def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[ExpresserMendelian[Any, Any, Any]]).render(indent)(tab)
 }
 
-case class TraitMapperMapped[G, T](map: Map[Characteristic, Map[G, T]]) extends TraitMapper[G, T] with Renderable {
+case class TraitMapperMapped[G, T](map: Map[Characteristic, Map[G, T]]) extends TraitMapper[G, T] with Auditable {
   def apply(ch: Characteristic, ga: Allele[G]): Try[Trait[T]] = FP.optionToTry(
     ga match {
       case Allele(g) => for (m <- map.get(ch); t <- m.get(g)) yield Trait(ch, t)

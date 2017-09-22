@@ -104,30 +104,30 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
 
   val expresser: Expresser[Boolean, String, Double] = ExpresserMendelian[Boolean, String, Double](traitMapper)
   val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
-  private val sUuid = """(\p{XDigit}{8})-(\p{XDigit}{4})-(\p{XDigit}{4})-(\p{XDigit}{4})-(\p{XDigit}{12})"""
-  private val uuidR = sUuid.r
+  private val sId = """(\w+)-(\w+)-(\p{XDigit}{16})"""
+  private val idR = sId.r
 
   behavior of "Colony"
 
   it should "render" in {
     val random = RNG[Base](3L)
     val colony = Colony("test colony", ecology, ecoFactors, genome, phenome).seedMembers(10, random)
-    val filtered = colony.render().replaceAll(sUuid, "<UUID>")
+    val filtered = colony.render().replaceAll(sId, "<ID>")
     println(filtered)
     filtered shouldBe
       """Colony(
   name:"test colony"
   organisms:(
-      SexualSedentaryOrganism:<UUID>,
-      SexualSedentaryOrganism:<UUID>,
-      SexualSedentaryOrganism:<UUID>,
-      SexualSedentaryOrganism:<UUID>,
-      SexualSedentaryOrganism:<UUID>,
-      SexualSedentaryOrganism:<UUID>,
-      SexualSedentaryOrganism:<UUID>,
-      SexualSedentaryOrganism:<UUID>,
-      SexualSedentaryOrganism:<UUID>,
-      SexualSedentaryOrganism:<UUID>
+      SexualSedentaryOrganism:<ID>,
+      SexualSedentaryOrganism:<ID>,
+      SexualSedentaryOrganism:<ID>,
+      SexualSedentaryOrganism:<ID>,
+      SexualSedentaryOrganism:<ID>,
+      SexualSedentaryOrganism:<ID>,
+      SexualSedentaryOrganism:<ID>,
+      SexualSedentaryOrganism:<ID>,
+      SexualSedentaryOrganism:<ID>,
+      SexualSedentaryOrganism:<ID>
     )
   generation:0
   ecology:test
@@ -154,8 +154,8 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
     val organism = colony.createOrganism(bn)
     organism.nucleus should matchPattern { case _ => }
     organism.name match {
-      case uuidR(b, c, d, e, f) => println(s"$b-$c-$d-$e-$f")
-      case x => fail(s"invalid UUID: $x")
+      case idR(b, c, d) => println(s"$b-$c-$d")
+      case x => fail(s"invalid ID: $x")
     }
   }
 

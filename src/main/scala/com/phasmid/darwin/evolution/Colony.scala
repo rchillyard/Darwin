@@ -27,6 +27,7 @@ import com.phasmid.darwin.Ecological
 import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
+import com.phasmid.laScala.fp.Streamer
 import com.phasmid.laScala.values.Incrementable
 import com.phasmid.laScala.{Prefix, RenderableCaseClass, Version}
 
@@ -111,11 +112,14 @@ abstract class AbstractColony[B, P, G, T, V: Incrementable, X, OrganismType <: O
   */
 case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterable[SexualSedentaryOrganism[B, G, T, X]], generation: Version[V], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]], genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T]) extends AbstractColony[B, Boolean, G, T, V, X, SexualSedentaryOrganism[B, G, T, X], Colony[B, G, T, V, X]](organisms, generation, ecology, ecoFactors, genome, phenome) {
 
+  import com.phasmid.darwin.evolution.Random.RandomizableLong
+  implicit val idStreamer = Streamer(RNG[Long](0).toStream)
+
   def seedMembers(size: Int, random: RNG[B]): Colony[B, G, T, V, X] = seedMembers(size, genome, 2, random)
 
   def build(xs: Iterable[SexualSedentaryOrganism[B, G, T, X]], v: Version[V]): Colony[B, G, T, V, X] = new Colony(name, xs, v, ecology, ecoFactors, genome, phenome)
 
-  def createOrganism(nucleus: Nucleus[B]): SexualSedentaryOrganism[B, G, T, X] = SexualSedentaryOrganism(java.util.UUID.randomUUID.toString, genome, phenome, nucleus, ecology)
+  def createOrganism(nucleus: Nucleus[B]): SexualSedentaryOrganism[B, G, T, X] = SexualSedentaryOrganism(generation, genome, phenome, nucleus, ecology)
 
   def apply(phenotype: Phenotype[T]): Adaptatype[X] = throw GeneticsException("apply not implemented") // FIXME implement me (??)
 

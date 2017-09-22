@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.base.Identifiable
+import com.phasmid.darwin.base.{Auditable, Identifiable}
 import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 
 /**
@@ -36,7 +36,7 @@ import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
   * @tparam G the underlying Gene type
   * @author scalaprof
   */
-case class Genotype[P, G](genes: Seq[Gene[P, G]]) extends Renderable {
+case class Genotype[P, G](genes: Seq[Gene[P, G]]) extends Auditable {
 
   def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Genotype[Any, Any]]).render(indent)(tab)
 
@@ -88,7 +88,7 @@ trait Locus[G] extends (() => Set[Allele[G]]) {
   override def toString = s"Locus at $location with dominant: $dominant and possible alleles: ${apply()}"
 }
 
-case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: Option[Allele[G]]) extends Locus[G] with Renderable {
+case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: Option[Allele[G]]) extends Locus[G] with Auditable {
   /**
     * @return the actual Alleles present at this Locus
     */

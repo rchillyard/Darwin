@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.base.{Identifiable, Plain}
+import com.phasmid.darwin.base.{Auditable, Identifiable, Plain}
 import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 
 
@@ -121,7 +121,7 @@ class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitnes
   *
   * @param fs a sequence of Fitness values
   */
-case class Viability(fs: Seq[Fitness]) extends (() => Fitness) with Renderable {
+case class Viability(fs: Seq[Fitness]) extends (() => Fitness) with Auditable {
 
   /**
     * Method to add a Fitness to this Viability

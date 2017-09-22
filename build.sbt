@@ -31,8 +31,6 @@ scalaTestVersion := (scalaBinaryVersion.value match {
 })
 
 
-
-
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
@@ -44,6 +42,7 @@ libraryDependencies ++= (scalaBinaryVersion.value match {
     "org.scala-lang" % "scala-reflect" % "2.12.3",
     // NOTE: we don't need this but dependencies apparently use different versions:
     "org.scalacheck" %% "scalacheck" % "1.13.5" % "test",
+    "ch.qos.logback" %  "logback-classic" % "1.2.3" % "runtime",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2"
   )
   case "2.11" =>   Seq(
@@ -52,6 +51,7 @@ libraryDependencies ++= (scalaBinaryVersion.value match {
     // NOTE: we don't need this but dependencies apparently use different versions:
     scalaModules %% "scala-xml" % scalaModulesVersion,
     "org.scalacheck" %% "scalacheck" % "1.13.2" % "test",
+    "ch.qos.logback" %  "logback-classic" % "1.2.3" % "runtime",
     "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0"
   )
@@ -63,7 +63,6 @@ libraryDependencies ++= Seq(
   scalaModules %% "scala-parser-combinators" % scalaModulesVersion,
   scalaModules %% "scala-xml" % "1.0.6",
 	"joda-time" % "joda-time" % "2.9.9",
-	"ch.qos.logback" %  "logback-classic" % "1.2.3" % "runtime",
   "com.phasmid" %% "lascala" % "1.0.8-SNAPSHOT",
   "org.clapper" %% "classutil" % "1.1.2",
 	akkaGroup %% "akka-actor" % akkaVersion.value,
