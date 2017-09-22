@@ -24,7 +24,7 @@
 package com.phasmid.darwin.eco
 
 import com.phasmid.darwin.base.{Auditable, Identifiable, Plain}
-import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
+import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 
 /**

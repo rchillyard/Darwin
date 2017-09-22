@@ -24,7 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.Auditable
-import com.phasmid.laScala.{Prefix, RNG, Renderable, RenderableCaseClass}
+import com.phasmid.laScala.{Prefix, RNG, RenderableCaseClass}
 
 /**
   * Created by scalaprof on 7/31/16.

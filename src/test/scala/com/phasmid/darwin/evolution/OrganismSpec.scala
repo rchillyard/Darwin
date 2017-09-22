@@ -104,7 +104,9 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
   val expresser: Expresser[Boolean, String, Double] = ExpresserMendelian[Boolean, String, Double](traitMapper)
   val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
   val generation = Version(1, None)
+
   import com.phasmid.darwin.evolution.Random.RandomizableLong
+
   implicit val idStreamer = Streamer(RNG[Long](0).toStream)
 
   behavior of "Organism"

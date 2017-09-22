@@ -24,7 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.{Auditable, Identifiable}
-import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
+import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 /**
   * This class represents a genotype: the genes of a particular organism.

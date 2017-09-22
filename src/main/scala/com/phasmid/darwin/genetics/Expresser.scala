@@ -25,7 +25,7 @@ package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.Auditable
 import com.phasmid.laScala.fp.FP
-import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
+import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 import scala.util.Try
 

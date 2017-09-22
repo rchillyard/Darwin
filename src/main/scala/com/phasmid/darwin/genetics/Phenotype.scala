@@ -24,7 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.Auditable
-import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
+import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 /**
   * This class represents the Phenotype for an Organism. The Phenotype is "expressed" from the Genotype with respect to

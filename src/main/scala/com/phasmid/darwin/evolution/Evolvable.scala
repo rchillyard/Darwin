@@ -26,7 +26,7 @@ package com.phasmid.darwin.evolution
 import com.phasmid.darwin.base.Auditable
 import com.phasmid.darwin.eco.Fitness
 import com.phasmid.laScala.values.{Incrementable, Rational}
-import com.phasmid.laScala.{Renderable, Sequential, Version}
+import com.phasmid.laScala.{Sequential, Version}
 
 import scala.language.implicitConversions
 import scala.util.Try

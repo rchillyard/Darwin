@@ -23,10 +23,9 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.base.Identifiable
+import com.phasmid.darwin.base.{Audit, Identifiable}
 import com.phasmid.darwin.evolution.{RNG, Random}
 import com.phasmid.laScala.fp.FP._
-import com.phasmid.laScala.fp.Audit
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 

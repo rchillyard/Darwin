@@ -23,10 +23,9 @@
 
 package com.phasmid.darwin.base
 
-import com.phasmid.darwin.evolution.Random
-import com.phasmid.laScala.fp.{Audit, Streamer}
+import com.phasmid.laScala.fp.Streamer
 import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass, Version}
-import com.typesafe.scalalogging.{LazyLogging, Logger}
+
 
 trait Identifier {
   /**
@@ -45,13 +44,13 @@ abstract class Identified(id: Identifier) extends Identifier {
 
 trait Auditable extends Renderable /** with LazyLogging **/ {
   import Audit._
-  def audit : Unit = {
+  def audit() : Unit = {
     Audit.log(this.render())
   }
 }
 
 abstract class Identifying extends Auditable {
-  audit
+  audit()
 }
 
 object Identifying {
@@ -81,7 +80,7 @@ trait CaseIdentifiable[T] extends Identifiable {
 
   def render(indent: Int)(implicit tab: (Int) => Prefix, typeTag: TypeTag[T]): String =
     this match {
-        // If we have already rendered this via audit mechanism, then we use super.render
+      // If we have already rendered this via audit mechanism, then we use super.render
       case Identifying(_) => super.render(indent)(tab)
       case _ =>
         // Otherwise, if we this object is nested within another, we use super.render
@@ -101,7 +100,7 @@ case class RandomName[V](prefix: String, generation: Version[V], id: Id) extends
 }
 
 object RandomName {
-//  implicit def randomName[V](r: Random[Long], prefix: String, generation: Version[V]): RandomName[V] = apply(prefix, generation, r())
+  //  implicit def randomName[V](r: Random[Long], prefix: String, generation: Version[V]): RandomName[V] = apply(prefix, generation, r())
 }
 
 case class Id(id: Long) {
@@ -110,5 +109,8 @@ case class Id(id: Long) {
 }
 
 object Id {
+
+  import scala.language.implicitConversions
+
   implicit def randomId(ls: Streamer[Long]): Id = Id(ls())
 }

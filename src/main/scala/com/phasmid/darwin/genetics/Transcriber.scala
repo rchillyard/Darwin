@@ -23,7 +23,8 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.laScala.fp.{FP, Audit}
+import com.phasmid.darwin.base.Audit
+import com.phasmid.laScala.fp.FP
 import org.slf4j.Logger
 
 /**

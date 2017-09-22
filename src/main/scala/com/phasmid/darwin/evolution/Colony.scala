@@ -113,6 +113,7 @@ abstract class AbstractColony[B, P, G, T, V: Incrementable, X, OrganismType <: O
 case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterable[SexualSedentaryOrganism[B, G, T, X]], generation: Version[V], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]], genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T]) extends AbstractColony[B, Boolean, G, T, V, X, SexualSedentaryOrganism[B, G, T, X], Colony[B, G, T, V, X]](organisms, generation, ecology, ecoFactors, genome, phenome) {
 
   import com.phasmid.darwin.evolution.Random.RandomizableLong
+
   implicit val idStreamer = Streamer(RNG[Long](0).toStream)
 
   def seedMembers(size: Int, random: RNG[B]): Colony[B, G, T, V, X] = seedMembers(size, genome, 2, random)
