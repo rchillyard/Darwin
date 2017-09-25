@@ -88,8 +88,6 @@ sealed trait Transcriber[B, G] extends TranscriberFunction[B, G] {
   */
 abstract class AbstractTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends Transcriber[B, G] {
 
-  implicit private val spyLogger = Transcriber.logger
-
   /**
     * This method is required to be defined by sub-types (extenders) of Transcriber.
     * Given a Seq[B] corresponding to the location of a gene on a Chromosome, return the Allele that
@@ -101,10 +99,12 @@ abstract class AbstractTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends
     *         CONSIDER just using a normal if clause here
     */
   def transcribeBases(bs: Seq[B]): Option[Allele[G]] = FP.which(bs.nonEmpty)(f(bs), None)
+
+  implicit private val auditLogger = Transcriber.auditLogger
 }
 
 case class PlainTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends AbstractTranscriber[B, G](f)
 
 object Transcriber {
-  val logger: Logger = Audit.getLogger(Transcriber.getClass)
+  val auditLogger: Logger = Audit.getLogger(Transcriber.getClass)
 }

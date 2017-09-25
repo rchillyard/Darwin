@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.base.{Auditable, Identifiable}
+import com.phasmid.darwin.base.{Auditable, Identifiable, Identifier}
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 /**
@@ -36,7 +36,7 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
   * @tparam G the underlying Gene type
   * @author scalaprof
   */
-case class Genotype[P, G](genes: Seq[Gene[P, G]]) extends Auditable {
+case class Genotype[P, G](id: Identifier, genes: Seq[Gene[P, G]]) extends Auditable {
 
   def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Genotype[Any, Any]]).render(indent)(tab)
 

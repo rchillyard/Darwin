@@ -26,7 +26,7 @@ package com.phasmid.darwin.plugin
 import java.io.File
 
 import org.clapper.classutil.{ClassFinder, ClassInfo}
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.reflect.ClassTag
 import scala.reflect.internal.util.ScalaClassLoader.URLClassLoader
@@ -49,7 +49,7 @@ case class PluginManager[P <: Plugin : ClassTag](list: List[File], max: Option[I
   private val pc: Class[P] = pt.runtimeClass.asInstanceOf[Class[P]]
   private val pn = pc.getCanonicalName
 
-  private val logger = LoggerFactory.getLogger(getClass)
+  private val logger: Logger = LoggerFactory.getLogger(getClass)
 
   logger.info(s"PluginManager for plugins of type: $pn")
 

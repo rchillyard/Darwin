@@ -23,10 +23,12 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.base.{Audit, Identifiable}
+import com.phasmid.darwin.base.{Audit, Identifiable, Identifier_Random}
 import com.phasmid.darwin.evolution.{RNG, Random}
 import com.phasmid.laScala.fp.FP._
+import com.phasmid.laScala.fp.Streamer
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
+import org.slf4j.Logger
 
 
 /**
@@ -59,8 +61,6 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     */
   def sexual: Boolean = sexual(ploidy)
 
-  implicit private val spyLogger = Audit.getLogger(getClass)
-
   /**
     * @return the total number of loci (locations) on this Genome
     */
@@ -76,7 +76,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
   def apply(bsss: Nucleus[B]): Genotype[P, G] = {
     require(bsss.size == chromosomes, s"size of outer Sequences dimension (${bsss.size}) should equal the karyotype ($chromosomes)")
     val genes = Audit.audit(s"genes for $bsss: ", for ((bss, k) <- bsss zip karyotype; l <- k.ls) yield transcribe(bss, l))
-    Genotype[P, G](genes)
+    Genotype[P, G](Identifier_Random("g", idStreamer), genes)
   }
 
   /**
@@ -129,7 +129,11 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     case i: Int => i
     case _ => throw GeneticsException(s"invalid Ploidy type: ${ploidy.getClass}")
   }
+  implicit private val auditLogger: Logger = Audit.getLogger(getClass)
 
+  import com.phasmid.darwin.evolution.Random.RandomizableLong
+
+  implicit val idStreamer: Streamer[Long] = Streamer(RNG[Long](0).toStream)
 }
 
 /**

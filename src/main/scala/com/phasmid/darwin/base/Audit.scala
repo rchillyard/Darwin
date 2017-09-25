@@ -43,7 +43,7 @@ import scala.util.{Failure, Success, Try}
   * If you just want to slip in a quick invocation of Audit.audit, you will need to provide an implicit spyFunc.
   * The proper simple way to do this is to declare a logger as follows (you can use any name you like since it's an implicit):
   *
-  * implicit val spyLogger: org.slf4j.Logger = Audit.getLogger(getClass)
+  * implicit val auditLogger: org.slf4j.Logger = Audit.getLogger(getClass)
   *
   * There's even an (improper) default logger based on the Audit class itself which you can use simply by adding this:
   * import Audit._
@@ -55,7 +55,7 @@ import scala.util.{Failure, Success, Try}
   *
   * However, there is another mechanism for turning auditing off. For example, you have some code which you are continually working on.
   * You don't like to release it with the calls to Audit intact so you remove them. Then you have to go to a significant amount of trouble to put them back.
-  * An alternative is to declare the spyLogger to be null (but then you really must include the type annotation as shown above).
+  * An alternative is to declare the auditLogger to be null (but then you really must include the type annotation as shown above).
   *
   * Created by scalaprof on 9/19/17.
   */

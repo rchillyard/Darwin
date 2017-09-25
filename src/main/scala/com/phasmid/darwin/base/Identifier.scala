@@ -26,7 +26,15 @@ package com.phasmid.darwin.base
 import com.phasmid.laScala.fp.Streamer
 import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass, Version}
 
+/**
+  * This module contains several traits and classes which define aspects of an object's
+  * appearance and identification.
+  */
 
+/**
+  * This trait defines the concept of an identifier, with a name which is a String.
+  *
+  */
 trait Identifier {
   /**
     * Provide the name of an object, primarily for rendering/debugging purposes.
@@ -38,23 +46,22 @@ trait Identifier {
   override def toString: String = name
 }
 
-abstract class Identified(id: Identifier) extends Identifier {
-  def name: String = id.name
-}
+/**
+  * This trait defines the concept of something that can be audited in a form which is readable (because Auditable
+  * extends Renderable).
+  */
+trait Auditable extends Renderable {
 
-trait Auditable extends Renderable /** with LazyLogging **/ {
-  import Audit._
-  def audit() : Unit = {
+  /** previously extended also from LazyLogging **/
+
+  /**
+    * Render this object (top-level) and log it to the Audit log.
+    */
+  def audit(): Unit = {
+    import com.phasmid.darwin.base.Audit._
+
     Audit.log(this.render())
   }
-}
-
-abstract class Identifying extends Auditable {
-  audit()
-}
-
-object Identifying {
-  def unapply(arg: Identifying): Option[Renderable] = Some(arg)
 }
 
 trait Identifiable extends Auditable with Identifier {
@@ -74,6 +81,14 @@ trait Identifiable extends Auditable with Identifier {
   }
 }
 
+/**
+  * This trait defines, for a case class, an object which is not only Identifiable but, on invocation of render,
+  * will either render the name only or will render it as a case class (that's to say as a tuple).
+  *
+  * For such a class, it is not necessary (although allowable) to define render.
+  *
+  * @tparam T the underlying type of the case class
+  */
 trait CaseIdentifiable[T] extends Identifiable {
 
   import scala.reflect.runtime.universe._
@@ -90,26 +105,81 @@ trait CaseIdentifiable[T] extends Identifiable {
 
 }
 
+/**
+  * This trait defines an Auditable object which renders itself simply by invoking toString.
+  */
 trait Plain extends Auditable {
   // NOTE: it's OK for render to invoke toString but it's never OK for toString to invoke render!!
   def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = toString
 }
 
-case class RandomName[V](prefix: String, generation: Version[V], id: Id) extends Identifier {
-  def name: String = s"$prefix-$generation-$id"
+case class IdentifierName(name: String) extends Identifier
+
+/**
+  * CONSIDER do we really need this? It's just a convenience
+  *
+  * Abstract class which implements Identifier but delegates its identification to the value of id.
+  *
+  * @param id the Identifier
+  */
+abstract class Identified(id: Identifier) extends Identifier {
+  def name: String = id.name
 }
 
-object RandomName {
-  //  implicit def randomName[V](r: Random[Long], prefix: String, generation: Version[V]): RandomName[V] = apply(prefix, generation, r())
+/**
+  * This abstract class extends Auditable and automatically invokes audit() on construction.
+  * The name Identifying is intended to imply that it self-identifies when constructed.
+  */
+abstract class Identifying extends Auditable {
+  audit()
 }
 
+/**
+  * This class represents an Id which is, typically, based on a random Long number.
+  *
+  * @param id a Long which hopefully, is unique.
+  */
 case class Id(id: Long) {
   // CONSIDER improving this...
   override def toString: String = ("000000000000000" + id.toHexString) takeRight 16
 }
 
-object Id {
+/**
+  * This class represents a randomly-chosen name based on the current generation (version).
+  *
+  * TODO rename this class to something more sensible
+  *
+  * @param prefix     the prefix (which tends to identify the type of the object owning this Identifier_Random_Version).
+  * @param generation the generation that this object belongs to (objects which persist throughout do not normally
+  *                   use this type of identifier).
+  * @param id         an Id
+  * @tparam V the underlying Version type of the generation.
+  */
+case class Identifier_Random_Version[V](prefix: String, generation: Version[V], id: Id) extends Identifier {
+  def name: String = s"$prefix-$generation-$id"
+}
 
+/**
+  * This class represents a randomly-chosen name.
+  *
+  * TODO rename this class to something more sensible
+  *
+  * @param prefix the prefix (which tends to identify the type of the object owning this Identifier_Random_Version).
+  * @param id     an Id
+  */
+case class Identifier_Random(prefix: String, id: Id) extends Identifier {
+  def name: String = s"$prefix-$id"
+}
+
+object Identifier_Random_Version {
+  //  implicit def randomName[V](r: Random[Long], prefix: String, generation: Version[V]): Identifier_Random_Version[V] = apply(prefix, generation, r())
+}
+
+object Identifying {
+  def unapply(arg: Identifying): Option[Renderable] = Some(arg)
+}
+
+object Id {
   import scala.language.implicitConversions
 
   implicit def randomId(ls: Streamer[Long]): Id = Id(ls())

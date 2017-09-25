@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.base.IdentifierName
 import com.phasmid.darwin.eco.FunctionShape.logistic
 import com.phasmid.darwin.eco.{Fitness, FunctionShape}
 import org.scalatest.{FlatSpec, Matchers}
@@ -55,7 +56,7 @@ class PhenomeSpec extends FlatSpec with Matchers {
 
   behavior of "apply"
   it should "work" in {
-    val genotype = Genotype(Seq(geneH1, geneG2))
+    val genotype = Genotype(IdentifierName("test"), Seq(geneH1, geneG2))
 
     def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
 
@@ -71,8 +72,8 @@ class PhenomeSpec extends FlatSpec with Matchers {
     def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
 
     val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
-    val genotype1 = Genotype(Seq(geneH1, geneG2))
-    val genotype2 = Genotype(Seq(geneG2, geneH1))
+    val genotype1 = Genotype(IdentifierName("G2"), Seq(geneH1, geneG2))
+    val genotype2 = Genotype(IdentifierName("H1"), Seq(geneG2, geneH1))
     val phenotype1 = phenome(genotype1)
     val phenotype2 = phenome(genotype2)
     phenome.attractiveness(phenotype1, phenotype2) shouldBe Fitness.viable
@@ -97,7 +98,7 @@ class PhenomeSpec extends FlatSpec with Matchers {
     }
 
     val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> mockHeight, locusG -> girth), mockExpresser, mockAttraction)
-    phenome.attractiveness(phenome(Genotype(Seq(geneG1, geneH2))), phenome(Genotype(Seq(geneG2, geneH1))))() should ===(0.9820137900379085 +- 1E-10)
-    phenome.attractiveness(phenome(Genotype(Seq(geneG2, geneH1))), phenome(Genotype(Seq(geneG1, geneH1))))() should ===(0.5 +- 1E-10)
+    phenome.attractiveness(phenome(Genotype(IdentifierName("G1H2"), Seq(geneG1, geneH2))), phenome(Genotype(IdentifierName("G2H1"), Seq(geneG2, geneH1))))() should ===(0.9820137900379085 +- 1E-10)
+    phenome.attractiveness(phenome(Genotype(IdentifierName("G2H1"), Seq(geneG2, geneH1))), phenome(Genotype(IdentifierName("G1H1"), Seq(geneG1, geneH1))))() should ===(0.5 +- 1E-10)
   }
 }

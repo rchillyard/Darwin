@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.base.IdentifierName
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
 import com.phasmid.darwin.genetics.dna.{Base, Guanine}
@@ -65,7 +66,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
   import com.phasmid.darwin.evolution.Random.RandomizableBase
 
   val height: Characteristic = Characteristic("height")
-  val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
+  val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
   val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test", factorMap, ff, adapter)
   val adaptatype: Adaptatype[Int] = ecology(phenotype)
   private val adaptations: Seq[Adaptation[Int]] = adaptatype.adaptations
@@ -107,7 +108,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
 
   import com.phasmid.darwin.evolution.Random.RandomizableLong
 
-  implicit val idStreamer = Streamer(RNG[Long](0).toStream)
+  implicit val idStreamer: Streamer[Long] = Streamer(RNG[Long](0).toStream)
 
   behavior of "Organism"
 
@@ -128,7 +129,8 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
     val (bn, _) = genome.recombine(random)
     val organism = SexualSedentaryOrganism(generation, genome, phenome, bn, ecology)
     val actual = organism.genotype
-    actual shouldBe Genotype(Seq(geneHGG))
+    actual should matchPattern { case Genotype(_, Seq(_)) => }
+    actual.genes shouldBe Seq(geneHGG)
   }
 
   it should "calculate phenotype correctly" in {
@@ -137,7 +139,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
     println(s"ecoFactors: $ecoFactors")
     val (bn, _) = genome.recombine(random)
     val organism = SexualSedentaryOrganism(generation, genome, phenome, bn, ecology)
-    organism.phenotype shouldBe Phenotype(List(Trait(height, 2.0)))
+    organism.phenotype should matchPattern { case Phenotype(_, List(Trait(`height`, 2.0))) => }
   }
 
   it should "calculate adaptatype" in {

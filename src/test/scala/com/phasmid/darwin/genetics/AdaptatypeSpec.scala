@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
+import com.phasmid.darwin.base.IdentifierName
 import com.phasmid.darwin.eco._
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -56,14 +57,14 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
   behavior of "adaptation"
   it should "render correctly" in {
     val height = Characteristic("height")
-    val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
+    val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
     val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
     val adaptatype: Adaptatype[Double] = ecology(phenotype)
     adaptatype.render() shouldBe "Adaptatype(\n  adaptations:(Adaptation(\n        factor:elephant grass\n        ecoFitness:<function1>\n        ))\n  )"
   }
   it should "yield appropriate fitness" in {
     val height = Characteristic("height")
-    val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
+    val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
     val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
     val adaptatype: Adaptatype[Double] = ecology(phenotype)
     val adaptations = adaptatype.adaptations
@@ -77,7 +78,7 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
   behavior of "adaptatype"
   it should "yield appropriate fitness" in {
     val height = Characteristic("height")
-    val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
+    val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
     val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
     val adaptatype: Adaptatype[Double] = ecology(phenotype)
     val fy: Try[Fitness] = adaptatype.fitness(ecosystem)

@@ -27,6 +27,7 @@ import com.phasmid.darwin.base.{Audit, Identifiable}
 import com.phasmid.darwin.eco.{Fitness, Viability}
 import com.phasmid.laScala.fp.FP._
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
+import org.slf4j.Logger
 
 import scala.util.Try
 
@@ -49,7 +50,6 @@ import scala.util.Try
   * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
   */
 case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T], attraction: (Trait[T], Trait[T]) => Fitness) extends Phenomic[P, G, T] with Identifiable {
-  implicit private val spyLogger = Audit.getLogger(getClass)
 
   /**
     * Method to express a Genotype with respect to this Phenome.
@@ -67,8 +67,8 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     )
       yield for (t <- expresser(c, g))
         yield t
-    val result = Phenotype(sequence(ttts).get)
-    result
+    // TODO create a different, but related, Identifier for phenotype
+    Phenotype(genotype.id, sequence(ttts).get)
   }
 
   /**
@@ -87,6 +87,7 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
 
   override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Phenome[Any, Any, Any]]).render(indent)(tab)
 
+  implicit private val auditLogger: Logger = Audit.getLogger(getClass)
 }
 
 /**

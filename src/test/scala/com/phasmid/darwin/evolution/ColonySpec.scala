@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.base.IdentifierName
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
 import com.phasmid.darwin.genetics.dna.Base
@@ -63,7 +64,7 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
   import com.phasmid.darwin.evolution.Random.RandomizableBase
 
   val height: Characteristic = Characteristic("height")
-  val phenotype: Phenotype[Double] = Phenotype(Seq(Trait(height, 2.0)))
+  val phenotype: Phenotype[Double] = Phenotype(IdentifierName("phenotype"), Seq(Trait(height, 2.0)))
   val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test", factorMap, ff, adapter)
   val adaptatype: Adaptatype[Int] = ecology(phenotype)
   private val adaptations: Seq[Adaptation[Int]] = adaptatype.adaptations
