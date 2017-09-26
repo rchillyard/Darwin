@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.base.Auditable
+import com.phasmid.darwin.base._
 import com.phasmid.darwin.eco._
 import com.phasmid.laScala.fp.FP
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
@@ -38,7 +38,7 @@ import scala.util.Try
   * Created by scalaprof on 5/9/16.
   */
 
-case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) extends Auditable {
+case class Adaptatype[X](id: Identifier, adaptations: Seq[Adaptation[X]]) extends Identified(id) with CaseIdentifiable[Adaptatype[Any]] {
   /**
     * Method to evaluate and blend the fitness of each adaptation into a single fitness, wrapped in Try
     *
@@ -51,7 +51,7 @@ case class Adaptatype[X](adaptations: Seq[Adaptation[X]]) extends Auditable {
     for (fs <- FP.sequence(for ((a, e) <- ts) yield a(e))) yield Viability(fs)()
   }
 
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Adaptatype[Any]]).render(indent)(tab)
+  //  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Adaptatype[Any]]).render(indent)(tab)
 
 }
 

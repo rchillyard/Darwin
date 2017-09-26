@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.base.{Audit, Identifiable}
+import com.phasmid.darwin.base._
 import com.phasmid.darwin.eco.{Fitness, Viability}
 import com.phasmid.laScala.fp.FP._
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
@@ -68,7 +68,7 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
       yield for (t <- expresser(c, g))
         yield t
     // TODO create a different, but related, Identifier for phenotype
-    Phenotype(genotype.id, sequence(ttts).get)
+    Phenotype(IdentifierStrUID("ph", UID(genotype.id)), sequence(ttts).get)
   }
 
   /**

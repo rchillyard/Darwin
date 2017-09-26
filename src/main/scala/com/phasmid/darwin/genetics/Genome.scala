@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.base.{Audit, Identifiable, Identifier_Random}
+import com.phasmid.darwin.base.{Audit, Identifiable, IdentifierStrUID}
 import com.phasmid.darwin.evolution.{RNG, Random}
 import com.phasmid.laScala.fp.FP._
 import com.phasmid.laScala.fp.Streamer
@@ -76,7 +76,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
   def apply(bsss: Nucleus[B]): Genotype[P, G] = {
     require(bsss.size == chromosomes, s"size of outer Sequences dimension (${bsss.size}) should equal the karyotype ($chromosomes)")
     val genes = Audit.audit(s"genes for $bsss: ", for ((bss, k) <- bsss zip karyotype; l <- k.ls) yield transcribe(bss, l))
-    Genotype[P, G](Identifier_Random("g", idStreamer), genes)
+    Genotype[P, G](IdentifierStrUID("g", idStreamer), genes)
   }
 
   /**

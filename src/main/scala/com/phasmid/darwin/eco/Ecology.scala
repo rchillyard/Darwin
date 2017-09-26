@@ -24,7 +24,7 @@
 package com.phasmid.darwin.eco
 
 import com.phasmid.darwin.Ecological
-import com.phasmid.darwin.base.{Identifiable, Identifying}
+import com.phasmid.darwin.base._
 import com.phasmid.darwin.genetics._
 import com.phasmid.laScala.fp.FP.sequence
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
@@ -32,7 +32,7 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 /**
   * Created by scalaprof on 5/9/16.
   */
-case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Identifying with Ecological[T, X] with Identifiable {
+case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Identifying with Ecological[T, X] with Identifiable with CaseIdentifiable[Ecology[Any, Any]] {
 
   /**
     * The apply method for this Ecology. For each Trait in the given Phenotype, we look up its corresponding Factor
@@ -45,7 +45,7 @@ case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: Fi
     */
   def apply(phenotype: Phenotype[T]): Adaptatype[X] = {
     val xats = for (t <- phenotype.traits; f <- factors.get(t.characteristic.name)) yield for (a <- adapter(f, t, fitness)) yield a
-    Adaptatype(sequence(xats).get)
+    Adaptatype(IdentifierStrUID("at", UID(phenotype.id)), sequence(xats).get)
   }
 
   override def toString: String = s"Ecology($name, $factors, $fitness, $adapter"

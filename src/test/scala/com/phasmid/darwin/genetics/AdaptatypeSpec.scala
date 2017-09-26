@@ -28,6 +28,7 @@ import com.phasmid.darwin.eco._
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util._
+import scala.util.matching.Regex
 
 /**
   * Created by scalaprof on 5/6/16.
@@ -60,7 +61,12 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
     val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
     val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
     val adaptatype: Adaptatype[Double] = ecology(phenotype)
-    adaptatype.render() shouldBe "Adaptatype(\n  adaptations:(Adaptation(\n        factor:elephant grass\n        ecoFitness:<function1>\n        ))\n  )"
+    val adaptatypeR: Regex = """(\p{XDigit}{16})""".r
+//    adaptatype.render().split(":").toList.last match {
+//      case adaptatypeR(_) =>
+//      case x => fail(s"$x didn't match")
+//    }
+     adaptatype.render().split(":").toList.last should matchPattern { case adaptatypeR(_) => }
   }
   it should "yield appropriate fitness" in {
     val height = Characteristic("height")

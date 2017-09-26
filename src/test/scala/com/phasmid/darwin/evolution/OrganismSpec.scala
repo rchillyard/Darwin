@@ -149,7 +149,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
     val (bn, _) = genome.recombine(random)
     val organism = SexualSedentaryOrganism(generation, genome, phenome, bn, ecology)
     val z: Adaptatype[Int] = ecology(organism.phenotype)
-    z should matchPattern { case Adaptatype(List(Adaptation(`elephantGrass`, _))) => }
+    z should matchPattern { case Adaptatype(_, List(Adaptation(`elephantGrass`, _))) => }
   }
 
   it should "calculate fitness" in {
