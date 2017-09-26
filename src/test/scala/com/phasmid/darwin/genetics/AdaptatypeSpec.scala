@@ -61,12 +61,16 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
     val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
     val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
     val adaptatype: Adaptatype[Double] = ecology(phenotype)
-    val adaptatypeR: Regex = """(\p{XDigit}{16})""".r
-//    adaptatype.render().split(":").toList.last match {
-//      case adaptatypeR(_) =>
-//      case x => fail(s"$x didn't match")
-//    }
-     adaptatype.render().split(":").toList.last should matchPattern { case adaptatypeR(_) => }
+    // TODO for some reason the compiler doesn't like this --
+    // but, as Galileo might have said: "eppur se muove"
+    val adaptatypeR: Regex =
+    """(\p{XDigit}{16})""".r
+    //    adaptatype.render().split(":").toList.last match {
+    //      case adaptatypeR(_) =>
+    //      case x => fail(s"$x didn't match")
+    //    }
+    val actual: String = adaptatype.render().split(":").toList.last
+    actual should matchPattern { case adaptatypeR(_) => }
   }
   it should "yield appropriate fitness" in {
     val height = Characteristic("height")

@@ -28,8 +28,10 @@ package com.phasmid.darwin.evolution
   */
 trait GenerationListener {
   /**
-    * This method is called whenever the {@link Evolvable} implementer
-    * completes a new generation or when the {@link Evolution} itself is
+    * This method is called whenever the
+    * {@link Evolvable} implementer
+    * completes a new generation or when the
+    * {@link Evolution} itself is
     * completely exhausted (has no more evolvables to work with).
     *
     * @param evolvable

@@ -23,8 +23,7 @@
 
 package com.phasmid.darwin.base
 
-import com.phasmid.laScala.fp.Streamer
-import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass, Version}
+import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 
 /**
   * This module contains several traits and classes which define aspects of an object's

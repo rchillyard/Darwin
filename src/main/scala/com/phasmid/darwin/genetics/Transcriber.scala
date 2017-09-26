@@ -100,7 +100,7 @@ abstract class AbstractTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends
     */
   def transcribeBases(bs: Seq[B]): Option[Allele[G]] = FP.which(bs.nonEmpty)(f(bs), None)
 
-  implicit private val auditLogger = Transcriber.auditLogger
+  implicit private val auditLogger: Logger = Transcriber.auditLogger
 }
 
 case class PlainTranscriber[B, G](f: Seq[B] => Option[Allele[G]]) extends AbstractTranscriber[B, G](f)

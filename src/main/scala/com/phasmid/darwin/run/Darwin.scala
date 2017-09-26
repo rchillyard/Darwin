@@ -49,7 +49,7 @@ case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: 
 
   def ok: Boolean = (for (l <- max) yield sequence <= l).getOrElse(true)
 
-  val evolutionEngine = new Runnable {
+  val evolutionEngine: Runnable = new Runnable {
     override def run(): Unit = {
       sequence += 1
       ps foreach (_.onTick(sequence, interval))

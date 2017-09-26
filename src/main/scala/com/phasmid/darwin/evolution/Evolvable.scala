@@ -192,7 +192,7 @@ abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv
 
   private def next(v: Version[V])(implicit k: Evolvable[X] => Rational[Long], r: Evolvable[X] => RNG[Long]): Repr = {
     val (s, n) = (buildInternal(survivors, v), buildInternal(nonSurvivors, v))
-    implicit val random = r(this)
+    implicit val random: RNG[Long] = r(this)
     // TODO need to fix this because, currently, sexual reproduction will be from pairs
     // chosen from two different populations: survivors and non-survivors.
     val nextGeneration = (s.iterator ++ s.offspring ++ buildInternal(n * k(this), v).offspring).toSeq.distinct

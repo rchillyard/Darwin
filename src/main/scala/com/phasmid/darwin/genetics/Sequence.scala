@@ -91,7 +91,7 @@ object Sequence {
     */
   def create[B](bases: B*) = Sequence(bases)
 
-  implicit def renderer[B] = new Renderer[B] {
+  implicit def renderer[B]: Renderer[B] = new Renderer[B] {
     def apply(bs: Seq[B]): String = bs.mkString("", "", "")
   }
 }

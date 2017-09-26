@@ -23,8 +23,8 @@
 
 package com.phasmid.darwin.base
 
+import com.phasmid.laScala.Version
 import com.phasmid.laScala.fp.Streamer
-import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass, Version}
 
 /**
   * This module contains several traits and classes which define aspects of an object's
@@ -88,6 +88,7 @@ case class IdentifierStrVerUID[V](prefix: String, generation: Version[V], id: UI
 trait HasId {
   def id: UID
 }
+
 /**
   * This class represents a randomly-chosen name.
   *
@@ -107,6 +108,7 @@ object UID {
     case x: HasId => apply(x.id.id)
     case _ => apply(1L) // TODO randomize this
   }
+
   import scala.language.implicitConversions
 
   implicit def randomId(ls: Streamer[Long]): UID = UID(ls())

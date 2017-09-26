@@ -114,7 +114,7 @@ case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterabl
 
   import com.phasmid.darwin.evolution.Random.RandomizableLong
 
-  implicit val idStreamer = Streamer(RNG[Long](0).toStream)
+  implicit val idStreamer: Streamer[Long] = Streamer(RNG[Long](0).toStream)
 
   def seedMembers(size: Int, random: RNG[B]): Colony[B, G, T, V, X] = seedMembers(size, genome, 2, random)
 
