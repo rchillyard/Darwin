@@ -37,7 +37,7 @@ class ExpresserSpec extends FlatSpec with Matchers {
   private val short = Trait[Double](height, 1.6)
 
   "apply" should "work" in {
-    val gene = new Gene[Boolean, String] {
+    val gene = new Gene[String, Boolean] {
       override def locus: Locus[String] = UnknownLocus(Location("test", 0, 0))
 
       override def name: String = "test"
@@ -49,9 +49,9 @@ class ExpresserSpec extends FlatSpec with Matchers {
       override def toString = s"gene $name at $locus with alleles: ${apply(true)} and ${apply(false)} and distinct: $distinct"
     }
 
-    val exp = new AbstractExpresser[Boolean, String, Double] {
+    val exp = new AbstractExpresser[String, Boolean, Double] {
       // XXX a rather simple non-Mendelian selector which determines the allele simply from one specific alternative of the gene
-      override def selectAllele(gene: Gene[Boolean, String]): Allele[String] = gene(true)
+      override def selectAllele(gene: Gene[String, Boolean]): Allele[String] = gene(true)
 
       val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
         case (_, Allele(h)) => Success(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
@@ -66,14 +66,14 @@ class ExpresserSpec extends FlatSpec with Matchers {
     val pq = Set(Allele("P"), Allele("Q"))
     val locus1 = PlainLocus(Location("height", 0, 1), ts, Some(Allele("S")))
     //    val locus2 = PlainLocus(Location("girth", 1, 1), pq, Some(Allele("P")))
-    val gene1 = MendelianGene[Boolean, String](locus1, Seq(Allele("T"), Allele("S")))
+    val gene1 = MendelianGene[String, Boolean](locus1, Seq(Allele("T"), Allele("S")))
     val girth = Characteristic("girth")
     val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
       case (`height`, Allele(h)) => Success(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
       case (`girth`, Allele(g)) => Success(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
       case (c, _) => Failure(GeneticsException(s"traitMapper failed for $c"))
     }
-    val exp = ExpresserMendelian[Boolean, String, Double](traitMapper)
+    val exp = ExpresserMendelian[String, Boolean, Double](traitMapper)
     exp(height, gene1) shouldBe Success(short)
   }
 }

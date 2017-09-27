@@ -37,11 +37,11 @@ import scala.util.{Failure, Success, Try}
   */
 sealed trait Adapter[T, X] extends AdapterFunction[T, X] {
 
-  def matchFactors(f: Factor, t: Trait[T]): Try[(T, FunctionShape[X, T])]
+  def matchFactors(f: Factor, t: Trait[T]): Try[(T, ShapeFunction[T, X])]
 
   override def apply(factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X]): Try[Adaptation[X]] = {
     // TODO tidy this all up nicely
-    val fc: (T) => (FunctionShape[X, T]) => (X) => Fitness = ff.curried
+    val fc: (T) => (ShapeFunction[T, X]) => (X) => Fitness = ff.curried
     val x_f_t: Try[(X) => Fitness] = for ((t, s) <- matchFactors(factor, `trait`)) yield fc(t)(s)
 
     def f_xe_fo(ef: EcoFactor[X]): Try[Fitness] = x_f_t match {

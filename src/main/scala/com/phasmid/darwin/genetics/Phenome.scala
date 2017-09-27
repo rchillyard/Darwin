@@ -49,7 +49,7 @@ import scala.util.Try
   * @tparam G the underlying Gene value type, typically String
   * @tparam T the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
   */
-case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[P, G, T], attraction: (Trait[T], Trait[T]) => Fitness) extends Phenomic[P, G, T] with Identifiable {
+case class Phenome[G, P, T](name: String, characteristics: Map[Locus[G], Characteristic], expresser: Expresser[G, P, T], attraction: (Trait[T], Trait[T]) => Fitness) extends Phenomic[G, P, T] with Identifiable {
 
   /**
     * Method to express a Genotype with respect to this Phenome.
@@ -60,7 +60,7 @@ case class Phenome[P, G, T](name: String, characteristics: Map[Locus[G], Charact
     * @param genotype the genotype to be expressed
     * @return a Phenotype
     */
-  def apply(genotype: Genotype[P, G]): Phenotype[T] = {
+  def apply(genotype: Genotype[G, P]): Phenotype[T] = {
     val ttts: Seq[Try[Trait[T]]] = for (g <- genotype.genes;
                                         //                                        c <- Spy.spy(s"g: $g; charactistics: ", characteristics.get(g.locus))
                                         c <- characteristics.get(g.locus)

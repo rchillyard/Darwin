@@ -46,7 +46,7 @@ import scala.util.Try
   * //@tparam G the gene type
   * //@tparam T the trait type
   */
-sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
+sealed trait Expresser[G, P, T] extends ExpresserFunction[G, P, T] {
   /**
     * Method to select the operative Allele for this Gene.
     * If your application is based on non-Mendelian genetics, you will need to override this method.
@@ -54,7 +54,7 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
     * @param gene the given gene
     * @return the expressed allele
     */
-  def selectAllele(gene: Gene[P, G]): Allele[G] = {
+  def selectAllele(gene: Gene[G, P]): Allele[G] = {
     //noinspection ComparingUnrelatedTypes
     def isDominant(a: Allele[G]) = gene.locus.dominant match {
       case Some(x) => x == a
@@ -80,12 +80,12 @@ sealed trait Expresser[P, G, T] extends ExpresserFunction[P, G, T] {
     * @param gene the given gene
     * @return a new Trait
     */
-  def apply(ch: Characteristic, gene: Gene[P, G]): Try[Trait[T]] = traitMapper(ch, selectAllele(gene))
+  def apply(ch: Characteristic, gene: Gene[G, P]): Try[Trait[T]] = traitMapper(ch, selectAllele(gene))
 }
 
-abstract class AbstractExpresser[P, G, T] extends Expresser[P, G, T]
+abstract class AbstractExpresser[G, P, T] extends Expresser[G, P, T]
 
-case class ExpresserMendelian[P, G, T](traitMapper: TraitMapper[G, T]) extends AbstractExpresser[P, G, T] with Auditable {
+case class ExpresserMendelian[G, P, T](traitMapper: TraitMapper[G, T]) extends AbstractExpresser[G, P, T] with Auditable {
   override def toString(): String = s"ExpresserMendelian($traitMapper)"
 
   def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[ExpresserMendelian[Any, Any, Any]]).render(indent)(tab)

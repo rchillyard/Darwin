@@ -46,9 +46,9 @@ import org.slf4j.Logger
   *           for polyploid: P is Int.
   * @tparam G the underlying gene value type
   */
-case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
+case class Genome[B, G, P](name: String, karyotype: Seq[Chromosome], ploidy: P,
                            // CONSIDER combining transcriber and locusMap
-                           transcriber: Transcriber[B, G], locusMap: (Location) => Locus[G]) extends Sexual[P] with Genomic[B, P, G] with Identifiable {
+                           transcriber: Transcriber[B, G], locusMap: (Location) => Locus[G]) extends Sexual[P] with Genomic[B, G, P] with Identifiable {
   /**
     * @return the the number of chromosomes (pairs, actually) defined for this Genome. Synonymous with "karyotype"
     */
@@ -73,10 +73,10 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     *             while the outer dimension should match the number of chromosomes
     * @return a new instance of Genotype[P]
     */
-  def apply(bsss: Nucleus[B]): Genotype[P, G] = {
+  def apply(bsss: Nucleus[B]): Genotype[G, P] = {
     require(bsss.size == chromosomes, s"size of outer Sequences dimension (${bsss.size}) should equal the karyotype ($chromosomes)")
     val genes = Audit.audit(s"genes for $bsss: ", for ((bss, k) <- bsss zip karyotype; l <- k.ls) yield transcribe(bss, l))
-    Genotype[P, G](IdentifierStrUID("g", idStreamer), genes)
+    Genotype[G, P](IdentifierStrUID("g", idStreamer), genes)
   }
 
   /**
@@ -101,7 +101,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @param location the location of the gene on the Sequence
     * @return a new instance of Gene[P]
     */
-  def transcribe(bss: SequenceSet[B], location: Location): Gene[P, G] = {
+  def transcribe(bss: SequenceSet[B], location: Location): Gene[G, P] = {
     //    val gaos = Spy.spy(s"transcribe($bss, $location): gaos=", for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g)
     val gaos = for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g
     PGene(locusMap(location), sequence(gaos).get)
@@ -117,7 +117,7 @@ case class Genome[B, P, G](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @param l  the Locus of the Gene
     * @param as a sequence of Alleles. For a diploid system (P is Boolean), then the cardinality of as should be 2
     */
-  case class PGene(l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as) {
+  case class PGene(l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[G, P](l, as) {
     override def toString: String = "PGene:" + super.toString
 
     override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)

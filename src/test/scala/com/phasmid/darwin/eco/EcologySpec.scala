@@ -39,18 +39,18 @@ class EcologySpec extends FlatSpec with Matchers {
   private val factorMap = Map("height" -> elephantGrass)
 
   val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int] {
-    def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, FunctionShape[Int, Double])] = f match {
+    def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Int])] = f match {
       case `elephantGrass` => t.characteristic.name match {
-        case "height" => Success((t.value, FunctionShape.shapeDiracInv_I))
+        case "height" => Success((t.value, ShapeFunction.shapeDiracInv_I))
         case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
   }
 
-  val ff: (Double, FunctionShape[Int, Double], Int) => Fitness = {
+  val ff: (Double, ShapeFunction[Double, Int], Int) => Fitness = {
     (t, fs, x) =>
       fs match {
-        case FunctionShape(_, f) => f(x)(t)
+        case ShapeFunction(_, f) => f(x)(t)
         case _ => throw GeneticsException(s"ecoFitness does not implement functionType: $fs")
       }
   }

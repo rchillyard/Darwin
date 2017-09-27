@@ -163,7 +163,7 @@ object Viability {
   * @tparam T the underlying type of the trait
   * @tparam X the underlying type of the ecofactor
   */
-case class FunctionShape[X, T](name: String, f: X => T => Fitness) extends Identifiable
+case class ShapeFunction[T, X](name: String, f: X => T => Fitness) extends Identifiable
 
 object Fitness {
   val viable: Fitness = new Fitness(1)
@@ -178,37 +178,37 @@ object Fitness {
   def unapply(f: Fitness): Option[Double] = Some(f.x)
 }
 
-object FunctionShape {
+object ShapeFunction {
 
   import Fitness.{nonViable, viable}
 
   import Numeric.IntIsIntegral
 
   /**
-    * Generic method to construct a FunctionShape based on two parametric types: X and T, and two functions.
+    * Generic method to construct a ShapeFunction based on two parametric types: T and X, and two functions.
     *
     * @param f    a function which, given two Double values, yields a Fitness (examples are Dirac delta function or logistic function)
     * @param g    a function which, given a Fitness, yields a Fitness (examples are identity and the negation method)
     * @param name the name of the shape
-    * @tparam X the underlying eco factor type
     * @tparam T the underlying trait type
-    * @return FunctionShape object
+    * @tparam X the underlying eco factor type
+    * @return ShapeFunction object
     */
-  def apply[X: Numeric, T: Numeric](f: (Double, Double) => Fitness, g: Fitness => Fitness, name: String): FunctionShape[X, T] = FunctionShape[X, T](name, { x: X => t: T => g(f(implicitly[Numeric[T]].toDouble(t), implicitly[Numeric[X]].toDouble(x))) })
+  def apply[T: Numeric, X: Numeric](f: (Double, Double) => Fitness, g: Fitness => Fitness, name: String): ShapeFunction[T, X] = ShapeFunction[T, X](name, { x: X => t: T => g(f(implicitly[Numeric[T]].toDouble(t), implicitly[Numeric[X]].toDouble(x))) })
 
   /**
-    * Generic method to construct a FunctionShape based on two parametric types: X and T, two functions and a constant.
+    * Generic method to construct a ShapeFunction based on two parametric types: T and X, two functions and a constant.
     *
     * @param f    a function which, given two Double values, yields a Fitness (examples are Dirac delta function or logistic function)
     * @param g    a function which, given a Fitness, yields a Fitness (examples are identity and the negation method)
     * @param k    the constant which, applied to a sigmoid function (such as logistic), varies its shape -- a value of zero would result in
     *             the Dirac delta function; a value of +infinity would result in half for all inputs (i.e. no discrimination).
     * @param name the name of the shape
-    * @tparam X the underlying eco factor type
     * @tparam T the underlying trait type
-    * @return FunctionShape object
+    * @tparam X the underlying eco factor type
+    * @return ShapeFunction object
     */
-  def apply[X: Numeric, T: Numeric](f: Double => (Double, Double) => Fitness, g: Fitness => Fitness, k: Double, name: String): FunctionShape[X, T] = FunctionShape[X, T](name, { x: X => t: T => g(f(k)(implicitly[Numeric[T]].toDouble(t), implicitly[Numeric[X]].toDouble(x))) })
+  def apply[T: Numeric, X: Numeric](f: Double => (Double, Double) => Fitness, g: Fitness => Fitness, k: Double, name: String): ShapeFunction[T, X] = ShapeFunction[T, X](name, { x: X => t: T => g(f(k)(implicitly[Numeric[T]].toDouble(t), implicitly[Numeric[X]].toDouble(x))) })
 
   /**
     * This is the standard value for the logistic function.
@@ -217,21 +217,21 @@ object FunctionShape {
 
   /**
     * Following are the "usual" four shape functions: Dirac and Logistic (regular and inverted).
-    * They are "usual" because the FunctionShape is based on Double, Double.
-    * If you need other shapes, simply build a FunctionShape in a similar manner to here.
+    * They are "usual" because the ShapeFunction is based on Double, Double.
+    * If you need other shapes, simply build a ShapeFunction in a similar manner to here.
     */
-  val shapeDirac: FunctionShape[Double, Double] = FunctionShape(dirac, identity, "shapeDirac")
-  val shapeDiracInv: FunctionShape[Double, Double] = FunctionShape(dirac, _.-, "shapeDirac-i")
-  val shapeLogistic: FunctionShape[Double, Double] = FunctionShape(logistic, identity, k, "shapeLogistic")
-  val shapeLogisticInv: FunctionShape[Double, Double] = FunctionShape(logistic, _.-, k, "shapeLogistic-i")
+  val shapeDirac: ShapeFunction[Double, Double] = ShapeFunction(dirac, identity, "shapeDirac")
+  val shapeDiracInv: ShapeFunction[Double, Double] = ShapeFunction(dirac, _.-, "shapeDirac-i")
+  val shapeLogistic: ShapeFunction[Double, Double] = ShapeFunction(logistic, identity, k, "shapeLogistic")
+  val shapeLogisticInv: ShapeFunction[Double, Double] = ShapeFunction(logistic, _.-, k, "shapeLogistic-i")
 
   /**
     * Following are the Int/Double values of the four shape functions: Dirac and Logistic (regular and inverted).
     */
-  val shapeDirac_I: FunctionShape[Int, Double] = FunctionShape(dirac, identity, "shapeDirac")
-  val shapeDiracInv_I: FunctionShape[Int, Double] = FunctionShape(dirac, _.-, "shapeDirac-i")
-  val shapeLogistic_I: FunctionShape[Int, Double] = FunctionShape(logistic, identity, k, "shapeLogistic")
-  val shapeLogisticInv_I: FunctionShape[Int, Double] = FunctionShape(logistic, _.-, k, "shapeLogistic-i")
+  val shapeDirac_I: ShapeFunction[Double, Int] = ShapeFunction(dirac, identity, "shapeDirac")
+  val shapeDiracInv_I: ShapeFunction[Double, Int] = ShapeFunction(dirac, _.-, "shapeDirac-i")
+  val shapeLogistic_I: ShapeFunction[Double, Int] = ShapeFunction(logistic, identity, k, "shapeLogistic")
+  val shapeLogisticInv_I: ShapeFunction[Double, Int] = ShapeFunction(logistic, _.-, k, "shapeLogistic-i")
 
   /**
     * Method to compare x1 with x2 and determine viability.

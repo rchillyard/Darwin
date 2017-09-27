@@ -91,7 +91,7 @@ object Audit {
     *
     * The caller MUST provide an implicit value in scope for a Logger (unless the spyFunc has been explicitly defined to use some other non-logging mechanism, such as calling getPrintlnSpyFunc).
     *
-    * NOTE that there will be times when you cannot use audit, for example when yielding the result of a tail-recursive method. You will need to use log then instead.
+    * NOTE that there will be times when you cannot use audit, for example when yielding the result of a tail-recursive method. You will need to use debug then instead.
     *
     * @param message       (call-by-name) a String to be used as the prefix of the resulting message OR as the whole string where "{}" will be substituted by the value.
     *                      Note that the message will only be evaluated if auditing will actually occur, otherwise, since it is call-by-name, it will never be evaluated.
@@ -117,14 +117,14 @@ object Audit {
     *
     * It is recommended simply to import Audit._ before invoking this method.
     *
-    * CONSIDER renaming this method as debug and providing warn, info, etc. versions
+    * CONSIDER adding warn, info, etc. versions
     *
     * @param w       a String to be used as the prefix of the resulting message
     * @param b       if true AND if auditing is true, the spyFunc will be called (defaults to true)
     * @param spyFunc (implicit) the function to be called with a String based on w and x IF b && auditing are true
     * @return the value of x
     */
-  def log(w: => String, b: Boolean = true)(implicit spyFunc: String => Audit, isEnabledFunc: Audit => Boolean) {audit(w, (), b); ()}
+  def debug(w: => String, b: Boolean = true)(implicit spyFunc: String => Audit, isEnabledFunc: Audit => Boolean) {audit(w, (), b); ()}
 
   /**
     * This method can be used if you have an expression you would like to be evaluated WITHOUT any auditing going on.

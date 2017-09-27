@@ -57,8 +57,9 @@ trait Evolvable[X] extends Ordered[Evolvable[X]] with Permutable[X] {
   def evaluateFitness(x: X): Boolean
 
   /**
-    * This method yields a new Evolvable by reproduction.
+    * This method yields a new set of X objects, by reproduction.
     * If the ploidy of X is haploid, then reproduction will be asexual, otherwise mating must occur between male/female pairs.
+    * All members of this Evolvable take part in reproduction, as deceased organisms have already been eliminated from this.
     *
     * @return a new Evolvable
     */
@@ -191,6 +192,8 @@ abstract class BaseEvolvable[V: Incrementable, X, Repr](members: Iterable[X], vv
   protected def *(fraction: Rational[Long])(implicit random: RNG[Long]): Iterable[X] = permute.take((fraction * members.size).floor.toInt).toSeq
 
   private def next(v: Version[V])(implicit k: Evolvable[X] => Rational[Long], r: Evolvable[X] => RNG[Long]): Repr = {
+    // TODO in sexual reproduction, we need to introduce to s a small number (possibly zero) of members of a distinct Evolvable
+    // such as a rival Colony. Typically, these additions, if any, will be males.
     val (s, n) = (buildInternal(survivors, v), buildInternal(nonSurvivors, v))
     implicit val random: RNG[Long] = r(this)
     // TODO need to fix this because, currently, sexual reproduction will be from pairs

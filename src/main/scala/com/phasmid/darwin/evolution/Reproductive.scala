@@ -21,28 +21,22 @@
  *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.phasmid.darwin
+package com.phasmid.darwin.evolution
 
-import scala.util.Try
+trait Reproductive[O] extends (() => Iterable[O])
 
-/**
-  * Created by scalaprof on 7/14/17.
-  */
-package object eco {
-  /**
-    * This function type is the type of a parameter of an Adaptation. In the context of an Adapter, this function
-    * will yield, for a given EcoType, its Fitness (wrapped in Try)
-    *
-    * @tparam EcoType the underlying type of the ecological types such as Environment
-    */
-  type EcoFitness[EcoType] = EcoFactor[EcoType] => Try[Fitness]
+trait ASexual[B, G, T, V, X, OrganismType <: Organism[B, G, Unit, T, V, X]] extends Reproductive[OrganismType] {
 
-  /**
-    * This function type is the type of a parameter of an Adapter. For a tuple of trait value, function "type", and eco factor value.
-    *
-    * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
-    * @tparam EcoType   the underlying type of the ecological types such as Environment
-    */
-  type FitnessFunction[TraitType, EcoType] = (TraitType, ShapeFunction[TraitType, EcoType], EcoType) => Fitness
+  override def apply(): Iterable[OrganismType] = reproduce
 
+  def reproduce: Iterable[OrganismType]
+}
+
+trait Sexual[B, G, T, V, X, OrganismType <: Organism[B, G, Boolean, T, V, X]] extends Reproductive[OrganismType] {
+
+  override def apply(): Iterable[OrganismType] = mate(pool)
+
+  def mate(evolvable: Evolvable[X]): Iterable[OrganismType]
+
+  def pool: Evolvable[X]
 }

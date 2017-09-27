@@ -34,16 +34,36 @@ import scala.util.Try
 /**
   * Created by scalaprof on 7/27/16.
   */
-trait Organism[B, P, G, T, X] {
+trait Organism[B, G, P, T, V, X] extends Reproductive[Organism[B, G, P, T, V, X]] {
 
-  def genome: Genome[B, P, G]
+  /**
+    * @return the generation during which this organism was formed
+    */
+  def generation: Version[V]
 
-  def phenome: Phenome[P, G, T]
+  /**
+    * @return the genome from which the genotype of this organism was formed
+    */
+  def genome: Genome[B, G, P]
 
+  /**
+    * @return the phenome from which the phenotype of this organism was formed
+    */
+  def phenome: Phenome[G, P, T]
+
+  /**
+    * @return the nucleus of this organism
+    */
   def nucleus: Nucleus[B]
 
-  def genotype: Genotype[P, G] = genome(nucleus)
+  /**
+    * @return the genotype of this organism
+    */
+  def genotype: Genotype[G, P] = genome(nucleus)
 
+  /**
+    * @return the phenotype of this organism
+    */
   def phenotype: Phenotype[T] = phenome(genotype)
 
   /**
@@ -54,36 +74,51 @@ trait Organism[B, P, G, T, X] {
     * @return the Fitness of this Organism in the ecology, wrapped in Try
     */
   def fitness(ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]]): Try[Fitness] = ecology(phenotype).fitness(ecoFactors)
+
 }
 
 /**
   * Created by scalaprof on 7/27/16.
   */
-trait SedentaryOrganism[B, P, G, T, X] extends Organism[B, P, G, T, X] {
+trait SedentaryOrganism[B, G, P, T, V, X] extends Organism[B, G, P, T, V, X] {
 
   def ecology: Ecology[T, X]
 
   def adaptatype: Adaptatype[X] = ecology(phenotype)
 
-  def build(d: Identifier, genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, P, G, T, X]
+  def build(d: Identifier, generation: Version[V], genome: Genome[B, G, P], phenome: Phenome[G, P, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, P, T, V, X]
 }
 
-case class SexualSedentaryOrganism[B, G, T, X](id: Identifier, genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with SedentaryOrganism[B, Boolean, G, T, X] with CaseIdentifiable[SexualSedentaryOrganism[Any, Any, Any, Any]] {
-  def build(d: Identifier, genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, Boolean, G, T, X] = SexualSedentaryOrganism(id, genome, phenome, nucleus, ecology)
+case class SexualSedentaryOrganism[B, G, T, V, X](id: Identifier, generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with Sexual[B, G, T, V, X, Organism[B, G, Boolean, T, V, X]] with SedentaryOrganism[B, G, Boolean, T, V, X] with CaseIdentifiable[SexualSedentaryOrganism[Any, Any, Any, Any, Any]] {
+  def build(d: Identifier, generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, Boolean, T, V, X] = SexualSedentaryOrganism(id, generation, genome, phenome, nucleus, ecology)
 
-  //  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[SexualSedentaryOrganism[Any,Any,Any,Any]]).render(indent)(tab)
+  def mate(evolvable: Evolvable[X]): Iterable[Organism[B, G, Boolean, T, V, X]] = ??? // TODO
 
+  def pool: Evolvable[X] = ??? // TODO
 }
 
 object SexualSedentaryOrganism {
 
-  def apply[B, G, T, X, V](generation: Version[V], genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], nucleus: Nucleus[B], ecology: Ecology[T, X])(implicit streamer: Streamer[Long]): SexualSedentaryOrganism[B, G, T, X] = new SexualSedentaryOrganism[B, G, T, X](IdentifierStrVerUID("sso", generation, streamer), genome, phenome, nucleus, ecology)
+  def apply[B, G, T, V, X](generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], nucleus: Nucleus[B], ecology: Ecology[T, X])(implicit streamer: Streamer[Long]): SexualSedentaryOrganism[B, G, T, V, X] = new SexualSedentaryOrganism[B, G, T, V, X](IdentifierStrVerUID("sso", generation, streamer), generation, genome, phenome, nucleus, ecology)
 
-  //  def apply[B, G, T, X](genome: Genome[B, Boolean, G], phenome: Phenome[Boolean, G, T], random: Stream[(B,B)], ecology: Ecology[T, X]): SexualSedentaryOrganism[B, G, T, X] = {
+  //  def apply[B, G, T, X](genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], random: Stream[(B,B)], ecology: Ecology[T, X]): SexualSedentaryOrganism[B, G, T, X] = {
   //    val loci: Int = genome.loci
   //    val x: List[(B, B)] = random take loci toList
   //    val y: (Seq[B], Seq[B]) = x unzip
   //    apply(genome, phenome, Seq(y._1, y._2), ecology)
   //  }
 
+}
+
+case class Bacterium[B, G, T, V, X](id: Identifier, generation: Version[V], genome: Genome[B, G, Unit], phenome: Phenome[G, Unit, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with ASexual[B, G, T, V, X, Organism[B, G, Unit, T, V, X]] with SedentaryOrganism[B, G, Unit, T, V, X] with CaseIdentifiable[Bacterium[Any, Any, Any, Any, Any]] {
+  //  def build(d: Identifier, genome: Genome[B, G, Unit], phenome: Phenome[G, Unit, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, Unit, T, V, X] =
+
+  def build(d: Identifier, generation: Version[V], genome: Genome[B, G, Unit], phenome: Phenome[G, Unit, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) = Bacterium(id, generation, genome, phenome, nucleus, ecology)
+
+  def reproduce: Iterable[Organism[B, G, Unit, T, V, X]] = ??? // TODO
+}
+
+object Bacterium {
+
+  def apply[B, G, T, V, X](generation: Version[V], genome: Genome[B, G, Unit], phenome: Phenome[G, Unit, T], nucleus: Nucleus[B], ecology: Ecology[T, X])(implicit streamer: Streamer[Long]): Bacterium[B, G, T, V, X] = new Bacterium[B, G, T, V, X](IdentifierStrVerUID("sso", generation, streamer), generation, genome, phenome, nucleus, ecology)
 }

@@ -74,7 +74,7 @@ package object genetics {
     * A specific Genome type where BaseType is set to Base, Ploidy is Boolean and GeneType is String.
     * That's to say, genomes of the natural, eukaryotic world (everything except bacteria).
     */
-  type NaturalGenome = Genome[Base, Boolean, String]
+  type NaturalGenome = Genome[Base, String, Boolean]
 
   // Function Types...
 
@@ -85,24 +85,24 @@ package object genetics {
     * @tparam BaseType is the underlying type of the Sequence: for natural genetics, BaseType is Base, that's to say one of a
     *                  set of four alphabetic bases made up of proteins and which make up the molecule called DNA.
     *                  But different applications might want to choose something else.
+    * @tparam GeneType the underlying Gene value type, typically String
     * @tparam Ploidy   the ploidy type for the Genotype, typically (for eukaryotic genetics) is Boolean (ploidy=2);
     *                  for haploid: Ploidy is Unit;
     *                  for polyploid: Ploidy is Int.
-    * @tparam GeneType the underlying Gene value type, typically String
     */
-  type Genomic[BaseType, Ploidy, GeneType] = Nucleus[BaseType] => Genotype[Ploidy, GeneType]
+  type Genomic[BaseType, GeneType, Ploidy] = Nucleus[BaseType] => Genotype[GeneType, Ploidy]
 
   /**
     * Phenomic is a type which provides the functionality to express a Genotype (that's to say a sequence of Genes)
     * into a Phenotype. As far as I'm aware, Phenomic is not a real word.
     *
+    * @tparam GeneType  the underlying Gene value type, typically String
     * @tparam Ploidy    the ploidy type for the Genotype, typically (for eukaryotic genetics) is Boolean (ploidy=2);
     *                   for haploid: Ploidy is Unit;
     *                   for polyploid: Ploidy is Int.
-    * @tparam GeneType  the underlying Gene value type, typically String
     * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
     */
-  type Phenomic[Ploidy, GeneType, TraitType] = Genotype[Ploidy, GeneType] => Phenotype[TraitType]
+  type Phenomic[GeneType, Ploidy, TraitType] = Genotype[GeneType, Ploidy] => Phenotype[TraitType]
 
   /**
     * This function type is a mapper between a Characteristic/Allele pair and an (optional) Trait. It is used by implementers
@@ -127,12 +127,12 @@ package object genetics {
   /**
     * This function type is the basis of the expression of genes into traits.
     *
+    * @tparam GeneType  the underlying Gene value type, typically String
     * @tparam Ploidy    the ploidy type for the Genotype, typically (for eukaryotic genetics) is Boolean (ploidy=2);
     *                   for haploid: Ploidy is Unit;
     *                   for polyploid: Ploidy is Int.
-    * @tparam GeneType  the underlying Gene value type, typically String
     * @tparam TraitType the underlying type of Phenotype and its Traits, typically (for natural genetic algorithms) Double
     */
-  type ExpresserFunction[Ploidy, GeneType, TraitType] = (Characteristic, Gene[Ploidy, GeneType]) => Try[Trait[TraitType]]
+  type ExpresserFunction[GeneType, Ploidy, TraitType] = (Characteristic, Gene[GeneType, Ploidy]) => Try[Trait[TraitType]]
 
 }

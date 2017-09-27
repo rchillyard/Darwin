@@ -36,7 +36,7 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
   * @tparam G the underlying Gene type
   * @author scalaprof
   */
-case class Genotype[P, G](id: Identifier, genes: Seq[Gene[P, G]]) extends Auditable {
+case class Genotype[G, P](id: Identifier, genes: Seq[Gene[G, P]]) extends Auditable {
 
   def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Genotype[Any, Any]]).render(indent)(tab)
 
@@ -55,7 +55,7 @@ case class Genotype[P, G](id: Identifier, genes: Seq[Gene[P, G]]) extends Audita
   *           Otherwise, P will be Int.
   * @tparam G the underlying Gene type
   */
-trait Gene[P, G] extends (P => Allele[G]) with Identifiable {
+trait Gene[G, P] extends (P => Allele[G]) with Identifiable {
   def locus: Locus[G]
 
   /**
@@ -109,13 +109,13 @@ case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: 
   *           Otherwise, P will be Int.
   * @tparam G the underlying Gene type
   */
-case class MendelianGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[P, G](l, as) {
+case class MendelianGene[G, P](l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[G, P](l, as) {
   override def toString = s"""MendelianGene: at $l with alleles: ${as.mkString(", ")}"""
 
   override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[MendelianGene[Any, Any]]).render(indent)(tab)
 }
 
-abstract class AbstractGene[P, G](l: Locus[G], as: Seq[Allele[G]]) extends Gene[P, G] {
+abstract class AbstractGene[G, P](l: Locus[G], as: Seq[Allele[G]]) extends Gene[G, P] {
 
   /**
     * @return this Gene's Locus

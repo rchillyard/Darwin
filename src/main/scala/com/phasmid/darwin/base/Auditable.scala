@@ -44,7 +44,7 @@ trait Auditable extends Renderable {
   def audit(): Unit = {
     import com.phasmid.darwin.base.Audit._
 
-    Audit.log(this.render())
+    Audit.debug(this.render())
   }
 }
 

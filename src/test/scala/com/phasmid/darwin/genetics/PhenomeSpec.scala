@@ -24,8 +24,8 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.IdentifierName
-import com.phasmid.darwin.eco.FunctionShape.logistic
-import com.phasmid.darwin.eco.{Fitness, FunctionShape}
+import com.phasmid.darwin.eco.ShapeFunction.logistic
+import com.phasmid.darwin.eco.{Fitness, ShapeFunction}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util._
@@ -39,10 +39,10 @@ class PhenomeSpec extends FlatSpec with Matchers {
   val pq = Set(Allele("P"), Allele("Q"))
   val locusH = PlainLocus(Location("height", 0, 1), ts, Some(Allele("T")))
   val locusG = PlainLocus(Location("girth", 1, 1), pq, Some(Allele("P")))
-  private val geneH1 = MendelianGene[Boolean, String](locusH, Seq(Allele("T"), Allele("S")))
-  private val geneH2 = MendelianGene[Boolean, String](locusH, Seq(Allele("S"), Allele("S")))
-  private val geneG1 = MendelianGene[Boolean, String](locusG, Seq(Allele("Q"), Allele("Q")))
-  private val geneG2 = MendelianGene[Boolean, String](locusG, Seq(Allele("P"), Allele("Q")))
+  private val geneH1 = MendelianGene[String, Boolean](locusH, Seq(Allele("T"), Allele("S")))
+  private val geneH2 = MendelianGene[String, Boolean](locusH, Seq(Allele("S"), Allele("S")))
+  private val geneG1 = MendelianGene[String, Boolean](locusG, Seq(Allele("Q"), Allele("Q")))
+  private val geneG2 = MendelianGene[String, Boolean](locusG, Seq(Allele("P"), Allele("Q")))
   val height = Characteristic("height")
   val girth = Characteristic("girth")
   val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
@@ -51,7 +51,7 @@ class PhenomeSpec extends FlatSpec with Matchers {
     case (c, _) => Failure(GeneticsException(s"traitMapper: no trait for $c"))
   }
 
-  val expresser: Expresser[Boolean, String, Double] = ExpresserMendelian[Boolean, String, Double](traitMapper)
+  val expresser: Expresser[String, Boolean, Double] = ExpresserMendelian[String, Boolean, Double](traitMapper)
 
 
   behavior of "apply"
@@ -60,7 +60,7 @@ class PhenomeSpec extends FlatSpec with Matchers {
 
     def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
 
-    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
+    val phenome: Phenome[String, Boolean, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
     val phenotype = phenome(genotype)
     phenotype.traits.length shouldBe 2
     phenotype.traits.head shouldBe Trait[Double](height, 2.0)
@@ -71,7 +71,7 @@ class PhenomeSpec extends FlatSpec with Matchers {
   it should "work where there is no sexual selection" in {
     def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
 
-    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
+    val phenome: Phenome[String, Boolean, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
     val genotype1 = Genotype(IdentifierName("G2"), Seq(geneH1, geneG2))
     val genotype2 = Genotype(IdentifierName("H1"), Seq(geneG2, geneH1))
     val phenotype1 = phenome(genotype1)
@@ -86,8 +86,8 @@ class PhenomeSpec extends FlatSpec with Matchers {
       case (Characteristic("girth", _), Allele(g)) => println(s"girth with allele $g"); Success(Trait(girth, g match { case "Q" => 3.0; case "P" => 1.2 }))
       case (c, _) => Failure(GeneticsException(s"traitMapper: no trait for $c"))
     }
-    val mockExpresser: Expresser[Boolean, String, Double] = new ExpresserMendelian[Boolean, String, Double](mockTraitMapper)
-    val mockFunctionShape: FunctionShape[Double, Double] = FunctionShape(logistic, identity, 0.1, "shapeLogistic")
+    val mockExpresser: Expresser[String, Boolean, Double] = new ExpresserMendelian[String, Boolean, Double](mockTraitMapper)
+    val mockFunctionShape: ShapeFunction[Double, Double] = ShapeFunction(logistic, identity, 0.1, "shapeLogistic")
 
     def mockAttraction(observer: Trait[Double], observed: Trait[Double]): Fitness = {
       (observer, observed) match {
@@ -97,7 +97,7 @@ class PhenomeSpec extends FlatSpec with Matchers {
       }
     }
 
-    val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> mockHeight, locusG -> girth), mockExpresser, mockAttraction)
+    val phenome: Phenome[String, Boolean, Double] = Phenome("test", Map(locusH -> mockHeight, locusG -> girth), mockExpresser, mockAttraction)
     phenome.attractiveness(phenome(Genotype(IdentifierName("G1H2"), Seq(geneG1, geneH2))), phenome(Genotype(IdentifierName("G2H1"), Seq(geneG2, geneH1))))() should ===(0.9820137900379085 +- 1E-10)
     phenome.attractiveness(phenome(Genotype(IdentifierName("G2H1"), Seq(geneG2, geneH1))), phenome(Genotype(IdentifierName("G1H1"), Seq(geneG1, geneH1))))() should ===(0.5 +- 1E-10)
   }

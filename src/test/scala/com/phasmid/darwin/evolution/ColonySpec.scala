@@ -45,18 +45,18 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
   private val factorMap = Map("height" -> elephantGrass)
 
   val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int] {
-    def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, FunctionShape[Int, Double])] = f match {
+    def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Int])] = f match {
       case `elephantGrass` => t.characteristic.name match {
-        case "height" => Success((t.value, FunctionShape.shapeDiracInv_I))
+        case "height" => Success((t.value, ShapeFunction.shapeDiracInv_I))
         case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
   }
 
-  val ff: (Double, FunctionShape[Int, Double], Int) => Fitness = {
+  val ff: (Double, ShapeFunction[Double, Int], Int) => Fitness = {
     (t, fs, x) =>
       fs match {
-        case FunctionShape(_, f) => f(x)(t)
+        case ShapeFunction(_, f) => f(x)(t)
         case _ => throw GeneticsException(s"ecoFitness does not implement functionType: $fs")
       }
   }
@@ -94,7 +94,7 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
     hoxC -> UnknownLocus[String](hoxC))
   val girth = Characteristic("girth")
   val karyotype = Seq(Chromosome("test", isSex = false, Seq(locHeight)))
-  val genome: Genome[Base, Boolean, String] = Genome("test", karyotype, true, transcriber, locusMap)
+  val genome: Genome[Base, String, Boolean] = Genome("test", karyotype, true, transcriber, locusMap)
   val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
     case (`height`, Allele(h)) => Success(Trait(height, h match { case "T" => 2.0; case "S" => 1.6 }))
     case (`girth`, Allele(g)) => Success(Trait(height, g match { case "Q" => 3.0; case "P" => 1.2 }))
@@ -103,8 +103,8 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
 
   def attraction(observer: Trait[Double], observed: Trait[Double]): Fitness = Fitness.viable
 
-  val expresser: Expresser[Boolean, String, Double] = ExpresserMendelian[Boolean, String, Double](traitMapper)
-  val phenome: Phenome[Boolean, String, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
+  val expresser: Expresser[String, Boolean, Double] = ExpresserMendelian[String, Boolean, Double](traitMapper)
+  val phenome: Phenome[String, Boolean, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
   private val sId = """(\w+)-(\w+)-(\p{XDigit}{16})"""
   private val idR = sId.r
 

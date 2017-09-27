@@ -42,16 +42,16 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
   private val ecosystem = Map("elephant grass" -> efElephantGrass)
 
   val adapter: Adapter[Double, Double] = new AbstractAdapter[Double, Double] {
-    def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, FunctionShape[Double, Double])] = f match {
+    def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Double])] = f match {
       case `elephantGrass` => t.characteristic.name match {
-        case "height" => Success(t.value, FunctionShape.shapeDiracInv)
+        case "height" => Success(t.value, ShapeFunction.shapeDiracInv)
         case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
   }
 
-  def fitnessFunction(t: Double, functionType: FunctionShape[Double, Double], x: Double): Fitness = functionType match {
-    case FunctionShape(_, f) => f(x)(t)
+  def fitnessFunction(t: Double, functionType: ShapeFunction[Double, Double], x: Double): Fitness = functionType match {
+    case ShapeFunction(_, f) => f(x)(t)
     case _ => throw GeneticsException(s"ecoFitness does not implement functionType: $functionType")
   }
 
