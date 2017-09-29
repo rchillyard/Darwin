@@ -112,7 +112,7 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
 
   it should "render" in {
     val random = RNG[Base](3L)
-    val colony = Colony("test colony", ecology, ecoFactors, genome, phenome).seedMembers(10, random)
+    val colony = Colony("test colony", ecology, ecoFactors, genome, phenome).seedMembers(12, random)
     val filtered = colony.render().replaceAll(sId, "<ID>")
     println(filtered)
     filtered shouldBe
@@ -128,7 +128,8 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
       SexualSedentaryOrganism:<ID>,
       SexualSedentaryOrganism:<ID>,
       SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>
+      SexualSedentaryOrganism:<ID>,
+      ...[2 more elements]
     )
   generation:0
   ecology:test

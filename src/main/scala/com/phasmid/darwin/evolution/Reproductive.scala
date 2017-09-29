@@ -25,18 +25,56 @@ package com.phasmid.darwin.evolution
 
 trait Reproductive[O] extends (() => Iterable[O])
 
-trait ASexual[B, G, T, V, X, OrganismType <: Organism[B, G, Unit, T, V, X]] extends Reproductive[OrganismType] {
+/**
+  * This trait defines reproductive style.
+  *
+  * @tparam P the Ploidy type
+  */
+trait Sexual[P] {
+  /**
+    * Determine if this reproduction style is sexual
+    *
+    * @return true for diploid or polyploid genomes
+    */
+  def sexual(p: P): Boolean = p match {
+    case _: Int => true
+    case _: Boolean => true
+    case _ => false
+  }
 
-  override def apply(): Iterable[OrganismType] = reproduce
-
-  def reproduce: Iterable[OrganismType]
 }
 
-trait Sexual[B, G, T, V, X, OrganismType <: Organism[B, G, Boolean, T, V, X]] extends Reproductive[OrganismType] {
+trait ASexual[B, G, T, V, X, OrganismType <: Organism[B, G, Unit, T, V, X]] extends Reproductive[OrganismType] {
+
+  override def apply(): Iterable[OrganismType] = fission
+
+  /**
+    * Method to define, in general terms, the means of reproducing this ASexual object.
+    * In strict Fission, there is only one daughter cell. But here, we may have many daughter cells.
+    *
+    * @return
+    */
+  def fission: Iterable[OrganismType]
+}
+
+trait Mating[B, G, T, V, X, OrganismType <: Organism[B, G, Boolean, T, V, X]] extends Reproductive[OrganismType] {
 
   override def apply(): Iterable[OrganismType] = mate(pool)
 
+  /**
+    * Method to define the means of reproducing from this Sexual object and one of the pool of potential mates taken from the members of evolvable.
+    *
+    * @param evolvable the pool of potential mates. In general, this evolvable may include organisms of the same sex as this which allows for the possibility of hermaphroditic reproduction.
+    * @return an Iterable of organisms, i.e. progeny from this mating.
+    */
   def mate(evolvable: Evolvable[X]): Iterable[OrganismType]
 
+  /**
+    * Method to define a pool of potential mates for this object.
+    * In the general case, this pool of mates will include members of a different Colony who have entered the territory of this Colony for the purpose of mating.
+    *
+    * @return an Evolvable which contains a number of organisms from which to choose a mate for this object.
+    *         Note that the result may include this object and may include members of this object's own sex.
+    */
   def pool: Evolvable[X]
 }

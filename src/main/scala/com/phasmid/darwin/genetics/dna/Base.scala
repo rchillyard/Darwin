@@ -41,28 +41,28 @@ trait Base extends Identifiable {
 }
 
 case object Guanine extends Base {
-  def pair = Cytosine
+  def pair: Base = Cytosine
 
   val name = "G"
   val i = 0
 }
 
 case object Cytosine extends Base {
-  def pair = Guanine
+  def pair: Base = Guanine
 
   val name = "C"
   val i = 1
 }
 
 case object Adenine extends Base {
-  def pair = Thymine
+  def pair: Base = Thymine
 
   val name = "A"
   val i = 2
 }
 
 case object Thymine extends Base {
-  def pair = Adenine
+  def pair: Base = Adenine
 
   val name = "T"
   val i = 3

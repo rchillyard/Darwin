@@ -24,7 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.{Audit, Identifiable, IdentifierStrUID}
-import com.phasmid.darwin.evolution.{RNG, Random}
+import com.phasmid.darwin.evolution.{RNG, Random, Sexual}
 import com.phasmid.laScala.fp.FP._
 import com.phasmid.laScala.fp.Streamer
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
@@ -170,21 +170,3 @@ case class Location(name: String, offset: Int, length: Int) extends Identifiable
   override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
 }
 
-/**
-  * This trait defines reproductive style.
-  *
-  * @tparam P the Ploidy type
-  */
-trait Sexual[P] {
-  /**
-    * Determine if this reproduction style is sexual
-    *
-    * @return true for diploid or polyploid genomes
-    */
-  def sexual(p: P): Boolean = p match {
-    case _: Int => true
-    case _: Boolean => true
-    case _ => false
-  }
-
-}

@@ -34,7 +34,7 @@ import scala.util.Try
 /**
   * Created by scalaprof on 7/27/16.
   */
-trait Organism[B, G, P, T, V, X] extends Reproductive[Organism[B, G, P, T, V, X]] {
+trait Organism[B, G, P, T, V, X] extends Reproductive[Organism[B, G, P, T, V, X]] with Sexual[P] {
 
   /**
     * @return the generation during which this organism was formed
@@ -89,7 +89,7 @@ trait SedentaryOrganism[B, G, P, T, V, X] extends Organism[B, G, P, T, V, X] {
   def build(d: Identifier, generation: Version[V], genome: Genome[B, G, P], phenome: Phenome[G, P, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, P, T, V, X]
 }
 
-case class SexualSedentaryOrganism[B, G, T, V, X](id: Identifier, generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with Sexual[B, G, T, V, X, Organism[B, G, Boolean, T, V, X]] with SedentaryOrganism[B, G, Boolean, T, V, X] with CaseIdentifiable[SexualSedentaryOrganism[Any, Any, Any, Any, Any]] {
+case class SexualSedentaryOrganism[B, G, T, V, X](id: Identifier, generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with Mating[B, G, T, V, X, Organism[B, G, Boolean, T, V, X]] with SedentaryOrganism[B, G, Boolean, T, V, X] with CaseIdentifiable[SexualSedentaryOrganism[Any, Any, Any, Any, Any]] {
   def build(d: Identifier, generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, Boolean, T, V, X] = SexualSedentaryOrganism(id, generation, genome, phenome, nucleus, ecology)
 
   def mate(evolvable: Evolvable[X]): Iterable[Organism[B, G, Boolean, T, V, X]] = ??? // TODO
@@ -115,7 +115,7 @@ case class Bacterium[B, G, T, V, X](id: Identifier, generation: Version[V], geno
 
   def build(d: Identifier, generation: Version[V], genome: Genome[B, G, Unit], phenome: Phenome[G, Unit, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) = Bacterium(id, generation, genome, phenome, nucleus, ecology)
 
-  def reproduce: Iterable[Organism[B, G, Unit, T, V, X]] = ??? // TODO
+  def fission: Iterable[Organism[B, G, Unit, T, V, X]] = ??? // TODO
 }
 
 object Bacterium {

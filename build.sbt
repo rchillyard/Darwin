@@ -29,7 +29,6 @@ scalaTestVersion := (scalaBinaryVersion.value match {
 	case "2.12" => "3.0.1"
 })
 
-
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
@@ -62,7 +61,7 @@ libraryDependencies ++= Seq(
   scalaModules %% "scala-parser-combinators" % scalaModulesVersion,
   scalaModules %% "scala-xml" % "1.0.6",
 	"joda-time" % "joda-time" % "2.9.9",
-  "com.phasmid" %% "lascala" % "1.0.8",
+  "com.phasmid" %% "lascala" % "1.0.9-SNAPSHOT",
   "org.clapper" %% "classutil" % "1.1.2",
 	akkaGroup %% "akka-actor" % akkaVersion.value,
 	"org.scalatest" %% "scalatest" % scalaTestVersion.value % "test"
