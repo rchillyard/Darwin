@@ -46,7 +46,7 @@ import scala.annotation.tailrec
   * @tparam P            the Ploidy type
   * @tparam G            the Gene type
   * @tparam T            the Trait type
-  * @tparam V            the version type (defined to be Incrementable)
+  * @tparam V            the generation type (defined to be Incrementable)
   * @tparam X            the underlying type of the xs
   * @tparam OrganismType the Organism type
   * @tparam Repr         the Representation type for this Colony
@@ -114,8 +114,21 @@ abstract class AbstractColony[B, G, P, T, V: Incrementable, X, OrganismType <: O
 
 /**
   * Created by scalaprof on 7/27/16.
+  *
+  * @param name       an identifier for this Colony
+  * @param organisms  a collection of organisms, each of type OrganismType
+  * @param generation a version representing this generation
+  * @param ecology    an Ecology type for this Colony
+  * @param ecoFactors the actual ecology in which this Colony flourishes
+  * @param genome     the Genome of the organisms represented in this Colony
+  * @param phenome    the Phenome of the organisms represented in this Colony
+  * @tparam B the Base type
+  * @tparam G the Gene type
+  * @tparam T the Trait type
+  * @tparam V the generation type (defined to be Incrementable)
+  * @tparam X the underlying type of the xs
   */
-case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterable[SexualSedentaryOrganism[B, G, T, V, X]], generation: Version[V], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T]) extends AbstractColony[B, G, Boolean, T, V, X, SexualSedentaryOrganism[B, G, T, V, X], Colony[B, G, T, V, X]](organisms, generation, ecology, ecoFactors, genome, phenome) {
+case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterable[SexualSedentaryOrganism[B, G, T, V, X]], override val generation: Version[V], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T]) extends AbstractColony[B, G, Boolean, T, V, X, SexualSedentaryOrganism[B, G, T, V, X], Colony[B, G, T, V, X]](organisms, generation, ecology, ecoFactors, genome, phenome) {
 
   import com.phasmid.darwin.evolution.Random.RandomizableLong
 

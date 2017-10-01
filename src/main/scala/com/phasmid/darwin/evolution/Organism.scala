@@ -33,8 +33,17 @@ import scala.util.Try
 
 /**
   * Created by scalaprof on 7/27/16.
+  *
+  * Definition of an organism and its behaviors
+  *
+  * @tparam B the Base type
+  * @tparam G the Gene type
+  * @tparam P the Ploidy type
+  * @tparam T the Trait type
+  * @tparam V the Version (Generation) type
+  * @tparam X the Eco-type
   */
-trait Organism[B, G, P, T, V, X] extends Reproductive[Organism[B, G, P, T, V, X]] with Sexual[P] with Individual {
+trait Organism[B, G, P, T, V, X] extends Reproductive[Organism[B, G, P, T, V, X]] with Sexual[P] with Individual[T, X] {
 
   /**
     * @return the generation during which this organism was formed

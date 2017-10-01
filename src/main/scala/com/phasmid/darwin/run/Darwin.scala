@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import com.phasmid.darwin.plugin._
+import com.phasmid.darwin.visualization.Avatar
 import com.phasmid.laScala.fp.Args
 import org.slf4j.LoggerFactory
 
@@ -42,6 +43,7 @@ import scala.util.Try
   */
 case class Darwin(name: String, interval: Duration, max: Option[Long], plugins: String, initialDelay: FiniteDuration = FiniteDuration(100, TimeUnit.MILLISECONDS))(implicit ec: ExecutionContext) extends Listener with Pluggable {
   private val logger = LoggerFactory.getLogger(getClass)
+  // TODO why is this EvolvablePlugin and not just Plugin?
   private val pm = PluginManager[EvolvablePlugin](plugins)
   private val ps: mutable.MutableList[EvolvablePlugin] = mutable.MutableList()
   for (k <- pm.plugins.toList; p <- pm.getPlugin(k)) addPlugin(p)
@@ -92,3 +94,7 @@ object Darwin extends App {
 trait Pluggable {
   def addPlugin(p: EvolvablePlugin): Unit
 }
+
+case class CreateAvatar(avatar: Avatar)
+
+case class KillAvatar(avatar: Avatar)

@@ -23,15 +23,17 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.eco.Fitness
+import com.phasmid.darwin.eco.{EcoFactor, Ecology, Fitness}
 import com.phasmid.laScala.values.Rational
 import com.phasmid.laScala.{Prefix, Renderable, Version}
 import org.scalatest.{FlatSpec, Inside, Matchers}
 
 import scala.util.Success
 
-case class Member(x: Int) extends Individual {
+case class Member(x: Int) extends Individual[Any, Any] {
   def name = s""""${x.toString}""""
+
+  def fitness(ecology: Ecology[Any, Any], ecoFactors: Map[String, EcoFactor[Any]]) = Success(Fitness(1 - (x % 2)))
 }
 /**
   * Created by scalaprof on 7/25/16.
@@ -44,7 +46,10 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
 
   case class MockEvolvable(members: Iterable[Member], v: Version[Int]) extends BaseEvolvable[Int, Member, MockEvolvable](members, v) {
 
-    def evaluateFitness(x: Member): Boolean = x.x % 2 == 0
+    def evaluateFitness(x: Member): Boolean = x.fitness(null, null) match {
+      case Success(f) => f() > 0.5
+      case _ => false
+    }
 
     def offspring: Iterator[Member] = members.toIterator filter (_.x > 3) map (_.x + 100) map Member.apply
 
@@ -67,7 +72,7 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
       */
     def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = {
       val sb = new StringBuilder(s"MockEvolvable(")
-      sb.append(nl(indent + 1) + "version:" + Renderable.renderElem(version, indent + 2))
+      sb.append(nl(indent + 1) + "generation:" + Renderable.renderElem(generation, indent + 2))
       sb.append(nl(indent + 1) + "members:" + Renderable.renderElem(members, indent + 2))
       sb.append(")")
       sb.toString()
@@ -86,7 +91,7 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
     val evolvable = MockEvolvable(fibonacci, Version(0, None))
     evolvable.render() shouldBe
       """MockEvolvable(
-  version:0
+  generation:0
   members:(
         "1",
         "1",
@@ -102,7 +107,7 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
     val evolvable = MockEvolvable(Seq(), Version(0, None))
     val x = evolvable.build(Seq(Member(1), Member(1), Member(3), Member(2), Member(13), Member(5), Member(8)), Version(1, None))
     x.iterator.toSeq shouldBe permutedMembers
-    x.version() shouldBe 1
+    x.generation() shouldBe 1
   }
   it should "yield 3 offspring" in {
     val evolvable = MockEvolvable(fibonacci, Version(0, None))
@@ -123,12 +128,12 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
   }
   it should "evolve" in {
     val evolvable = MockEvolvable(fibonacci, Version(0, None))
-    evolvable.version shouldBe Version(0, None, isSnapshot = false)
+    evolvable.generation shouldBe Version(0, None, isSnapshot = false)
     val next = evolvable.next()
     next should matchPattern { case Success(MockEvolvable(_, _)) => }
     inside(next) {
       case Success(me) =>
-        me.version shouldBe Version(1, None, isSnapshot = false)
+        me.generation shouldBe Version(1, None, isSnapshot = false)
         me.members shouldBe Stream(Member(2), Member(8), Member(108), Member(113))
     }
   }

@@ -43,6 +43,6 @@ trait GenerationListener {
     * null as the parameter.
     * @tparam Z the underlying type of individuals
     */
-  def onGeneration[Z <: Individual](evolvable: Evolvable[Z]): Unit
+  def onGeneration[Z <: Individual[_, _]](evolvable: Evolvable[Z]): Unit
 
 }

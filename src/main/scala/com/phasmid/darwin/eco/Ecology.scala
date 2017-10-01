@@ -31,6 +31,15 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 /**
   * Created by scalaprof on 5/9/16.
+  *
+  * An ecology in which organisms can adapt and thrive (or not as the case may be).
+  *
+  * @param name    name by which to refer to this Ecology
+  * @param factors the factors present in this Ecology
+  * @param fitness the fitness function
+  * @param adapter the adapter
+  * @tparam T the trait type
+  * @tparam X the eco-type
   */
 case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Identifying with Ecological[T, X] with Identifiable with CaseIdentifiable[Ecology[Any, Any]] {
 

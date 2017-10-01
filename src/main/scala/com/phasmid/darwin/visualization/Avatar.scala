@@ -23,9 +23,10 @@
 
 package com.phasmid.darwin.visualization
 
-trait Visualizable {
+import com.phasmid.darwin.base.Identifiable
+import com.phasmid.darwin.evolution.Individual
 
-  def position: Position
+trait Avatar extends Identifiable {
 
   def features: Map[String, Any]
 
@@ -33,10 +34,8 @@ trait Visualizable {
 
 }
 
-trait Position {
-  def spatial: Cartesian
-
-  def velocity: Cartesian
-}
+trait Avagen[T, X] extends (Individual[T, X] => Avatar)
 
 case class Cartesian(x: Double, y: Double, z: Double)
+
+case class Color(r: Int, g: Int, b: Int)
