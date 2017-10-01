@@ -29,6 +29,8 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 /**
   * TODO redefine this: it should be a pair (or collection) of Ecologies, where there are boundaries between pairs.
   *
+  * TODO there should be a type, similar to Genome/Phenome, perhaps called Biome, that defines the characteristics of an eco system, and a another type like Biotype that actually defines those characteristics for a specific environment.
+  *
   * An Environment is where the fitness of phenotypes (or organisms) is evaluated to determine viability.
   * An Environment is essentially the intersection of a number of EcoFactors, for each of which an organism
   * is evaluated. The fitness of the various eco factors are then combined to generate the overall fitness

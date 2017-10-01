@@ -24,11 +24,12 @@
 package com.phasmid.darwin.visualization
 
 import com.phasmid.darwin.evolution.{Evolvable, Individual}
-import com.phasmid.darwin.run.{CreateAvatar, Darwin, KillAvatar}
+import com.phasmid.darwin.plugin.Listener
+import com.phasmid.darwin.run.{CreateAvatar, KillAvatar}
 
 import scala.collection.mutable
 
-case class Visualizer[T, X](avagen: Avagen[T, X], darwin: Darwin) {
+case class Visualizer[T, X](avagen: Avagen[T, X], listener: Listener) {
 
   def visualize[Z <: Individual[T, X]](e: Evolvable[Z]): Unit = {
     // TODO no, we need to do this when an individual is born
@@ -40,13 +41,13 @@ case class Visualizer[T, X](avagen: Avagen[T, X], darwin: Darwin) {
   def createAvatar(i: Individual[T, X]): Unit = {
     val avatar = avagen(i)
     hashMap.put(i.name, avatar)
-    darwin.receive(this, CreateAvatar(avatar))
+    listener.receive(this, CreateAvatar(avatar))
   }
 
   def updateAvatar(i: Individual[T, X]): Unit = {
     hashMap.get(i.name) match {
       case Some(a) =>
-        darwin.receive(this, KillAvatar(a))
+        listener.receive(this, KillAvatar(a))
         createAvatar(i)
       case None => println(s"logic error re: $i")
     }
@@ -55,7 +56,7 @@ case class Visualizer[T, X](avagen: Avagen[T, X], darwin: Darwin) {
   def destroyAvatar(i: Individual[T, X]): Unit = {
     hashMap.get(i.name) match {
       case Some(a) =>
-        darwin.receive(this, KillAvatar(a))
+        listener.receive(this, KillAvatar(a))
       case None => println(s"logic error re: $i")
     }
   }
