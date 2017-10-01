@@ -21,28 +21,10 @@
  *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.phasmid.darwin.evolution
+package com.phasmid.darwin.visualization
 
-/**
-  * Created by scalaprof on 7/26/17.
-  */
-trait GenerationListener {
-  /**
-    * This method is called whenever the
-    * {@link Evolvable} implementer
-    * completes a new generation or when the
-    * {@link Evolution} itself is
-    * completely exhausted (has no more evolvables to work with).
-    *
-    * @param evolvable
-    * the implementer of { @link Evolvable} which has completed a
-    * generation or null if the { @link Evolution} itself has
-    * completed.
-    *
-    * NOTE: implementers of this method must be prepared to accept
-    * null as the parameter.
-    * @tparam Z the underlying type of individuals
-    */
-  def onGeneration[Z <: Individual](evolvable: Evolvable[Z]): Unit
+import com.phasmid.darwin.plugin.{Listenable, Listener, Plugin}
 
-}
+trait VisualizerPlugin extends Plugin with VisualizationListener with Listenable
+
+trait VisualizationListener extends Listener

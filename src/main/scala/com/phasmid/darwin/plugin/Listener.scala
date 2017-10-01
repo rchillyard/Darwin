@@ -21,28 +21,28 @@
  *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.phasmid.darwin.evolution
+package com.phasmid.darwin.plugin
 
 /**
-  * Created by scalaprof on 7/26/17.
+  * This trait defines a listener which can receive messages.
+  * Normally, in an Actor system, implementers will delegate to an actor.
+  *
   */
-trait GenerationListener {
+trait Listener {
   /**
-    * This method is called whenever the
-    * {@link Evolvable} implementer
-    * completes a new generation or when the
-    * {@link Evolution} itself is
-    * completely exhausted (has no more evolvables to work with).
+    * Receive a message
     *
-    * @param evolvable
-    * the implementer of { @link Evolvable} which has completed a
-    * generation or null if the { @link Evolution} itself has
-    * completed.
-    *
-    * NOTE: implementers of this method must be prepared to accept
-    * null as the parameter.
-    * @tparam Z the underlying type of individuals
+    * @param sender the sender
+    * @param msg    the message
     */
-  def onGeneration[Z <: Individual](evolvable: Evolvable[Z]): Unit
-
+  def receive(sender: AnyRef, msg: Any): Unit
 }
+
+/**
+  * This trait defines a type of Plugin which can receive messages.
+  * Normally, in an Actor system, implementers will delegate to an actor.
+  *
+  */
+trait ListenerPlugin extends Plugin with Listener
+
+

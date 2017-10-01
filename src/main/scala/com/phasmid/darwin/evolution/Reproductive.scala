@@ -67,7 +67,7 @@ trait Mating[B, G, T, V, X, OrganismType <: Organism[B, G, Boolean, T, V, X]] ex
     * @param evolvable the pool of potential mates. In general, this evolvable may include organisms of the same sex as this which allows for the possibility of hermaphroditic reproduction.
     * @return an Iterable of organisms, i.e. progeny from this mating.
     */
-  def mate(evolvable: Evolvable[X]): Iterable[OrganismType]
+  def mate(evolvable: Evolvable[OrganismType]): Iterable[OrganismType]
 
   /**
     * Method to define a pool of potential mates for this object.
@@ -76,5 +76,5 @@ trait Mating[B, G, T, V, X, OrganismType <: Organism[B, G, Boolean, T, V, X]] ex
     * @return an Evolvable which contains a number of organisms from which to choose a mate for this object.
     *         Note that the result may include this object and may include members of this object's own sex.
     */
-  def pool: Evolvable[X]
+  def pool: Evolvable[OrganismType]
 }

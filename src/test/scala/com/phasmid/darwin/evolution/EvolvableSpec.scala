@@ -30,6 +30,9 @@ import org.scalatest.{FlatSpec, Inside, Matchers}
 
 import scala.util.Success
 
+case class Member(x: Int) extends Individual {
+  def name = s""""${x.toString}""""
+}
 /**
   * Created by scalaprof on 7/25/16.
   */
@@ -39,19 +42,19 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
 
   implicit val random: RNG[Long] = RNG[Long](0)
 
-  case class MockEvolvable(members: Iterable[Int], v: Version[Int]) extends BaseEvolvable[Int, Int, MockEvolvable](members, v) {
+  case class MockEvolvable(members: Iterable[Member], v: Version[Int]) extends BaseEvolvable[Int, Member, MockEvolvable](members, v) {
 
-    def evaluateFitness(x: Int): Boolean = x % 2 == 0
+    def evaluateFitness(x: Member): Boolean = x.x % 2 == 0
 
-    def offspring: Iterator[Int] = members.toIterator filter (_ > 3) map (_ + 100)
+    def offspring: Iterator[Member] = members.toIterator filter (_.x > 3) map (_.x + 100) map Member.apply
 
-    def build(xs: Iterable[Int], v: Version[Int]): MockEvolvable = MockEvolvable(xs.toSeq, v)
+    def build(xs: Iterable[Member], v: Version[Int]): MockEvolvable = MockEvolvable(xs.toSeq, v)
 
-    protected[EvolvableSpec] override def survivors: Iterable[Int] = super.survivors
+    protected[EvolvableSpec] override def survivors: Iterable[Member] = super.survivors
 
-    protected[EvolvableSpec] override def -(i: Iterable[Int]): Iterable[Int] = super.-(i)
+    protected[EvolvableSpec] override def -(i: Iterable[Member]): Iterable[Member] = super.-(i)
 
-    protected[EvolvableSpec] override def *(fraction: Rational[Long])(implicit random: RNG[Long]): Iterable[Int] = super.*(fraction)
+    protected[EvolvableSpec] override def *(fraction: Rational[Long])(implicit random: RNG[Long]): Iterable[Member] = super.*(fraction)
 
     def isFit(f: Fitness): Boolean = f.x >= 0.5
 
@@ -73,47 +76,60 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
 
   }
 
+  val fibonacci = Seq(Member(1), Member(1), Member(2), Member(3), Member(5), Member(8), Member(13))
+  val permutedMembers = Stream(Member(1), Member(1), Member(3), Member(2), Member(13), Member(5), Member(8))
   "MockEvolvable" should "shuffle properly" in {
-    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
-    evolvable.permute.toSeq shouldBe Stream(1, 1, 3, 2, 13, 5, 8)
+    val evolvable = MockEvolvable(fibonacci, Version(0, None))
+    evolvable.permute.toSeq shouldBe permutedMembers
   }
   it should "render" in {
-    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
-    evolvable.render() shouldBe "MockEvolvable(\n  version:0\n  members:(\n        1,\n        1,\n        2,\n        3,\n        5,\n        8,\n        13\n      ))"
+    val evolvable = MockEvolvable(fibonacci, Version(0, None))
+    evolvable.render() shouldBe
+      """MockEvolvable(
+  version:0
+  members:(
+        "1",
+        "1",
+        "2",
+        "3",
+        "5",
+        "8",
+        "13"
+      ))"""
   }
 
   it should "build properly" in {
     val evolvable = MockEvolvable(Seq(), Version(0, None))
-    val x = evolvable.build(Seq(1, 1, 3, 2, 13, 5, 8), Version(1, None))
-    x.iterator.toSeq shouldBe Seq(1, 1, 3, 2, 13, 5, 8)
-    x() shouldBe 0
+    val x = evolvable.build(Seq(Member(1), Member(1), Member(3), Member(2), Member(13), Member(5), Member(8)), Version(1, None))
+    x.iterator.toSeq shouldBe permutedMembers
+    x.version() shouldBe 1
   }
   it should "yield 3 offspring" in {
-    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
-    evolvable.offspring.toSeq shouldBe Seq(105, 108, 113)
+    val evolvable = MockEvolvable(fibonacci, Version(0, None))
+    evolvable.offspring.toSeq shouldBe Seq(Member(105), Member(108), Member(113))
   }
   it should "yield 2 survivors -- the even numbers" in {
-    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
-    evolvable.survivors shouldBe Seq(2, 8)
+    val evolvable = MockEvolvable(fibonacci, Version(0, None))
+    evolvable.survivors shouldBe Seq(Member(2), Member(8))
   }
   it should "yield 5 from * 2/3" in {
-    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13, 21), Version(0, None))
-    (evolvable * Rational(2, 3)).toSeq shouldBe Seq(1, 21, 3, 5, 13)
+    val evolvable = MockEvolvable(fibonacci :+ Member(21), Version(0, None))
+    (evolvable * Rational(2, 3)).toSeq shouldBe Seq(Member(1), Member(21), Member(3), Member(5), Member(13))
   }
   it should "retain 3 after subtracting result of * 2/3" in {
-    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13, 21), Version(0, None))
-    val x: Iterable[Int] = evolvable * Rational(2, 3)
-    (evolvable - x).toSeq shouldBe Seq(2, 8)
+    val evolvable = MockEvolvable(fibonacci :+ Member(21), Version(0, None))
+    val x: Iterable[Member] = evolvable * Rational(2, 3)
+    (evolvable - x).toSeq shouldBe Seq(Member(2), Member(8))
   }
   it should "evolve" in {
-    val evolvable = MockEvolvable(Seq(1, 1, 2, 3, 5, 8, 13), Version(0, None))
+    val evolvable = MockEvolvable(fibonacci, Version(0, None))
     evolvable.version shouldBe Version(0, None, isSnapshot = false)
     val next = evolvable.next()
     next should matchPattern { case Success(MockEvolvable(_, _)) => }
     inside(next) {
       case Success(me) =>
         me.version shouldBe Version(1, None, isSnapshot = false)
-        me.members shouldBe Stream(2, 8, 108, 113)
+        me.members shouldBe Stream(Member(2), Member(8), Member(108), Member(113))
     }
   }
 }

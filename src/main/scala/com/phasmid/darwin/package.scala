@@ -53,4 +53,5 @@ package object darwin {
     * @tparam EcoType   the underlying type of the ecological types such as Environment
     */
   type AdapterFunction[TraitType, EcoType] = (Factor, Trait[TraitType], FitnessFunction[TraitType, EcoType]) => Try[Adaptation[EcoType]]
+
 }

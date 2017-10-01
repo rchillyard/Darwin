@@ -113,8 +113,9 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
   it should "render" in {
     val random = RNG[Base](3L)
     val colony = Colony("test colony", ecology, ecoFactors, genome, phenome).seedMembers(12, random)
-    val filtered = colony.render().replaceAll(sId, "<ID>")
-    println(filtered)
+    val rendered = colony.render()
+    println(rendered)
+    val filtered = rendered.replaceAll(sId, "<ID>")
     filtered shouldBe
       """Colony(
   name:"test colony"

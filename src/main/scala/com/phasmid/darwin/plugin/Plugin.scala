@@ -85,27 +85,7 @@ trait Plugin {
   def destroy()
 }
 
-/**
-  * This trait defines a listener which can receive messages.
-  * Normally, in an Actor system, implementers will delegate to an actor.
-  *
-  */
-trait Listener {
-  /**
-    * Receive a message
-    *
-    * @param sender the sender
-    * @param msg    the message
-    */
-  def receive(sender: AnyRef, msg: Any): Unit
-}
 
-/**
-  * This trait defines a type of Plugin which can receive messages.
-  * Normally, in an Actor system, implementers will delegate to an actor.
-  *
-  */
-trait ListenerPlugin extends Plugin with Listener
 
 sealed trait Status
 
