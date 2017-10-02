@@ -24,7 +24,7 @@
 package com.phasmid.darwin.evolution
 
 import com.phasmid.darwin.base.{Auditable, Identifier}
-import com.phasmid.darwin.eco.{EcoFactor, Ecology, Fitness}
+import com.phasmid.darwin.eco.{Environment, Fitness}
 import com.phasmid.laScala.values.{Incrementable, Rational}
 import com.phasmid.laScala.{Sequential, Version}
 
@@ -251,11 +251,10 @@ trait Individual[T, X] extends Identifier {
   /**
     * CONSIDER changing the parameters to this method if we can find them more simply
     *
-    * @param ecology    the Ecology
-    * @param ecoFactors the local ecology
-    * @return the Fitness of this Organism in the ecology, wrapped in Try
+    * @param environment the Environment in which this Individual thrives
+    * @return the Fitness of this Individual in the ecology, wrapped in Try
     */
-  def fitness(ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]]): Try[Fitness]
+  def fitness(environment: Environment[T, X]): Try[Fitness]
 
 
 }

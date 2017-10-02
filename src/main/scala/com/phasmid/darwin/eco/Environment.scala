@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.base.Identifiable
+import com.phasmid.darwin.base.{CaseIdentifiable, Identifiable}
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 /**
@@ -40,12 +40,10 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
   *
   *           Created by scalaprof on 5/5/16.
   */
-case class Environment[X](name: String, factors: EcoFactor[X]*) extends Identifiable {
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Environment[Any]]).render(indent)(tab)
-}
+case class Environment[T, X](name: String, ecology: Ecology[T, X], habitat: Habitat[X]) extends CaseIdentifiable[Environment[Any, Any]]
 
-trait Environmental[X] {
-  def environment: Environment[X]
+trait Environmental[T, X] {
+  def environment: Environment[T, X]
 }
 
 case class EcoFactor[X](factor: Factor, x: X) extends Identifiable {

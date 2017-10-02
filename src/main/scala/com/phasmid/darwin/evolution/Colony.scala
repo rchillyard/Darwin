@@ -27,6 +27,7 @@ import com.phasmid.darwin.Ecological
 import com.phasmid.darwin.base.Identifiable
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
+import com.phasmid.darwin.run.Species
 import com.phasmid.darwin.visualization.Visualizer
 import com.phasmid.laScala.fp.Streamer
 import com.phasmid.laScala.values.Incrementable
@@ -37,12 +38,9 @@ import scala.annotation.tailrec
 /**
   * Created by scalaprof on 7/27/16.
   *
-  * @param organisms  a collection of organisms, each of type OrganismType
-  * @param generation a version representing this generation
-  * @param ecology    an Ecology type for this Colony
-  * @param ecoFactors the actual ecology in which this Colony flourishes
-  * @param genome     the Genome of the organisms represented in this Colony
-  * @param phenome    the Phenome of the organisms represented in this Colony
+  * @param organisms   a collection of organisms, each of type OrganismType
+  * @param generation  a version representing this generation
+  * @param environment the Environment in which this Colony flourishes
   * @tparam B            the Base type
   * @tparam P            the Ploidy type
   * @tparam G            the Gene type
@@ -52,7 +50,7 @@ import scala.annotation.tailrec
   * @tparam OrganismType the Organism type
   * @tparam Repr         the Representation type for this Colony
   */
-abstract class AbstractColony[B, G, P, T, V: Incrementable, X, OrganismType <: Organism[B, G, P, T, V, X], Repr](organisms: Iterable[OrganismType], generation: Version[V], genome: Genome[B, G, P], phenome: Phenome[G, P, T], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]]) extends BaseEvolvable[V, OrganismType, Repr](organisms, generation) with Ecological[T, X] with Theocratic[B, Repr] with Identifiable {
+abstract class AbstractColony[B, G, P, T, V: Incrementable, X, OrganismType <: Organism[B, G, P, T, V, X], Repr](organisms: Iterable[OrganismType], generation: Version[V], genome: Genome[B, G, P], environment: Environment[T, X]) extends BaseEvolvable[V, OrganismType, Repr](organisms, generation) with Ecological[T, X] with Theocratic[B, Repr] with Identifiable {
 
   /**
     * Default implementation of isFit for any AbstractColony
@@ -85,7 +83,7 @@ abstract class AbstractColony[B, G, P, T, V: Incrementable, X, OrganismType <: O
     * @return true if x is fit enough to survive this generation
     * @throws Exception if the logic to evaluate the fitness of x fails in some unexpected way
     */
-  override def evaluateFitness(x: OrganismType): Boolean = (x.fitness(ecology, ecoFactors) map isFit).get
+  override def evaluateFitness(x: OrganismType): Boolean = (x.fitness(environment) map isFit).get
 
   /**
     * This method yields a new Evolvable by reproduction.
@@ -98,7 +96,7 @@ abstract class AbstractColony[B, G, P, T, V: Incrementable, X, OrganismType <: O
   override def offspring: Iterator[OrganismType] =
     if (genome.sexual) {
       // GeneticsException("sexual reproduction not yet implemented") // FIXME implement me
-      (organisms filter { o: OrganismType => o.fitness(ecology, ecoFactors).get.x >= 0 }).toIterator
+      (organisms filter { o: OrganismType => o.fitness(environment).get.x >= 0 }).toIterator
     }
     else
       (for (o <- organisms; x <- o()) yield x.asInstanceOf[OrganismType]).toIterator
@@ -124,31 +122,33 @@ abstract class AbstractColony[B, G, P, T, V: Incrementable, X, OrganismType <: O
 /**
   * Created by scalaprof on 7/27/16.
   *
-  * @param name       an identifier for this Colony
-  * @param organisms  a collection of organisms, each of type OrganismType
-  * @param generation a version representing this generation
-  * @param ecology    an Ecology type for this Colony
-  * @param ecoFactors the actual ecology in which this Colony flourishes
-  * @param genome     the Genome of the organisms represented in this Colony
-  * @param phenome    the Phenome of the organisms represented in this Colony
+  * @param name        an identifier for this Colony
+  * @param organisms   a collection of organisms, each of type OrganismType
+  * @param generation  a version representing this generation
+  * @param environment the Environment in which this Colony flourishes
+  * @param species     the Species of the organisms represented in this Colony
   * @tparam B the Base type
   * @tparam G the Gene type
   * @tparam T the Trait type
   * @tparam V the generation type (defined to be Incrementable)
-  * @tparam X the underlying type of the xs
+  * @tparam X the Eco-type
   */
-case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterable[SexualSedentaryOrganism[B, G, T, V, X]], override val generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]])(visualizer: Visualizer[T, X]) extends AbstractColony[B, G, Boolean, T, V, X, SexualSedentaryOrganism[B, G, T, V, X], Colony[B, G, T, V, X]](organisms, generation, genome, phenome, ecology, ecoFactors) {
+case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterable[SexualAdaptedOrganism[B, G, T, V, X]], override val generation: Version[V], species: Species[B, G, Boolean, T, X], environment: Environment[T, X]) extends AbstractColony[B, G, Boolean, T, V, X, SexualAdaptedOrganism[B, G, T, V, X], Colony[B, G, T, V, X]](organisms, generation, species.genome, environment) {
 
   import com.phasmid.darwin.evolution.Random.RandomizableLong
 
   implicit val idStreamer: Streamer[Long] = Streamer(RNG[Long](0).toStream)
 
+  private val genome = species.genome
+
+  private val visualizer: Visualizer[T, X] = species.visualizer
+
   def seedMembers(size: Int, random: RNG[B]): Colony[B, G, T, V, X] = seedMembers(size, genome, 2, random)
 
-  def build(xs: Iterable[SexualSedentaryOrganism[B, G, T, V, X]], v: Version[V]): Colony[B, G, T, V, X] = new Colony(name, xs, v, genome, phenome, ecology, ecoFactors)(visualizer)
+  def build(xs: Iterable[SexualAdaptedOrganism[B, G, T, V, X]], v: Version[V]): Colony[B, G, T, V, X] = new Colony(name, xs, v, species, environment)
 
-  def createOrganism(nucleus: Nucleus[B]): SexualSedentaryOrganism[B, G, T, V, X] = {
-    val result = SexualSedentaryOrganism(generation, genome, phenome, nucleus, ecology)
+  def createOrganism(nucleus: Nucleus[B]): SexualAdaptedOrganism[B, G, T, V, X] = {
+    val result = SexualAdaptedOrganism(generation, species, nucleus, environment.ecology)
     visualizer.createAvatar(result)
     result
   }
@@ -169,8 +169,8 @@ case class Colony[B, G, T, V: Incrementable, X](name: String, organisms: Iterabl
 
 object Colony {
 
-  def apply[B, G, T, V: Incrementable, X](name: String, generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]], visualizer: Visualizer[T, X]): Colony[B, G, T, V, X] = Colony(name, Nil, generation, genome, phenome, ecology, ecoFactors)(visualizer)
+  def apply[B, G, T, V: Incrementable, X](name: String, generation: Version[V], species: Species[B, G, Boolean, T, X], environment: Environment[T, X]): Colony[B, G, T, V, X] = Colony(name, Nil, generation, species, environment)
 
-  def apply[B, G, T, X](name: String, genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]], visualizer: Visualizer[T, X]): Colony[B, G, T, Long, X] = apply(name, Version.longVersion("0"), genome, phenome, ecology, ecoFactors, visualizer)
+  def apply[B, G, T, X](name: String, species: Species[B, G, Boolean, T, X], environment: Environment[T, X]): Colony[B, G, T, Long, X] = apply(name, Version.longVersion("0"), species, environment)
 
 }

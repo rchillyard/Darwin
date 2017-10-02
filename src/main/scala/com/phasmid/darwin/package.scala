@@ -24,7 +24,7 @@
 package com.phasmid
 
 import com.phasmid.darwin.eco.{Factor, FitnessFunction}
-import com.phasmid.darwin.genetics.{Adaptation, Adaptatype, Phenotype, Trait}
+import com.phasmid.darwin.genetics._
 
 import scala.util.Try
 

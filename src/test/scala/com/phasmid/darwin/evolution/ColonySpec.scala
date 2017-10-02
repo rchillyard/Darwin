@@ -28,6 +28,7 @@ import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
 import com.phasmid.darwin.genetics.dna.Base
 import com.phasmid.darwin.plugin.Listener
+import com.phasmid.darwin.run.Species
 import com.phasmid.darwin.visualization.{Avagen, Avatar, Visualizer}
 import org.scalatest.{FlatSpec, Inside, Matchers}
 
@@ -110,11 +111,7 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
   private val sId = """(\w+)-(\w+)-(\p{XDigit}{16})"""
   private val idR = sId.r
   private val avagen = new Avagen[Double, Int] {
-    def apply(v1: Individual[Double, Int]): Avatar {
-      def features: Map[String, Any]
-
-      def name: String
-    } = new Avatar {
+    def apply(v1: Individual[Double, Int]): Avatar = new Avatar {
       def features: Map[String, Any] = Map()
 
       def name: String = v1.name
@@ -124,12 +121,14 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
     def receive(sender: AnyRef, msg: Any): Unit = println(s"test listener: sender=$sender, msg=$msg")
   }
   val visualizer = new Visualizer[Double, Int](avagen, listener)
+  val species: Species[Base, String, Boolean, Double, Int] = Species("test species", genome, phenome)(visualizer)
+  val environment: Environment[Double, Int] = Environment("test environment", ecology, ecoFactors)
 
   behavior of "Colony"
 
   it should "render" in {
     val random = RNG[Base](3L)
-    val colony = Colony("test colony", genome, phenome, ecology, ecoFactors, visualizer).seedMembers(12, random)
+    val colony = Colony("test colony", species, environment).seedMembers(12, random)
     val rendered = colony.render()
     println(rendered)
     val filtered = rendered.replaceAll(sId, "<ID>")
@@ -137,39 +136,27 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
       """Colony(
   name:"test colony"
   organisms:(
-      SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>,
-      SexualSedentaryOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
+      SexualAdaptedOrganism:<ID>,
       ...[2 more elements]
     )
   generation:0
-  genome:Genome:test
-  phenome:Phenome(
-      name:"test"
-      characteristics:(
-          (Locus at L:height:0:1 with dominant: Some(T) and possible alleles: Set(T, S),height),
-          (Locus at L:girth:1:1 with dominant: Some(P) and possible alleles: Set(P, Q),girth)
-        )
-      expresser:ExpresserMendelian(
-          traitMapper:<function2>
-          )
-      attraction:<function2>
-      )
-  ecology:test
-  ecoFactors:((elephant grass,elephant grass))
+  species:Species:test species
+  environment:Environment:test environment
   )"""
   }
 
   it should "create an organism" in {
     val random = RNG[Base](3L)
-    val colony = Colony("test colony", genome, phenome, ecology, ecoFactors, visualizer)
+    val colony = Colony("test colony", species, environment)
     val (bn, _) = genome.recombine(random)
     val organism = colony.createOrganism(bn)
     organism.nucleus should matchPattern { case _ => }
@@ -181,7 +168,7 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
 
   it should "evolve" in {
     val random = RNG[Base](3L)
-    val colony = Colony("test colony", genome, phenome, ecology, ecoFactors, visualizer).seedMembers(10, random)
+    val colony = Colony("test colony", species, environment).seedMembers(10, random)
     println(colony)
     // TODO rework this test
     val cy = colony.next()

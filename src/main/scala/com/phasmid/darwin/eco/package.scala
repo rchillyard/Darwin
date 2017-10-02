@@ -45,4 +45,11 @@ package object eco {
     */
   type FitnessFunction[TraitType, EcoType] = (TraitType, ShapeFunction[TraitType, EcoType], EcoType) => Fitness
 
+  /**
+    * A Habitat is defined as a set of EcoFactors, indexed by name
+    *
+    * @tparam EcoType the type of the EcoFactors present in this Habitat
+    */
+  type Habitat[EcoType] = Map[String, EcoFactor[EcoType]]
+
 }

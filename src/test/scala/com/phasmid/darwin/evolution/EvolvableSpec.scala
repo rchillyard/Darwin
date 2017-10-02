@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.eco.{EcoFactor, Ecology, Fitness}
+import com.phasmid.darwin.eco.{Environment, Fitness}
 import com.phasmid.laScala.values.Rational
 import com.phasmid.laScala.{Prefix, Renderable, Version}
 import org.scalatest.{FlatSpec, Inside, Matchers}
@@ -33,7 +33,8 @@ import scala.util.Success
 case class Member(x: Int) extends Individual[Any, Any] {
   def name = s""""${x.toString}""""
 
-  def fitness(ecology: Ecology[Any, Any], ecoFactors: Map[String, EcoFactor[Any]]) = Success(Fitness(1 - (x % 2)))
+  // NOTE: this is very arbitrary
+  def fitness(environment: Environment[Any, Any]) = Success(Fitness(1 - (x % 2)))
 }
 /**
   * Created by scalaprof on 7/25/16.
@@ -46,7 +47,7 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
 
   case class MockEvolvable(members: Iterable[Member], v: Version[Int]) extends BaseEvolvable[Int, Member, MockEvolvable](members, v) {
 
-    def evaluateFitness(x: Member): Boolean = x.fitness(null, null) match {
+    def evaluateFitness(x: Member): Boolean = x.fitness(null) match {
       case Success(f) => f() > 0.5
       case _ => false
     }

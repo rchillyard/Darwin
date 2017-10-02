@@ -27,6 +27,9 @@ import com.phasmid.darwin.base.IdentifierName
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
 import com.phasmid.darwin.genetics.dna.{Base, Guanine}
+import com.phasmid.darwin.plugin.Listener
+import com.phasmid.darwin.run.Species
+import com.phasmid.darwin.visualization.{Avagen, Avatar, Visualizer}
 import com.phasmid.laScala.Version
 import com.phasmid.laScala.fp.Streamer
 import org.scalatest.{FlatSpec, Inside, Matchers}
@@ -104,7 +107,20 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
 
   val expresser: Expresser[String, Boolean, Double] = ExpresserMendelian[String, Boolean, Double](traitMapper)
   val phenome: Phenome[String, Boolean, Double] = Phenome("test", Map(locusH -> height, locusG -> girth), expresser, attraction)
+  private val avagen = new Avagen[Double, Int] {
+    def apply(v1: Individual[Double, Int]): Avatar = new Avatar {
+      def features: Map[String, Any] = Map()
+
+      def name: String = v1.name
+    }
+  }
+  private val listener = new Listener {
+    def receive(sender: AnyRef, msg: Any): Unit = println(s"test listener: sender=$sender, msg=$msg")
+  }
+  val visualizer = new Visualizer[Double, Int](avagen, listener)
+  private val species = Species("test species", genome, phenome)(visualizer)
   val generation = Version(1, None)
+  val environment = Environment("test environment", ecology, ecoFactors)
 
   import com.phasmid.darwin.evolution.Random.RandomizableLong
 
@@ -117,7 +133,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
     println(s"ecology: $ecology")
     println(s"ecoFactors: $ecoFactors")
     val (bn, _) = genome.recombine(random)
-    val organism = SexualSedentaryOrganism(generation, genome, phenome, bn, ecology)
+    val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
     val dna = for (a <- organism.nucleus; b <- a) yield b.bases
     dna.flatten shouldBe List(Guanine, Guanine)
   }
@@ -127,7 +143,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
     println(s"ecology: $ecology")
     println(s"ecoFactors: $ecoFactors")
     val (bn, _) = genome.recombine(random)
-    val organism = SexualSedentaryOrganism(generation, genome, phenome, bn, ecology)
+    val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
     val actual = organism.genotype
     actual should matchPattern { case Genotype(_, Seq(_)) => }
     actual.genes shouldBe Seq(geneHGG)
@@ -138,7 +154,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
     println(s"ecology: $ecology")
     println(s"ecoFactors: $ecoFactors")
     val (bn, _) = genome.recombine(random)
-    val organism = SexualSedentaryOrganism(generation, genome, phenome, bn, ecology)
+    val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
     organism.phenotype should matchPattern { case Phenotype(_, List(Trait(`height`, 2.0))) => }
   }
 
@@ -147,7 +163,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
     println(s"ecology: $ecology")
     println(s"ecoFactors: $ecoFactors")
     val (bn, _) = genome.recombine(random)
-    val organism = SexualSedentaryOrganism(generation, genome, phenome, bn, ecology)
+    val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
     val z: Adaptatype[Int] = ecology(organism.phenotype)
     z should matchPattern { case Adaptatype(_, List(Adaptation(`elephantGrass`, _))) => }
   }
@@ -157,8 +173,8 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
     println(s"ecology: $ecology")
     println(s"ecoFactors: $ecoFactors")
     val (bn, _) = genome.recombine(random)
-    val organism = SexualSedentaryOrganism(generation, genome, phenome, bn, ecology)
-    val fy: Try[Fitness] = organism.fitness(ecology, ecoFactors)
+    val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
+    val fy: Try[Fitness] = organism.fitness(environment)
     fy should matchPattern { case Success(_) => }
     // TODO ensure that this is really correct
     fy.get.x shouldBe 0.0 +- 0.001

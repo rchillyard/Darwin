@@ -24,8 +24,9 @@
 package com.phasmid.darwin.evolution
 
 import com.phasmid.darwin.base.{CaseIdentifiable, Identified, Identifier, IdentifierStrVerUID}
-import com.phasmid.darwin.eco.{EcoFactor, Ecology, Fitness}
+import com.phasmid.darwin.eco.{Ecology, Environment, Fitness}
 import com.phasmid.darwin.genetics._
+import com.phasmid.darwin.run.Species
 import com.phasmid.laScala.Version
 import com.phasmid.laScala.fp.Streamer
 
@@ -34,7 +35,9 @@ import scala.util.Try
 /**
   * Created by scalaprof on 7/27/16.
   *
-  * Definition of an organism and its behaviors
+  * Definition of an organism and its behaviors.
+  * An organism belongs to a Species and is able to reproduce.
+  * It's nucleus is considered fixed: there are no changes to the nucleus after the organism is born.
   *
   * @tparam B the Base type
   * @tparam G the Gene type
@@ -51,14 +54,9 @@ trait Organism[B, G, P, T, V, X] extends Reproductive[Organism[B, G, P, T, V, X]
   def generation: Version[V]
 
   /**
-    * @return the genome from which the genotype of this organism was formed
+    * @return the species to which this organism belongs
     */
-  def genome: Genome[B, G, P]
-
-  /**
-    * @return the phenome from which the phenotype of this organism was formed
-    */
-  def phenome: Phenome[G, P, T]
+  def species: Species[B, G, P, T, X]
 
   /**
     * @return the nucleus of this organism
@@ -68,66 +66,109 @@ trait Organism[B, G, P, T, V, X] extends Reproductive[Organism[B, G, P, T, V, X]
   /**
     * @return the genotype of this organism
     */
-  def genotype: Genotype[G, P] = genome(nucleus)
+  def genotype: Genotype[G, P] = species.genome(nucleus)
 
   /**
     * @return the phenotype of this organism
     */
-  def phenotype: Phenotype[T] = phenome(genotype)
+  def phenotype: Phenotype[T] = species.phenome(genotype)
 
   /**
-    * CONSIDER changing the parameters to this method if we can find them more simply
-    *
-    * @param ecology    the Ecology
-    * @param ecoFactors the local ecology
-    * @return the Fitness of this Organism in the ecology, wrapped in Try
+    * @param environment the Environment
+    * @return the Fitness of this Organism in the environment, wrapped in Try
     */
-  def fitness(ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]]): Try[Fitness] = ecology(phenotype).fitness(ecoFactors)
+  def fitness(environment: Environment[T, X]): Try[Fitness] = environment.ecology(phenotype).fitness(environment.habitat)
 
 }
 
 /**
+  * Definition of an adapted organism, one that is adapted to an Ecology.
+  * It is not generally fixed to a particular Habitat, but it its Ecology, and therefore its Adaptatype, is fixed.
+  *
   * Created by scalaprof on 7/27/16.
+  *
+  * @tparam B the Base type
+  * @tparam G the Gene type
+  * @tparam P the Ploidy type
+  * @tparam T the Trait type
+  * @tparam V the Version (Generation) type
+  * @tparam X the Eco-type
   */
-trait SedentaryOrganism[B, G, P, T, V, X] extends Organism[B, G, P, T, V, X] {
+trait AdaptedOrganism[B, G, P, T, V, X] extends Organism[B, G, P, T, V, X] {
 
+  /**
+    * @return the Ecology to which this organism is adapted
+    */
   def ecology: Ecology[T, X]
 
+  /**
+    * @return the adaptatype for this organism
+    */
   def adaptatype: Adaptatype[X] = ecology(phenotype)
 
-  def build(d: Identifier, generation: Version[V], genome: Genome[B, G, P], phenome: Phenome[G, P, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, P, T, V, X]
+  /**
+    * Method to build a new AdaptedOrganism
+    *
+    * @param id the id of the new instance
+    * @param generation the natal generation (version) of the new instance
+    * @param species the species of the new instance
+    * @param nucleus the nucleus of the new instance
+    * @param ecology the ecology of the new instance
+    * @return the new instance
+    */
+  def build(id: Identifier, generation: Version[V], species: Species[B, G, P, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, P, T, V, X]
 }
 
-case class SexualSedentaryOrganism[B, G, T, V, X](id: Identifier, generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with Mating[B, G, T, V, X, Organism[B, G, Boolean, T, V, X]] with SedentaryOrganism[B, G, Boolean, T, V, X] with CaseIdentifiable[SexualSedentaryOrganism[Any, Any, Any, Any, Any]] {
-  def build(d: Identifier, generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, Boolean, T, V, X] = SexualSedentaryOrganism(id, generation, genome, phenome, nucleus, ecology)
+/**
+  * Concrete case class which implements AdaptedOrganism and is Sexual (i.e. diploid).
+  *
+  * @param id the Identifier
+  * @param generation the generation
+  * @param species the species
+  * @param nucleus the nucleus
+  * @param ecology the ecology
+  * @tparam B the Base type
+  * @tparam G the Gene type
+  * @tparam T the Trait type
+  * @tparam V the Version (Generation) type
+  * @tparam X the Eco-type
+  */
+case class SexualAdaptedOrganism[B, G, T, V, X](id: Identifier, generation: Version[V], species: Species[B, G, Boolean, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with Mating[B, G, T, V, X, Organism[B, G, Boolean, T, V, X]] with AdaptedOrganism[B, G, Boolean, T, V, X] with CaseIdentifiable[SexualAdaptedOrganism[Any, Any, Any, Any, Any]] {
+  def build(id: Identifier, generation: Version[V], species: Species[B, G, Boolean, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, Boolean, T, V, X] = SexualAdaptedOrganism(id, generation, species, nucleus, ecology)
 
   def mate(evolvable: Evolvable[Organism[B, G, Boolean, T, V, X]]): Iterable[Organism[B, G, Boolean, T, V, X]] = ??? // TODO
 
   def pool: Evolvable[Organism[B, G, Boolean, T, V, X]] = ??? // TODO
 }
 
-object SexualSedentaryOrganism {
+object SexualAdaptedOrganism {
 
-  def apply[B, G, T, V, X](generation: Version[V], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], nucleus: Nucleus[B], ecology: Ecology[T, X])(implicit streamer: Streamer[Long]): SexualSedentaryOrganism[B, G, T, V, X] = new SexualSedentaryOrganism[B, G, T, V, X](IdentifierStrVerUID("sso", generation, streamer), generation, genome, phenome, nucleus, ecology)
-
-  //  def apply[B, G, T, X](genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T], random: Stream[(B,B)], ecology: Ecology[T, X]): SexualSedentaryOrganism[B, G, T, X] = {
-  //    val loci: Int = genome.loci
-  //    val x: List[(B, B)] = random take loci toList
-  //    val y: (Seq[B], Seq[B]) = x unzip
-  //    apply(genome, phenome, Seq(y._1, y._2), ecology)
-  //  }
+  def apply[B, G, T, V, X](generation: Version[V], species: Species[B, G, Boolean, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X])(implicit streamer: Streamer[Long]): SexualAdaptedOrganism[B, G, T, V, X] = new SexualAdaptedOrganism[B, G, T, V, X](IdentifierStrVerUID("sso", generation, streamer), generation, species, nucleus, ecology)
 
 }
 
-case class Bacterium[B, G, T, V, X](id: Identifier, generation: Version[V], genome: Genome[B, G, Unit], phenome: Phenome[G, Unit, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with ASexual[B, G, T, V, X, Organism[B, G, Unit, T, V, X]] with SedentaryOrganism[B, G, Unit, T, V, X] with CaseIdentifiable[Bacterium[Any, Any, Any, Any, Any]] {
-  //  def build(d: Identifier, genome: Genome[B, G, Unit], phenome: Phenome[G, Unit, T], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, Unit, T, V, X] =
-
-  def build(d: Identifier, generation: Version[V], genome: Genome[B, G, Unit], phenome: Phenome[G, Unit, T], nucleus: Nucleus[B], ecology: Ecology[T, X]) = Bacterium(id, generation, genome, phenome, nucleus, ecology)
+/**
+  * Concrete case class which implements AdaptedOrganism and is ASexual (i.e. haploid).
+  *
+  * @param id the Identifier
+  * @param generation the generation
+  * @param species the species
+  * @param nucleus the nucleus
+  * @param ecology the ecology
+  * @tparam B the Base type
+  * @tparam G the Gene type
+  * @tparam T the Trait type
+  * @tparam V the Version (Generation) type
+  * @tparam X the Eco-type
+  */
+case class Bacterium[B, G, T, V, X](id: Identifier, generation: Version[V], species: Species[B, G, Unit, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with ASexual[B, G, T, V, X, Organism[B, G, Unit, T, V, X]] with AdaptedOrganism[B, G, Unit, T, V, X] with CaseIdentifiable[Bacterium[Any, Any, Any, Any, Any]] {
 
   def fission: Iterable[Organism[B, G, Unit, T, V, X]] = ??? // TODO
+
+  def build(id: Identifier, generation: Version[V], species: Species[B, G, Unit, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]) = Bacterium(id, generation, species, nucleus, ecology)
 }
 
 object Bacterium {
 
-  def apply[B, G, T, V, X](generation: Version[V], genome: Genome[B, G, Unit], phenome: Phenome[G, Unit, T], nucleus: Nucleus[B], ecology: Ecology[T, X])(implicit streamer: Streamer[Long]): Bacterium[B, G, T, V, X] = new Bacterium[B, G, T, V, X](IdentifierStrVerUID("sso", generation, streamer), generation, genome, phenome, nucleus, ecology)
+  def apply[B, G, T, V, X](generation: Version[V], species: Species[B, G, Unit, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X])(implicit streamer: Streamer[Long]): Bacterium[B, G, T, V, X] = new Bacterium[B, G, T, V, X](IdentifierStrVerUID("sso", generation, streamer), generation, species, nucleus, ecology)
 }
