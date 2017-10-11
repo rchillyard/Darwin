@@ -119,6 +119,8 @@ class Fitness private(val x: Double) extends (() => Double) with Ordering[Fitnes
   * However, in this particular situation, it's quite tricky because the Fitness and Viability both extend no-param
   * functions which yield a result. The use of apply makes it very difficult to implement an implicit mechanism.
   *
+  * CONSIDER use CaseIdentifiable
+  *
   * @param fs a sequence of Fitness values
   */
 case class Viability(fs: Seq[Fitness]) extends (() => Fitness) with Auditable {
@@ -141,7 +143,7 @@ case class Viability(fs: Seq[Fitness]) extends (() => Fitness) with Auditable {
 
   override def toString(): String = s"Viability($fs)"
 
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
 
 }
 

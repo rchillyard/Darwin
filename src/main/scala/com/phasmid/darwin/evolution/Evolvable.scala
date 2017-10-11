@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.base.{Auditable, Identifier}
+import com.phasmid.darwin.base.Identifier
 import com.phasmid.darwin.eco.{Environment, Fitness}
 import com.phasmid.laScala.values.{Incrementable, Rational}
 import com.phasmid.laScala.{Sequential, Version}
@@ -141,7 +141,7 @@ trait SequentialEvolvable[Z <: Individual[_, _], V, Repr] extends Evolvable[Z] w
   * @tparam V the generation type (defined to be Incrementable)
   * @tparam Z the underlying type of the zs (must implement Individual)
   */
-abstract class BaseEvolvable[V: Incrementable, Z <: Individual[_, _], Repr](zs: Iterable[Z], vv: Version[V]) extends BaseGenerational[V, Repr](vv) with SequentialEvolvable[Z, V, Repr] with Auditable {
+abstract class BaseEvolvable[V: Incrementable, Z <: Individual[_, _], Repr](zs: Iterable[Z], vv: Version[V]) extends BaseGenerational[V, Repr](vv) with SequentialEvolvable[Z, V, Repr] {
 
   def next(v: Version[V]): Repr = doNext(v)
 

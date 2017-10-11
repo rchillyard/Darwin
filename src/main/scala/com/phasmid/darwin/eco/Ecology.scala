@@ -41,7 +41,7 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
   * @tparam T the trait type
   * @tparam X the eco-type
   */
-case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Identifying with Ecological[T, X] with Identifiable with CaseIdentifiable[Ecology[Any, Any]] {
+case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Identifying with Ecological[T, X] with Identifiable {
 
   /**
     * The apply method for this Ecology. For each Trait in the given Phenotype, we look up its corresponding Factor
@@ -59,8 +59,8 @@ case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: Fi
 
   override def toString: String = s"Ecology($name, $factors, $fitness, $adapter"
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = if (indent > 0) name
-  else RenderableCaseClass(this.asInstanceOf[Ecology[Any, Any]]).render(indent)(tab)
+  override def render(indent: Int)(implicit tab: (Int) => Prefix): String = CaseIdentifiable.renderAsCaseClass(this.asInstanceOf[Ecology[Any, Any]])(indent)
+
 }
 
 case class Factor(name: String) extends Identifiable {

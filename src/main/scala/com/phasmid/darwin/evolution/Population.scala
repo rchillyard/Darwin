@@ -23,45 +23,39 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.eco.{EcoFactor, Ecology}
-import com.phasmid.darwin.genetics.{Genome, Phenome}
-import com.phasmid.darwin.visualization.Visualizer
+import com.phasmid.darwin.eco.Ecology
+import com.phasmid.darwin.run.Species
 import com.phasmid.laScala.Version
 import com.phasmid.laScala.values.Incrementable
 
 /**
   * Created by scalaprof on 9/30/17.
   *
-  * @param name       an identifier for this Population
-  * @param colonies   the colonies which belong to this Population
-  * @param version    a version representing this generation
-  * @param ecology    an Ecology type for this Population
-  * @param ecoFactors the actual ecology in which this Population flourishes
-  * @param genome     the Genome of the organisms represented in this Population
-  * @param phenome    the Phenome of the organisms represented in this Population
+  * @param name     an identifier for this Population
+  * @param colonies the colonies which belong to this Population
+  * @param version  a version representing this generation
+  * @param ecology  an Ecology for which the members of this Population are adapted
+  * @param species  the Species of the organisms represented in this Population
   * @tparam B the Base type
   * @tparam G the Gene type
+  * @tparam P the Ploidy type
   * @tparam T the Trait type
   * @tparam V the generation type (defined to be Incrementable)
   * @tparam X the underlying type of the xs
   */
-case class Population[B, G, T, V: Incrementable, X](name: String, colonies: Iterable[Colony[B, G, T, V, X]], version: Version[V], visualizer: Visualizer[T, X], ecology: Ecology[T, X], ecoFactors: Map[String, EcoFactor[X]], genome: Genome[B, G, Boolean], phenome: Phenome[G, Boolean, T]) extends BaseGenerational[V, Population[B, G, T, V, X]](version) {
+case class Population[B, G, P, T, V: Incrementable, X, Z <: Organism[B, G, P, T, V, X], Y <: Colony[B, G, P, T, V, X, Z] : ColonyBuilder](name: String, colonies: Iterable[Y], version: Version[V], ecology: Ecology[T, X], species: Species[B, G, P, T, X]) extends BaseGenerational[V, Population[B, G, P, T, V, X, Z, Y]](version) {
+  val cb: ColonyBuilder[Y] = implicitly[ColonyBuilder[Y]]
+  val vi: Incrementable[V] = implicitly[Incrementable[V]]
   /**
     * Method to yield the next generation of this Population
     *
     * @param v the Version for the next generation
     * @return the next generation of this Population as a Repr
     */
-  def next(v: Version[V]): Population[B, G, T, V, X] = build(v, for (c <- colonies) yield c.next(v))
-
-  /**
-    *
-    * @param v  the Version for the next generation
-    * @param cs the colonies which will make up the next generation
-    * @return the next generation of this Population as a Repr
-    */
-  private def build(v: Version[V], cs: Iterable[Colony[B, G, T, V, X]]) = {
-    for (c <- colonies) visualizer.visualize(c)
-    Population(name, cs, v, visualizer, ecology, ecoFactors, genome, phenome)
+  def next(v: Version[V]): Population[B, G, P, T, V, X, Z, Y] = {
+    // TODO: remove this use of asInstanceOf -- it should not be necessary
+    val zs = for (c <- colonies) yield c.next(v).asInstanceOf[Y]
+    Population[B, G, P, T, V, X, Z, Y](name, zs, v, ecology, species)(vi, cb)
   }
+
 }

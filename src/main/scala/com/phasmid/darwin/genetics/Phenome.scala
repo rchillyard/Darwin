@@ -62,7 +62,6 @@ case class Phenome[G, P, T](name: String, characteristics: Map[Locus[G], Charact
     */
   def apply(genotype: Genotype[G, P]): Phenotype[T] = {
     val ttts: Seq[Try[Trait[T]]] = for (g <- genotype.genes;
-                                        //                                        c <- Spy.spy(s"g: $g; charactistics: ", characteristics.get(g.locus))
                                         c <- characteristics.get(g.locus)
     )
       yield for (t <- expresser(c, g))

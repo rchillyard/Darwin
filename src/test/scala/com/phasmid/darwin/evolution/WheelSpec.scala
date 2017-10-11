@@ -146,7 +146,7 @@ class WheelSpec extends FlatSpec with Matchers {
     hands count (_.name == "Straight Flush") shouldBe (9 +- 10) // 1.11
     hands count (_.name == "Four of a kind") shouldBe (156 +- 42) // 0.27
     hands count (_.name == "Full House") shouldBe (936 +- 94) // 0.1
-    hands count (_.name == "Flush") shouldBe (1277 +- 100) // 0.078
+    hands count (_.name == "Flush") shouldBe (1277 +- 128) // 0.1
     hands count (_.name == "Straight") shouldBe (2550 +- 150) // 0.059
     hands count (_.name == "Three of a kind") shouldBe (13728 +- 343) // 0.025
     hands count (_.name == "Two Pair") shouldBe (30888 +- 618) // // 0.02

@@ -102,7 +102,6 @@ case class Genome[B, G, P](name: String, karyotype: Seq[Chromosome], ploidy: P,
     * @return a new instance of Gene[P]
     */
   def transcribe(bss: SequenceSet[B], location: Location): Gene[G, P] = {
-    //    val gaos = Spy.spy(s"transcribe($bss, $location): gaos=", for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g)
     val gaos = for (bs <- bss) yield for (g <- transcriber(bs, location)) yield g
     PGene(locusMap(location), sequence(gaos).get)
   }

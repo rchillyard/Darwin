@@ -23,12 +23,12 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.base.IdentifierName
+import com.phasmid.darwin.base.{Audit, IdentifierName}
 import com.phasmid.darwin.eco._
 import org.scalatest.{FlatSpec, Matchers}
+import org.slf4j.Logger
 
 import scala.util._
-import scala.util.matching.Regex
 
 /**
   * Created by scalaprof on 5/6/16.
@@ -39,7 +39,7 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
   private val elephantGrass: Factor = Factor(sElephantGrass)
   private val factorMap = Map("height" -> elephantGrass)
   private val efElephantGrass = EcoFactor(elephantGrass, 1.6)
-  private val ecosystem = Map("elephant grass" -> efElephantGrass)
+  private val habitat = Map("elephant grass" -> efElephantGrass)
 
   val adapter: Adapter[Double, Double] = new AbstractAdapter[Double, Double] {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Double])] = f match {
@@ -56,6 +56,19 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
   }
 
   behavior of "adaptation"
+  // TODO try to get this working
+  ignore should "log itself" in {
+    Audit.auditing = true
+    implicit val logger: Logger = null
+    implicit def isEnabledFunc(x: Audit)(implicit logger: Logger): Boolean = true
+    val sb = new StringBuilder
+    Audit.internalLog = { s => sb.append(s) }
+    val height = Characteristic("height")
+    val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
+    val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
+    ecology(phenotype)
+    sb.toString() shouldBe "Adaptatype..."
+  }
   it should "render correctly" in {
     val height = Characteristic("height")
     val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
@@ -63,14 +76,11 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
     val adaptatype: Adaptatype[Double] = ecology(phenotype)
     // TODO for some reason the compiler doesn't like this --
     // but, as Galileo might have said: "eppur se muove"
-    val adaptatypeR: Regex =
-    """(\p{XDigit}{16})""".r
-    //    adaptatype.render().split(":").toList.last match {
-    //      case adaptatypeR(_) =>
-    //      case x => fail(s"$x didn't match")
-    //    }
-    val actual: String = adaptatype.render().split(":").toList.last
-    actual should matchPattern { case adaptatypeR(_) => }
+    val sAdaptatype = adaptatype.render()
+    println(s"adaptatype: $sAdaptatype")
+    val sId = """(\p{XDigit}{16})"""
+    val filtered = sAdaptatype.replaceAll(sId, "<ID>")
+    filtered shouldEqual "Adaptatype(\n  id:at:<ID>\n  adaptations:(Adaptation(\n        factor:elephant grass\n        ecoFitness:<function1>\n        ))\n  )"
   }
   it should "yield appropriate fitness" in {
     val height = Characteristic("height")
@@ -91,7 +101,7 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
     val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
     val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
     val adaptatype: Adaptatype[Double] = ecology(phenotype)
-    val fy: Try[Fitness] = adaptatype.fitness(ecosystem)
+    val fy: Try[Fitness] = adaptatype.fitness(habitat)
     fy should matchPattern { case Success(Fitness(_)) => }
     fy.get.x shouldBe 0.0
   }

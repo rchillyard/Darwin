@@ -41,8 +41,8 @@ sealed trait Adapter[T, X] extends AdapterFunction[T, X] {
 
   override def apply(factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X]): Try[Adaptation[X]] = {
     // TODO tidy this all up nicely
-    val fc: (T) => (ShapeFunction[T, X]) => (X) => Fitness = ff.curried
-    val x_f_t: Try[(X) => Fitness] = for ((t, s) <- matchFactors(factor, `trait`)) yield fc(t)(s)
+    val fc: T => (ShapeFunction[T, X]) => X => Fitness = ff.curried
+    val x_f_t: Try[X => Fitness] = for ((t, s) <- matchFactors(factor, `trait`)) yield fc(t)(s)
 
     def f_xe_fo(ef: EcoFactor[X]): Try[Fitness] = x_f_t match {
       // TODO need to check the factor types
@@ -50,6 +50,7 @@ sealed trait Adapter[T, X] extends AdapterFunction[T, X] {
       case Failure(t) => Failure(t)
     }
 
+    // TODO this doesn't look right at all! See definition of f_xe_fo above.
     x_f_t map { _ => Adaptation(factor, f_xe_fo) }
   }
 }

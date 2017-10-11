@@ -23,7 +23,6 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.base.IdentifierName
 import com.phasmid.darwin.genetics._
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -32,7 +31,7 @@ import scala.util._
 /**
   * Created by scalaprof on 5/6/16.
   */
-class EcologySpec extends FlatSpec with Matchers {
+class EnvironmentSpec extends FlatSpec with Matchers {
 
   private val sElephantGrass = "elephant grass"
   private val elephantGrass = Factor(sElephantGrass)
@@ -57,20 +56,11 @@ class EcologySpec extends FlatSpec with Matchers {
 
   "render" should "work" in {
     val ecology = Ecology[Double, Int]("test", factorMap, ff, adapter)
-    ecology.render() shouldBe "Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitness:<function3>\n  adapter:<function3>\n  )"
-    ecology.render(1) shouldBe "Ecology:test"
+    val ecoFactor: EcoFactor[Int] = EcoFactor(elephantGrass, 1)
+    val habitat: Habitat[Int] = Map(sElephantGrass -> ecoFactor)
+    val environment = Environment("test", ecology, habitat)
+    environment.render() shouldBe "Environment(\n  name:\"test\"\n  ecology:Ecology:test\n  habitat:((elephant grass,elephant grass))\n  )"
+    environment.render(1) shouldBe "Environment:test"
   }
 
-  val id: _root_.com.phasmid.darwin.base.Identifier = IdentifierName("test")
-
-  "apply" should "create adaptatype" in {
-    val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test", factorMap, ff, adapter)
-    val height = Characteristic("height")
-    val phenotype: Phenotype[Double] = Phenotype(id, Seq(Trait(height, 2.0)))
-    val adaptatype: Adaptatype[Int] = ecology(phenotype)
-    val adaptations = adaptatype.adaptations
-    adaptations.size shouldBe 1
-    val adaptation: Adaptation[Int] = adaptations.head
-    adaptation should matchPattern { case Adaptation(`elephantGrass`, _) => }
-  }
 }

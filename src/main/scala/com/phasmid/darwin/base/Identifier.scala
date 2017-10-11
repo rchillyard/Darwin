@@ -60,6 +60,20 @@ abstract class Identified(id: Identifier) extends Identifier {
 }
 
 /**
+  * CONSIDER do we really need this? It's just a convenience
+  *
+  * Abstract class which implements Identifier but delegates its identification to the value of id.
+  *
+  * @param id the Identifier
+  */
+abstract class SelfIdentified(id: Identifier) extends Identified(id) with SelfAuditing {
+
+  import Audit._
+
+  audit()
+}
+
+/**
   * This class represents an UID which is based on a (typically) random Long number.
   *
   * @param id a Long which hopefully, is unique.

@@ -30,6 +30,8 @@ import com.phasmid.darwin.genetics.dna.Base
 import com.phasmid.darwin.plugin.Listener
 import com.phasmid.darwin.run.Species
 import com.phasmid.darwin.visualization.{Avagen, Avatar, Visualizer}
+import com.phasmid.laScala.Version
+import com.phasmid.laScala.fp.Streamer
 import org.scalatest.{FlatSpec, Inside, Matchers}
 
 import scala.util.{Failure, Success, Try}
@@ -45,12 +47,11 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
 
   private val sElephantGrass = "elephant grass"
   private val elephantGrass: Factor = Factor(sElephantGrass)
-  private val factorMap = Map("height" -> elephantGrass)
-
+  private val sHeight = "height"
   val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int] {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Int])] = f match {
       case `elephantGrass` => t.characteristic.name match {
-        case "height" => Success((t.value, ShapeFunction.shapeDiracInv_I))
+        case `sHeight` => Success((t.value, ShapeFunction.shapeDiracInv_I))
         case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
@@ -66,15 +67,15 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
 
   import com.phasmid.darwin.evolution.Random.RandomizableBase
 
-  val height: Characteristic = Characteristic("height")
-  val phenotype: Phenotype[Double] = Phenotype(IdentifierName("phenotype"), Seq(Trait(height, 2.0)))
-  val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test", factorMap, ff, adapter)
+  val height: Characteristic = Characteristic(sHeight)
+  val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test phenotype"), Seq(Trait(height, 2.0)))
+  val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test ecology", Map(sHeight -> elephantGrass), ff, adapter)
   val adaptatype: Adaptatype[Int] = ecology(phenotype)
   private val adaptations: Seq[Adaptation[Int]] = adaptatype.adaptations
   val adaptation: Adaptation[Int] = adaptations.head
   adaptation should matchPattern { case Adaptation(`elephantGrass`, _) => }
   val ecoFactor: EcoFactor[Int] = EcoFactor(elephantGrass, 1)
-  val ecoFactors: Map[String, EcoFactor[Int]] = Map(sElephantGrass -> ecoFactor)
+  val habitat: Habitat[Int] = Map(sElephantGrass -> ecoFactor)
   private val transcriber: PlainTranscriber[Base, String] = PlainTranscriber[Base, String] { bs => Some(Allele(bs.head.toString)) }
   val hox: Location = Location("hox", 0, 1)
   // C or A
@@ -85,7 +86,7 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
   val hoxC = Location("hoxC", 2, 1)
   val ts = Set(Allele("T"), Allele("S"))
   val pq = Set(Allele("P"), Allele("Q"))
-  private val locHeight = Location("height", 0, 1)
+  private val locHeight = Location(sHeight, 0, 1)
   val locusH = PlainLocus(locHeight, ts, Some(Allele("T")))
   val locusG = PlainLocus(Location("girth", 1, 1), pq, Some(Allele("P")))
   val locusMap: (Location) => Locus[String] = Map(
@@ -122,7 +123,20 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
   }
   val visualizer = new Visualizer[Double, Int](avagen, listener)
   val species: Species[Base, String, Boolean, Double, Int] = Species("test species", genome, phenome)(visualizer)
-  val environment: Environment[Double, Int] = Environment("test environment", ecology, ecoFactors)
+  val environment: Environment[Double, Int] = Environment("test environment", ecology, habitat)
+
+  implicit object organismBuilder extends OrganismBuilder[SexualAdaptedOrganism[Base, String, Double, Long, Int]] {
+    implicit val idStreamer: Streamer[Long] = Streamer(RNG[Long](0).toStream)
+
+    def build[B, G, P, T, V, X](generation: Version[V], species: Species[B, G, P, T, X], nucleus: Nucleus[B], environment: Environment[T, X]): SexualAdaptedOrganism[Base, String, Double, Long, Int] = {
+      species match {
+        case s: Species[B, G, Boolean, T, X]@unchecked =>
+          val organism = SexualAdaptedOrganism[B, G, T, V, X](generation, s, nucleus, environment.ecology)(idStreamer)
+          organism.asInstanceOf[SexualAdaptedOrganism[Base, String, Double, Long, Int]]
+        case _ => throw new GeneticsException(s"build not defined for species $species", null)
+      }
+    }
+  }
 
   behavior of "Colony"
 

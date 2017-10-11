@@ -51,6 +51,8 @@ trait Replicator[B] {
 /**
   * An imperfect replicator that has a finite probability of mis-copying a given B element
   *
+  * CONSIDER use CaseIdentifiable
+  *
   * @param mnopc the mean number of perfect copies before an error is made
   * @param r     a random number generator (of Int)
   * @tparam B the base type
@@ -58,7 +60,11 @@ trait Replicator[B] {
 case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Replicator[B] with Auditable {
   // NOTE: a variable.
   var i = 0
-  private val rmnopc = RNG.values(r) map (_ % mnopc)
+
+  def modulo(x: Int, f: Int => Int) = f(x)
+
+  private val rmnopc = for (x <- RNG.values(r)) yield modulo(x, _ % mnopc)
+  //RNG.values(r) map (_ % mnopc)
 
   def random: Int = {i = i + 1; rmnopc(i)}
 
@@ -68,17 +74,19 @@ case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Repl
       if (random == 0) implicitly[Ordinal[B]].fromInt(random)
       else b
 
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[ImperfectReplicator[Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[ImperfectReplicator[Any]]).render(indent)(tab)
 
 }
 
 /**
   * An perfect replicator that has a zero probability of mis-copying a given B element
   *
+  * CONSIDER use CaseIdentifiable
+  *
   * @tparam B the base type
   */
 case class PerfectReplicator[B]() extends Replicator[B] with Auditable {
   def replicate(bs: Seq[B]): Seq[B] = bs
 
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[PerfectReplicator[Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[PerfectReplicator[Any]]).render(indent)(tab)
 }

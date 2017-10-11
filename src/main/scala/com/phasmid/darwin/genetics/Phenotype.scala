@@ -34,7 +34,7 @@ import com.phasmid.darwin.base._
   * @author scalaprof
   *         Created by scalaprof on 5/5/16.
   */
-case class Phenotype[T](id: Identifier, traits: Seq[Trait[T]]) extends Identifying with CaseIdentifiable[Phenotype[Any]] {
+case class Phenotype[T](id: Identifier, traits: Seq[Trait[T]]) extends CaseIdentifiable[Phenotype[Any]] {
   def name: String = id.name
 }
 

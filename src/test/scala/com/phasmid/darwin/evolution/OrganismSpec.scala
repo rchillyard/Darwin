@@ -47,12 +47,11 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
 
   private val sElephantGrass = "elephant grass"
   private val elephantGrass: Factor = Factor(sElephantGrass)
-  private val factorMap = Map("height" -> elephantGrass)
-
+  private val sHeight = "height"
   val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int] {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Int])] = f match {
       case `elephantGrass` => t.characteristic.name match {
-        case "height" => Success((t.value, ShapeFunction.shapeDiracInv_I))
+        case `sHeight` => Success((t.value, ShapeFunction.shapeDiracInv_I))
         case _ => Failure(GeneticsException(s"no match for factor: ${t.characteristic.name}"))
       }
     }
@@ -68,15 +67,15 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
 
   import com.phasmid.darwin.evolution.Random.RandomizableBase
 
-  val height: Characteristic = Characteristic("height")
+  val height: Characteristic = Characteristic(sHeight)
   val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
-  val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test", factorMap, ff, adapter)
+  val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test", Map(sHeight -> elephantGrass), ff, adapter)
   val adaptatype: Adaptatype[Int] = ecology(phenotype)
   private val adaptations: Seq[Adaptation[Int]] = adaptatype.adaptations
   val adaptation: Adaptation[Int] = adaptations.head
   adaptation should matchPattern { case Adaptation(`elephantGrass`, _) => }
   val ecoFactor: EcoFactor[Int] = EcoFactor(elephantGrass, 1)
-  val ecoFactors: Map[String, EcoFactor[Int]] = Map(sElephantGrass -> ecoFactor)
+  val habitat: Habitat[Int] = Map(sElephantGrass -> ecoFactor)
   private val transcriber: PlainTranscriber[Base, String] = PlainTranscriber[Base, String] { bs => Some(Allele(bs.head.toString)) }
   val hox: Location = Location("hox", 0, 1)
   // C or A
@@ -87,7 +86,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
   val hoxC = Location("hoxC", 2, 1)
   val ts = Set(Allele("T"), Allele("S"))
   val pq = Set(Allele("P"), Allele("Q"))
-  private val locHeight = Location("height", 0, 1)
+  private val locHeight = Location(sHeight, 0, 1)
   val locusH = PlainLocus(locHeight, ts, Some(Allele("T")))
   val locusG = PlainLocus(Location("girth", 1, 1), pq, Some(Allele("P")))
   val locusMap: (Location) => Locus[String] = Map(
@@ -120,7 +119,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
   val visualizer = new Visualizer[Double, Int](avagen, listener)
   private val species = Species("test species", genome, phenome)(visualizer)
   val generation = Version(1, None)
-  val environment = Environment("test environment", ecology, ecoFactors)
+  val environment = Environment("test environment", ecology, habitat)
 
   import com.phasmid.darwin.evolution.Random.RandomizableLong
 
@@ -128,10 +127,22 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
 
   behavior of "Organism"
 
+  it should "render" in {
+    val random = RNG[Base](0L)
+    println(s"ecology: $ecology")
+    println(s"habitat: $habitat")
+    val (bn, _) = genome.recombine(random)
+    val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
+    val sId = """(\w+)-(\w+)-(\p{XDigit}{16})"""
+    val s1 = organism.render()
+    s1.replaceAll(sId, "<ID>") shouldBe "SexualAdaptedOrganism(\n  id:<ID>\n  generation:1\n  species:Species:test species\n  nucleus:((\n        G,\n        G\n      ))\n  ecology:Ecology:test\n  )"
+    val s2 = organism.render(1)
+    s2.replaceAll(sId, "<ID>") shouldBe "SexualAdaptedOrganism:<ID>"
+  }
   it should "create random Organism correctly" in {
     val random = RNG[Base](0L)
     println(s"ecology: $ecology")
-    println(s"ecoFactors: $ecoFactors")
+    println(s"habitat: $habitat")
     val (bn, _) = genome.recombine(random)
     val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
     val dna = for (a <- organism.nucleus; b <- a) yield b.bases
@@ -141,7 +152,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
   it should "calculate genotype correctly" in {
     val random = RNG[Base](0L)
     println(s"ecology: $ecology")
-    println(s"ecoFactors: $ecoFactors")
+    println(s"habitat: $habitat")
     val (bn, _) = genome.recombine(random)
     val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
     val actual = organism.genotype
@@ -152,7 +163,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
   it should "calculate phenotype correctly" in {
     val random = RNG[Base](3L)
     println(s"ecology: $ecology")
-    println(s"ecoFactors: $ecoFactors")
+    println(s"habitat: $habitat")
     val (bn, _) = genome.recombine(random)
     val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
     organism.phenotype should matchPattern { case Phenotype(_, List(Trait(`height`, 2.0))) => }
@@ -161,7 +172,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
   it should "calculate adaptatype" in {
     val random = RNG[Base](3L)
     println(s"ecology: $ecology")
-    println(s"ecoFactors: $ecoFactors")
+    println(s"habitat: $habitat")
     val (bn, _) = genome.recombine(random)
     val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
     val z: Adaptatype[Int] = ecology(organism.phenotype)
@@ -171,7 +182,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
   it should "calculate fitness" in {
     val random = RNG[Base](3L)
     println(s"ecology: $ecology")
-    println(s"ecoFactors: $ecoFactors")
+    println(s"habitat: $habitat")
     val (bn, _) = genome.recombine(random)
     val organism = SexualAdaptedOrganism(generation, species, bn, ecology)
     val fy: Try[Fitness] = organism.fitness(environment)

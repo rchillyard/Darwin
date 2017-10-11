@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.base.Auditable
 import com.phasmid.darwin.eco.{Environment, Fitness}
 import com.phasmid.laScala.values.Rational
 import com.phasmid.laScala.{Prefix, Renderable, Version}
@@ -45,7 +46,13 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
 
   implicit val random: RNG[Long] = RNG[Long](0)
 
-  case class MockEvolvable(members: Iterable[Member], v: Version[Int]) extends BaseEvolvable[Int, Member, MockEvolvable](members, v) {
+  /**
+    * CONSIDER use CaseIdentifiable
+    *
+    * @param members the members of this evolvable
+    * @param v       the version (generation) of this evolvable
+    */
+  case class MockEvolvable(members: Iterable[Member], v: Version[Int]) extends BaseEvolvable[Int, Member, MockEvolvable](members, v) with Auditable {
 
     def evaluateFitness(x: Member): Boolean = x.fitness(null) match {
       case Success(f) => f() > 0.5
@@ -71,7 +78,7 @@ class EvolvableSpec extends FlatSpec with Matchers with Inside {
       * @param tab    the tabulator
       * @return the result
       */
-    def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = {
+    override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = {
       val sb = new StringBuilder(s"MockEvolvable(")
       sb.append(nl(indent + 1) + "generation:" + Renderable.renderElem(generation, indent + 2))
       sb.append(nl(indent + 1) + "members:" + Renderable.renderElem(members, indent + 2))

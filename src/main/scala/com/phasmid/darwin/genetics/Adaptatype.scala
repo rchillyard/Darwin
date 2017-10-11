@@ -33,26 +33,29 @@ import scala.util.Try
 /**
   * This class represents the Adaptations of an Organism.
   *
-  * CONSIDER fitness should take an Ecology instead of a Map[String, EcoFactor]
-  *
   * Created by scalaprof on 5/9/16.
   */
 
-case class Adaptatype[X](id: Identifier, adaptations: Seq[Adaptation[X]]) extends Identified(id) with CaseIdentifiable[Adaptatype[Any]] {
+case class Adaptatype[X](id: Identifier, adaptations: Seq[Adaptation[X]]) extends SelfIdentified(id) with Identifiable {
+
   /**
     * Method to evaluate and blend the fitness of each adaptation into a single fitness, wrapped in Try
     *
-    * @param ecology a map of factor keys to EcoFactor instances
+    * CONSIDER extracting this into a trait
+    *
+    * @param habitat the habitat for which we wish to evaluate fitness
     * @return a Fitness, wrapped in Try
     */
-  def fitness(ecology: Map[String, EcoFactor[X]]): Try[Fitness] = {
-    val ts = for (a <- adaptations; f <- ecology.get(a.factor.name)) yield (a, f)
-    assert(ts.nonEmpty, s"the ecology map did not match any adaptations: map keys: ${ecology.keys}; adaptations: $adaptations")
+  def fitness(habitat: Habitat[X]): Try[Fitness] = {
+    val ts = for (a <- adaptations; f <- habitat.get(a.factor.name)) yield (a, f)
+    assert(ts.nonEmpty, s"the ecology map did not match any adaptations: map keys: ${habitat.keys}; adaptations: $adaptations")
     for (fs <- FP.sequence(for ((a, e) <- ts) yield a(e))) yield Viability(fs)()
   }
 
-  //  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Adaptatype[Any]]).render(indent)(tab)
+  override def render(indent: Int)(implicit tab: (Int) => Prefix): String = CaseIdentifiable.renderAsCaseClass(this.asInstanceOf[Adaptatype[Any]])(indent)
 
+  // TODO this should not be necessary
+  override def toString: String = s"Adaptatype($id, $adaptations)"
 }
 
 /**
@@ -61,6 +64,8 @@ case class Adaptatype[X](id: Identifier, adaptations: Seq[Adaptation[X]]) extend
   * Created by scalaprof on 5/9/16.
   *
   * CONSIDER simply extending the fitness function
+  *
+  * CONSIDER use CaseIdentifiable
   */
 case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X]) extends Auditable with EcoFitness[X] {
 
@@ -68,6 +73,6 @@ case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X]) extends Audi
 
   override def toString(): String = s"Adaptation($factor, $ecoFitness)"
 
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Adaptation[Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Adaptation[Any]]).render(indent)(tab)
 }
 

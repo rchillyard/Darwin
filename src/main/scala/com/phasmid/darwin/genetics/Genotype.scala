@@ -29,6 +29,8 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 /**
   * This class represents a genotype: the genes of a particular organism.
   *
+  * CONSIDER use CaseIdentifiable
+  *
   * @tparam P the "ploidy" type:
   *           P is normally a Boolean to distinguish alleles in a diploid arrangement.
   *           But if you want to have a triploid arrangement (or any other ploidy) then you might
@@ -38,7 +40,7 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
   */
 case class Genotype[G, P](id: Identifier, genes: Seq[Gene[G, P]]) extends Auditable {
 
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Genotype[Any, Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Genotype[Any, Any]]).render(indent)(tab)
 
 }
 
@@ -88,13 +90,21 @@ trait Locus[G] extends (() => Set[Allele[G]]) {
   override def toString = s"Locus at $location with dominant: $dominant and possible alleles: ${apply()}"
 }
 
+/**
+  * CONSIDER use CaseIdentifiable
+  *
+  * @param location the Location of this Locus
+  * @param alleles  the possible Alleles at this locus
+  * @param dominant the dominant Allele (if any)
+  * @tparam G the underlying Gene type
+  */
 case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: Option[Allele[G]]) extends Locus[G] with Auditable {
   /**
     * @return the actual Alleles present at this Locus
     */
   def apply(): Set[Allele[G]] = alleles
 
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[PlainLocus[Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[PlainLocus[Any]]).render(indent)(tab)
 
 }
 

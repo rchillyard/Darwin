@@ -40,7 +40,7 @@ import scala.util.{Failure, Success, Try}
   * While this mechanism (by default) logs values using SLF4J, it does so in a functional style.
   * You do not have to break up your functional expressions to write logging statements (unless they are the recursive calls of a tail-recursive method).
   *
-  * If you just want to slip in a quick invocation of Audit.audit, you will need to provide an implicit spyFunc.
+  * If you just want to slip in a quick invocation of Audit.audit, you will need to provide an implicit auditFunc.
   * The proper simple way to do this is to declare a logger as follows (you can use any name you like since it's an implicit):
   *
   * implicit val auditLogger: org.slf4j.Logger = Audit.getLogger(getClass)
@@ -48,7 +48,7 @@ import scala.util.{Failure, Success, Try}
   * There's even an (improper) default logger based on the Audit class itself which you can use simply by adding this:
   * import Audit._
   *
-  * In order to use it with an explicitly defined spyFunc, please see the way it's done in SpySpec.
+  * In order to use it with an explicitly defined auditFunc, please see the way it's done in SpySpec (in LaScala where it's called spyFunc).
   *
   * By default, auditing is turned on so, if you want to turn it off for a portion of a run, you must set auditing to false, then reset it as it was when you return.
   * This is useful for benchmarking or any time you know that there will be just too much information (TMI).
@@ -67,8 +67,8 @@ trait Audit
 object Audit {
 
   /**
-    * This method (and the related class Audit) is here only to enable the implicit spyFunc mechanism.
-    * It you declare the return from spyFunc as Unit, the compiler doesn't know where to look for the implicit function.
+    * This method (and the related class Audit) is here only to enable the implicit auditFunc mechanism.
+    * It you declare the return from auditFunc as Unit, the compiler doesn't know where to look for the implicit function.
     *
     * @param x ignored
     * @return a new Audit instance
@@ -78,7 +78,7 @@ object Audit {
   lazy private val configuration = ConfigFactory.load()
 
   /**
-    * This is the global setting for whether to invoke the spyFunc of each audit invocation. However, each invocation can also turn auditing off for itself.
+    * This is the global setting for whether to invoke the auditFunc of each audit invocation. However, each invocation can also turn auditing off for itself.
     * Normally it is true. Think of this as the red emergency button. Setting this to false turns all auditing off everywhere.
     */
   var auditing: Boolean = configuration.getBoolean("auditing")
@@ -87,9 +87,9 @@ object Audit {
     * This method is used in development/debug phase to "see" the values of expressions
     * without altering the flow of the code.
     *
-    * The behavior implied by "see" is defined by the spyFunc. This could be a simple println (which is the default) or a SLF4J debug function or whatever.
+    * The behavior implied by "see" is defined by the auditFunc. This could be a simple println (which is the default) or a SLF4J debug function or whatever.
     *
-    * The caller MUST provide an implicit value in scope for a Logger (unless the spyFunc has been explicitly defined to use some other non-logging mechanism, such as calling getPrintlnSpyFunc).
+    * The caller MUST provide an implicit value in scope for a Logger (unless the auditFunc has been explicitly defined to use some other non-logging mechanism, such as calling getPrintlnAuditFunc).
     *
     * NOTE that there will be times when you cannot use audit, for example when yielding the result of a tail-recursive method. You will need to use debug then instead.
     *
@@ -98,17 +98,17 @@ object Audit {
     * @param x             (call-by-name) the value being spied on and which will be returned by this method; Note that since this is call-by-name, it is evaluated INSIDE
     *                      the audit method. This allows the method to deal with exceptions in such a way that a message based on 'message'
     *                      (and including the exception message rather than an actual X value, obviously) is logged as usual.
-    * @param b             if true AND if auditing is true, the spyFunc will be called (defaults to true). However, note that this is intended only for the situation
-    *                      where the default spyFunc is being used. If a logging spyFunc is used, then logging should be turned on/off at the class level via the
+    * @param b             if true AND if auditing is true, the auditFunc will be called (defaults to true). However, note that this is intended only for the situation
+    *                      where the default auditFunc is being used. If a logging auditFunc is used, then logging should be turned on/off at the class level via the
     *                      logging configuration file.
-    * @param spyFunc       (implicit) the function to be called (as a side-effect) with a String based on w and x IFF b && auditing are true.
+    * @param auditFunc     (implicit) the function to be called (as a side-effect) with a String based on w and x IFF b && auditing are true.
     * @param isEnabledFunc (implicit) the function to be called to determine if auditing is enabled -- by default this will be based on the (implicit) logger.
     * @tparam X the type of the value.
     * @return the value of x.
     */
-  def audit[X](message: => String, x: => X, b: Boolean = true)(implicit spyFunc: String => Audit, isEnabledFunc: Audit => Boolean): X = {
+  def audit[X](message: => String, x: => X, b: Boolean = true)(implicit auditFunc: String => Audit, isEnabledFunc: Audit => Boolean): X = {
     val xy = Try(x) // evaluate x inside Try
-    if (b && auditing && isEnabledFunc(mySpy)) doSpy(message, xy, b, spyFunc) // if auditing is turned on, log an appropriate message
+    if (b && auditing && isEnabledFunc(myAudit)) doAudit(message, xy, b, auditFunc) // if auditing is turned on, log an appropriate message
     xy.get // return the X value or throw the appropriate exception
   }
 
@@ -119,12 +119,12 @@ object Audit {
     *
     * CONSIDER adding warn, info, etc. versions
     *
-    * @param w       a String to be used as the prefix of the resulting message
-    * @param b       if true AND if auditing is true, the spyFunc will be called (defaults to true)
-    * @param spyFunc (implicit) the function to be called with a String based on w and x IF b && auditing are true
+    * @param w         a String to be used as the prefix of the resulting message
+    * @param b         if true AND if auditing is true, the auditFunc will be called (defaults to true)
+    * @param auditFunc (implicit) the function to be called with a String based on w and x IF b && auditing are true
     * @return the value of x
     */
-  def debug(w: => String, b: Boolean = true)(implicit spyFunc: String => Audit, isEnabledFunc: Audit => Boolean) {audit(w, (), b); ()}
+  def debug(w: => String, b: Boolean = true)(implicit auditFunc: String => Audit, isEnabledFunc: Audit => Boolean) {audit(w, (), b); ()}
 
   /**
     * This method can be used if you have an expression you would like to be evaluated WITHOUT any auditing going on.
@@ -134,7 +134,7 @@ object Audit {
     * @tparam X the type of the expression
     * @return the expression
     */
-  def noSpy[X](x: => X): X = {
+  def noAudit[X](x: => X): X = {
     val safe = auditing
     auditing = false
     val r = x
@@ -158,23 +158,30 @@ object Audit {
   implicit val defaultLogger: Logger = getLogger(getClass)
 
   /**
+    * By default the internalLog function does nothing at all. However, it can be set to a function that does something useful with a String
+    */
+  var internalLog: String => Unit = { _ => () }
+
+  /**
     * This is the default audit function.
-    * NOTE that if the logger parameter is null, then no logging is performed. This is another way to turn off logging.
+    * NOTE that if the logger parameter is null, then no logging is performed, unless internalLog has been reset.
+    * ...This (setting logger to null) is another way to turn off logging.
+    * NOTE however that if you do turn logger off, the default (implicit) isEnabledFunc will also return false, so that will have to be overridden.
     *
     * @param s      the message to be output when auditing
-    * @param logger an (implicit) logger (if null, then this method does nothing)
+    * @param logger an (implicit) logger (if null, then this method does tries the last resort: internalLog)
     * @return a Audit (that's to say nothing)
     */
-  implicit def spyFunc(s: String)(implicit logger: Logger): Audit = if (logger != null) Audit(logger.debug(prefix + s)) else Audit()
+  implicit def auditFunc(s: String)(implicit logger: Logger): Audit = if (logger != null) Audit(logger.debug(prefix + s)) else Audit(internalLog(prefix + s))
 
   /**
     * This is the default isEnabled function
     * This method takes a Audit object (essentially a Unit) and returns a Boolean if the logger is enabled for debug.
     *
-    * NOTE that it is necessary that this method takes a Audit, in the same way that the spyFunc must return a Audit --
+    * NOTE that it is necessary that this method takes a Audit, in the same way that the auditFunc must return a Audit --
     * so that the implicits can be found.
     *
-    * NOTE that if the logger parameter is null, then no logging is performed. This is another way to turn off logging.
+    * NOTE that if the logger parameter is null, then no logging is performed unless internalLog is set appropriately. This is another way to turn off logging.
     *
     * @param x      an instance of Audit
     * @param logger an (implicit) logger (if null, then this method returns false)
@@ -192,25 +199,25 @@ object Audit {
   def getLogger(clazz: Class[_]): Logger = LoggerFactory.getLogger(clazz)
 
   /**
-    * Get a println-type spyFunc that can be made an implicit val at the point of the audit method invocation so that audit invokes println statements instead of logging.
+    * Get a println-type auditFunc that can be made an implicit val at the point of the audit method invocation so that audit invokes println statements instead of logging.
     *
     * @param ps the PrintStream to use (defaults to System.out).
     * @return a audit function
     */
-  def getPrintlnSpyFunc(ps: PrintStream = System.out): String => Audit = { s => Audit(ps.println(prefix + s)) }
+  def getPrintlnAuditFunc(ps: PrintStream = System.out): String => Audit = { s => Audit(ps.println(prefix + s)) }
 
   /**
     * CONSIDER refactor so that an x which is a Failure will be logged as an exception.
     * The way the code is now, if X happens to be Try[Y], we will be given a Success(Failure(y)) and this will be formatted in the normal way.
     *
     */
-  private def doSpy[X](message: String, xy: => Try[X], b: Boolean, spyFunc: (String) => Audit) = {
+  private def doAudit[X](message: String, xy: => Try[X], b: Boolean, auditFunc: (String) => Audit) = {
     val w = xy match {
       case Success(x) => formatMessage(x, b)
       case Failure(t) => s"<<Exception thrown: ${t.getLocalizedMessage}>>"
     }
     val msg = if (message contains brackets) message else message + ": " + brackets
-    spyFunc(msg.replace(brackets, w))
+    auditFunc(msg.replace(brackets, w))
   }
 
   private def formatMessage[X](x: X, b: Boolean): String = x match {
@@ -222,7 +229,7 @@ object Audit {
     case Success(z) =>
       val sb = new StringBuilder("")
 
-      implicit def spyFunc(s: String): Audit = Audit(sb.append(s))
+      implicit def auditFunc(s: String): Audit = Audit(sb.append(s))
 
       // CONSIDER reworking this so that the result is "Success(...)" instead of "Success: ..."
       audit(s"Success", z, b)
@@ -238,5 +245,5 @@ object Audit {
     case _ => if (x != null) x.toString else "<<null>>"
   }
 
-  private val mySpy = apply(())
+  private val myAudit = apply(())
 }

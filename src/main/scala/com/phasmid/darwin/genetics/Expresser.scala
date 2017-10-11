@@ -85,12 +85,27 @@ sealed trait Expresser[G, P, T] extends ExpresserFunction[G, P, T] {
 
 abstract class AbstractExpresser[G, P, T] extends Expresser[G, P, T]
 
+/**
+  * CONSIDER use CaseIdentifiable
+  *
+  * @param traitMapper the trait mapper that defines this expresser
+  * @tparam G the Gene type
+  * @tparam P the Ploidy type
+  * @tparam T the Trait type
+  */
 case class ExpresserMendelian[G, P, T](traitMapper: TraitMapper[G, T]) extends AbstractExpresser[G, P, T] with Auditable {
   override def toString(): String = s"ExpresserMendelian($traitMapper)"
 
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[ExpresserMendelian[Any, Any, Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[ExpresserMendelian[Any, Any, Any]]).render(indent)(tab)
 }
 
+/**
+  * CONSIDER use CaseIdentifiable
+  *
+  * @param map the map of Characteristics to Gene-Traits
+  * @tparam G the Gene type
+  * @tparam T the Trait type
+  */
 case class TraitMapperMapped[G, T](map: Map[Characteristic, Map[G, T]]) extends TraitMapper[G, T] with Auditable {
   def apply(ch: Characteristic, ga: Allele[G]): Try[Trait[T]] = FP.optionToTry(
     ga match {
@@ -102,5 +117,5 @@ case class TraitMapperMapped[G, T](map: Map[Characteristic, Map[G, T]]) extends 
 
   override def toString(): String = s"TraitMapperMapped($map)"
 
-  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[TraitMapperMapped[Any, Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[TraitMapperMapped[Any, Any]]).render(indent)(tab)
 }

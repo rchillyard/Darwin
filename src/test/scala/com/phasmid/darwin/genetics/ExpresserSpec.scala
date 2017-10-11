@@ -65,7 +65,6 @@ class ExpresserSpec extends FlatSpec with Matchers {
     // TODO use pq
     val pq = Set(Allele("P"), Allele("Q"))
     val locus1 = PlainLocus(Location("height", 0, 1), ts, Some(Allele("S")))
-    //    val locus2 = PlainLocus(Location("girth", 1, 1), pq, Some(Allele("P")))
     val gene1 = MendelianGene[String, Boolean](locus1, Seq(Allele("T"), Allele("S")))
     val girth = Characteristic("girth")
     val traitMapper: (Characteristic, Allele[String]) => Try[Trait[Double]] = {
