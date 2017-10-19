@@ -48,7 +48,7 @@ class OrganismSpec extends FlatSpec with Matchers with Inside {
   private val sElephantGrass = "elephant grass"
   private val elephantGrass: Factor = Factor(sElephantGrass)
   private val sHeight = "height"
-  val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int] {
+  val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int]("elephant grass adapter") {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Int])] = f match {
       case `elephantGrass` => t.characteristic.name match {
         case `sHeight` => Success((t.value, ShapeFunction.shapeDiracInv_I))

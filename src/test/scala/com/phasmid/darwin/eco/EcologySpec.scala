@@ -38,7 +38,7 @@ class EcologySpec extends FlatSpec with Matchers {
   private val elephantGrass = Factor(sElephantGrass)
   private val factorMap = Map("height" -> elephantGrass)
 
-  val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int] {
+  val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int]("elephant grass adapter") {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Int])] = f match {
       case `elephantGrass` => t.characteristic.name match {
         case "height" => Success((t.value, ShapeFunction.shapeDiracInv_I))
@@ -57,7 +57,7 @@ class EcologySpec extends FlatSpec with Matchers {
 
   "render" should "work" in {
     val ecology = Ecology[Double, Int]("test", factorMap, ff, adapter)
-    ecology.render() shouldBe "Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitness:<function3>\n  adapter:<function3>\n  )"
+    ecology.render() shouldBe "Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitness:<function3>\n  adapter:<function1: elephant grass adapter>\n  )"
     ecology.render(1) shouldBe "Ecology:test"
   }
 

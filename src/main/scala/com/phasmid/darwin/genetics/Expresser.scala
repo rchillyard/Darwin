@@ -55,7 +55,6 @@ sealed trait Expresser[G, P, T] extends ExpresserFunction[G, P, T] {
     * @return the expressed allele
     */
   def selectAllele(gene: Gene[G, P]): Allele[G] = {
-    //noinspection ComparingUnrelatedTypes
     def isDominant(a: Allele[G]) = gene.locus.dominant match {
       case Some(x) => x == a
       case _ => throw GeneticsException(s"gene does not define dominant")

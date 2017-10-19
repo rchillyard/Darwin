@@ -37,7 +37,7 @@ class EnvironmentSpec extends FlatSpec with Matchers {
   private val elephantGrass = Factor(sElephantGrass)
   private val factorMap = Map("height" -> elephantGrass)
 
-  val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int] {
+  val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int]("elephant grass adapter") {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Int])] = f match {
       case `elephantGrass` => t.characteristic.name match {
         case "height" => Success((t.value, ShapeFunction.shapeDiracInv_I))

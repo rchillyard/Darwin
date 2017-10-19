@@ -24,6 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.AdapterFunction
+import com.phasmid.darwin.base.NamedFunction
 import com.phasmid.darwin.eco._
 
 import scala.util.{Failure, Success, Try}
@@ -39,10 +40,29 @@ sealed trait Adapter[T, X] extends AdapterFunction[T, X] {
 
   def matchFactors(f: Factor, t: Trait[T]): Try[(T, ShapeFunction[T, X])]
 
-  override def apply(factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X]): Try[Adaptation[X]] = {
+}
+
+/**
+  * Abstract base class implements Adapter[T,X]
+  *
+  * CONSIDER extending NamedFunction based on a more useful function type, in particular, this is really a function3, not a function1
+  *
+  * @tparam T the trait type
+  * @tparam X the eco-type
+  */
+abstract class AbstractAdapter[T, X](name: String) extends NamedFunction[Unit, Unit](name, { _ => () }) with Adapter[T, X] {
+
+  def apply(factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X]): Try[Adaptation[X]] = Adapter.applyAdapterFunction(factor, `trait`, ff, matchFactors)
+
+  override def toString(): String = super[NamedFunction].toString()
+
+}
+
+object Adapter {
+  def applyAdapterFunction[T, X](factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X], mf: (Factor, Trait[T]) => Try[(T, ShapeFunction[T, X])]): Try[Adaptation[X]] = {
     // TODO tidy this all up nicely
     val fc: T => (ShapeFunction[T, X]) => X => Fitness = ff.curried
-    val x_f_t: Try[X => Fitness] = for ((t, s) <- matchFactors(factor, `trait`)) yield fc(t)(s)
+    val x_f_t: Try[X => Fitness] = for ((t, s) <- mf(factor, `trait`)) yield fc(t)(s)
 
     def f_xe_fo(ef: EcoFactor[X]): Try[Fitness] = x_f_t match {
       // TODO need to check the factor types
@@ -53,6 +73,5 @@ sealed trait Adapter[T, X] extends AdapterFunction[T, X] {
     // TODO this doesn't look right at all! See definition of f_xe_fo above.
     x_f_t map { _ => Adaptation(factor, f_xe_fo) }
   }
-}
 
-abstract class AbstractAdapter[T, X] extends Adapter[T, X]
+}

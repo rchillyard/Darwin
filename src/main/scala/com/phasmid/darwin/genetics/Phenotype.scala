@@ -24,6 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base._
+import com.phasmid.laScala.Prefix
 
 /**
   * This class represents the Phenotype for an Organism. The Phenotype is "expressed" from the Genotype with respect to
@@ -36,9 +37,17 @@ import com.phasmid.darwin.base._
   */
 case class Phenotype[T](id: Identifier, traits: Seq[Trait[T]]) extends CaseIdentifiable[Phenotype[Any]] {
   def name: String = id.name
+
+  override def render(indent: Int)(implicit tab: (Int) => Prefix): String = CaseIdentifiable.renderAsCaseClass(this.asInstanceOf[Phenotype[Any]])(indent)
 }
 
 /**
+  * This class represents a specific value of a trait (in the biological sense, not the Scala sense).
+  * The type of the trait is represented by characteristic.
+  *
+  * CONSIDER renaming Characteristic as Trait and rename this class as something else.
+  *
+  * TODO don't extend CaseIdentifiable
   *
   * @param characteristic the Characteristic of this Trait
   * @param value          the T value of this Trait
@@ -47,7 +56,7 @@ case class Phenotype[T](id: Identifier, traits: Seq[Trait[T]]) extends CaseIdent
 case class Trait[T](characteristic: Characteristic, value: T) extends CaseIdentifiable[Trait[Any]] with Auditable {
   def isSexuallySelective: Boolean = characteristic.isSexuallySelective
 
+  override def render(indent: Int)(implicit tab: (Int) => Prefix): String = CaseIdentifiable.renderAsCaseClass(this.asInstanceOf[Trait[Any]])(indent)
 
-  //  def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Trait[Any]]).render(indent)(tab)
   def name: String = s"$value@$characteristic"
 }

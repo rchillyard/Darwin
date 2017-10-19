@@ -23,10 +23,11 @@
 
 package com.phasmid.darwin.genetics
 
-import com.phasmid.darwin.base.{Audit, IdentifierName}
+import com.phasmid.darwin.base.{Audit, IdentifierName, Identifying}
 import com.phasmid.darwin.eco._
+import com.phasmid.laScala.MockLogger
 import org.scalatest.{FlatSpec, Matchers}
-import org.slf4j.Logger
+import org.slf4j.event.Level
 
 import scala.util._
 
@@ -41,7 +42,7 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
   private val efElephantGrass = EcoFactor(elephantGrass, 1.6)
   private val habitat = Map("elephant grass" -> efElephantGrass)
 
-  val adapter: Adapter[Double, Double] = new AbstractAdapter[Double, Double] {
+  val adapter: Adapter[Double, Double] = new AbstractAdapter[Double, Double]("elephant grass adapter") {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Double])] = f match {
       case `elephantGrass` => t.characteristic.name match {
         case "height" => Success(t.value, ShapeFunction.shapeDiracInv)
@@ -57,17 +58,17 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
 
   behavior of "adaptation"
   // TODO try to get this working
-  ignore should "log itself" in {
+  it should "log itself" in {
     Audit.auditing = true
-    implicit val logger: Logger = null
-    implicit def isEnabledFunc(x: Audit)(implicit logger: Logger): Boolean = true
     val sb = new StringBuilder
-    Audit.internalLog = { s => sb.append(s) }
+    val logger = MockLogger("adaptationLogger", Level.DEBUG, sb)
+    Identifying.setLogger(logger)
     val height = Characteristic("height")
     val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))
     val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
-    ecology(phenotype)
-    sb.toString() shouldBe "Adaptatype..."
+    val _: Adaptatype[Double] = ecology(phenotype)
+    // TODO we should see something about Adaptatype too!
+    sb.toString() shouldBe "adaptationLogger: DEBUG: Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitness:<function3>\n  adapter:<function1: elephant grass adapter>\n  )\n"
   }
   it should "render correctly" in {
     val height = Characteristic("height")
@@ -80,7 +81,7 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
     println(s"adaptatype: $sAdaptatype")
     val sId = """(\p{XDigit}{16})"""
     val filtered = sAdaptatype.replaceAll(sId, "<ID>")
-    filtered shouldEqual "Adaptatype(\n  id:at:<ID>\n  adaptations:(Adaptation(\n        factor:elephant grass\n        ecoFitness:<function1>\n        ))\n  )"
+    filtered shouldEqual "Adaptatype(\n  id:at:<ID>\n  adaptations:(<function1: adaptation for elephant grass>)\n  )"
   }
   it should "yield appropriate fitness" in {
     val height = Characteristic("height")

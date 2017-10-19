@@ -217,7 +217,8 @@ object Audit {
       case Failure(t) => s"<<Exception thrown: ${t.getLocalizedMessage}>>"
     }
     val msg = if (message contains brackets) message else message + ": " + brackets
-    auditFunc(msg.replace(brackets, w))
+    // NOTE: we replace the construction ": ()" with nothing
+    auditFunc(msg.replace(brackets, w).replace(": ()", ""))
   }
 
   private def formatMessage[X](x: X, b: Boolean): String = x match {

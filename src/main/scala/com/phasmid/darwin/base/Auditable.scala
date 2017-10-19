@@ -24,6 +24,9 @@
 package com.phasmid.darwin.base
 
 import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
+import org.slf4j.{Logger, LoggerFactory}
+
+import scala.language.implicitConversions
 
 /**
   * This module contains several traits and classes which define aspects of an object's
@@ -41,8 +44,8 @@ trait Auditable extends Renderable {
   /**
     * Render this object (top-level) and log it to the Audit log.
     */
-  def audit()(implicit spyFunc: String => Audit, isEnabledFunc: Audit => Boolean): Unit = {
-    Audit.debug(render())(spyFunc, isEnabledFunc)
+  def audit()(implicit auditFunc: String => Audit, isEnabledFunc: Audit => Boolean): Unit = {
+    Audit.debug(render())(auditFunc, isEnabledFunc)
   }
 
 }
@@ -95,6 +98,8 @@ import scala.reflect.runtime.universe._
 /**
   * This abstract class is the sister of Identifying and is therefore self-auditing.
   *
+  * TODO eliminate this class because at present, it contributes nothing useful (in fact, it doesn't work).
+  *
   * It defines, for a case class, an object which is not only Identifiable but, on invocation of render,
   * will either render the name only or will render it as a case class.
   *
@@ -113,6 +118,13 @@ abstract class CaseIdentifiable[T: TypeTag] extends SelfAuditing {
 
   audit()
 
+  /**
+    * TODO this does not appear to work correctly
+    *
+    * @param indent the number of tabs to indent
+    * @param tab    the tab function
+    * @return the rendered object
+    */
   override def render(indent: Int)(implicit tab: (Int) => Prefix): String = CaseIdentifiable.renderAsCaseClass(this)(indent)
 }
 
@@ -159,12 +171,37 @@ trait SelfAuditing extends Auditable
   */
 abstract class Identifying extends SelfAuditing {
 
-  import Audit._
+  private implicit val logger: Logger = Identifying.logger
+  //  import Audit._
+  /**
+    * This is the default audit function.
+    * NOTE that if the logger parameter is null, then no logging is performed, unless internalLog has been reset.
+    * ...This (setting logger to null) is another way to turn off logging.
+    * NOTE however that if you do turn logger off, the default (implicit) isEnabledFunc will also return false, so that will have to be overridden.
+    *
+    * @param s the message to be output when auditing
+    *          //    * @param logger an (implicit) logger (if null, then this method does tries the last resort: internalLog)
+    * @return a Audit (that's to say nothing)
+    */
+  implicit def auditFunc(s: String): Audit = if (logger != null) Audit(logger.debug(s)) else Audit()
+
+  implicit def isEnabledFunc(x: Audit): Boolean = logger != null && logger.isDebugEnabled
   audit()
+
+  // CONSIDER building a registry for these types of object to warn if a name has already been used.
+  // Will need to call finally on the object, to detach it from the registry.
 }
 
 object SelfAuditing {
   def unapply(arg: SelfAuditing): Option[Renderable] = Some(arg)
 }
 
+object Identifying {
+  var logger: Logger = LoggerFactory.getLogger(getClass)
+
+  def setLogger(l: Logger): Unit = {
+    if (logger != null) logger = l
+    else logger = LoggerFactory.getLogger(getClass)
+  }
+}
 

@@ -154,7 +154,6 @@ class AuditSpec extends FlatSpec with Matchers {
     auditMessage shouldBe "Hello: 1 is the value for i\nHello: 2 is the value for i\n"
   }
   it should "use internalLog when logger is set to null" in {
-    //    import Audit._
     Audit.auditing = true
     implicit val logger: Logger = null
 
@@ -215,6 +214,6 @@ class AuditSpec extends FlatSpec with Matchers {
     implicit def auditFunc(s: String): Audit = Audit(auditMessage += s"explicit audit: $s\n")
 
     Audit.debug("my log message")
-    auditMessage shouldBe "explicit audit: my log message: ()\n"
+    auditMessage shouldBe "explicit audit: my log message\n"
   }
 }

@@ -25,8 +25,8 @@ package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base._
 import com.phasmid.darwin.eco._
+import com.phasmid.laScala.Prefix
 import com.phasmid.laScala.fp.FP
-import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 import scala.util.Try
 
@@ -65,14 +65,10 @@ case class Adaptatype[X](id: Identifier, adaptations: Seq[Adaptation[X]]) extend
   *
   * CONSIDER simply extending the fitness function
   *
-  * CONSIDER use CaseIdentifiable
+  * CONSIDER use Identifying
   */
-case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X]) extends Auditable with EcoFitness[X] {
+case class Adaptation[X](factor: Factor, ecoFitness: EcoFitness[X]) extends NamedFunction[EcoFactor[X], Try[Fitness]](s"adaptation for $factor", ecoFitness) with Auditable with EcoFitness[X] {
 
-  def apply(x: EcoFactor[X]): Try[Fitness] = ecoFitness(x)
-
-  override def toString(): String = s"Adaptation($factor, $ecoFitness)"
-
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Adaptation[Any]]).render(indent)(tab)
+  override def render(indent: Int)(implicit tab: (Int) => Prefix): String = CaseIdentifiable.renderAsCaseClass(this.asInstanceOf[Adaptation[Any]])(indent)
 }
 
