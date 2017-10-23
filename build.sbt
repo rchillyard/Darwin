@@ -8,6 +8,8 @@ version := "1.0.0-SNAPSHOT"
 scalaVersion := "2.11.8"
 crossScalaVersions := Seq("2.10.6","2.11.8","2.12.3")
 
+val laScalaVersion = "1.0.9-SNAPSHOT"
+
 val scalaModules = "org.scala-lang.modules"
 val scalaModulesVersion = "1.0.6"
 
@@ -61,7 +63,7 @@ libraryDependencies ++= Seq(
   scalaModules %% "scala-parser-combinators" % scalaModulesVersion,
   scalaModules %% "scala-xml" % "1.0.6",
 	"joda-time" % "joda-time" % "2.9.9",
-  "com.phasmid" %% "lascala" % "1.0.9-SNAPSHOT",
+  "com.phasmid" %% "lascala" % laScalaVersion,
   "org.clapper" %% "classutil" % "1.1.2",
 	akkaGroup %% "akka-actor" % akkaVersion.value,
 	"org.scalatest" %% "scalatest" % scalaTestVersion.value % "test"
