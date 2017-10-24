@@ -1,0 +1,65 @@
+# Scala CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/sample-config/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:8-jdk
+      
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/Darwin
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+      # LaScala Circle CI latest successful build. Can be found from: https://circleci.com/gh/rchillyard/LaScala/tree/master
+      LaScalaBuildNumber: 2
+      # GitHub Username
+      GitHubName: rchillyard
+      # Circle CI Token for download artifacts. Can be generated from: https://circleci.com/account/api
+      CircleCIToken: 4cf8c4341b1054f81036e0231edf20085f3ac90c
+    
+    steps:
+      - checkout
+      - run: echo "export lascalaver=$(ls -l|grep "laScalaVersion" build.sbt|cut -d'"' -f2|head -1)" >> $BASH_ENV
+      # - run: git submodule sync
+      # - run: git submodule update --init
+      # - run: mkdir -p /home/circleci/.m2/repository/
+      # - run: cp -r ./LaScala/artifacts/com /home/circleci/.m2/repository/
+      # - run: sudo chmod 777 /home/circleci/.m2
+      # - run: find /home/circleci/.m2
+      - run: export CIRCLE_TOKEN=?circle-token=$CircleCIToken
+      - run: curl https://circleci.com/api/v1.1/project/github/$GitHubName/LaScala/$LaScalaBuildNumber/artifacts$CIRCLE_TOKEN | grep -o 'https://[^"]*' > artifacts.txt
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/docs/ -A 'lascala_*-javadoc.jar*' %$CIRCLE_TOKEN
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/ivys/ -A 'ivy.xml*' %$CIRCLE_TOKEN
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/jars/ -A 'lascala_*.jar*' -R '*-javadoc.jar*,*-sources.jar*' %$CIRCLE_TOKEN
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/poms/ -A 'lascala_*.pom*' %$CIRCLE_TOKEN
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/srcs/ -A 'lascala_*-sources.jar*' %$CIRCLE_TOKEN
+      - run: find /home/circleci/.ivy2/local -name "*.tmp"  | xargs rm -f
+      # - run: awk -F/ '{wget}' $0$CIRCLE_TOKEN artifacts.txt
+      - run: find /home/circleci/.ivy2/local
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "build.sbt" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run: cat /dev/null | sbt test:compile
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies--{{ checksum "build.sbt" }}
+        
+      # run tests!
+      - run: cat /dev/null | sbt test:test
