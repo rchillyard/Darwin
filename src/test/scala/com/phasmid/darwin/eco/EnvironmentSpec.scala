@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.eco
 
+import com.phasmid.darwin.base.NamedFunction3
 import com.phasmid.darwin.genetics._
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -46,15 +47,9 @@ class EnvironmentSpec extends FlatSpec with Matchers {
     }
   }
 
-  val ff: (Double, ShapeFunction[Double, Int], Int) => Fitness = {
-    (t, fs, x) =>
-      fs match {
-        case ShapeFunction(_, f) => f(x)(t)
-        case _ => throw GeneticsException(s"ecoFitness does not implement functionType: $fs")
-      }
-  }
 
   "render" should "work" in {
+    val ff = new NamedFunction3[Double, ShapeFunction[Double, Int], Int, Fitness]("shape-only", { (t, fs, x) => fs(x)(t) })
     val ecology = Ecology[Double, Int]("test", factorMap, ff, adapter)
     val ecoFactor: EcoFactor[Int] = EcoFactor(elephantGrass, 1)
     val habitat: Habitat[Int] = Map(sElephantGrass -> ecoFactor)

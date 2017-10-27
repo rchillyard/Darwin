@@ -52,14 +52,14 @@ sealed trait Adapter[T, X] extends AdapterFunction[T, X] {
   */
 abstract class AbstractAdapter[T, X](name: String) extends NamedFunction[Unit, Unit](name, { _ => () }) with Adapter[T, X] {
 
-  def apply(factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X]): Try[Adaptation[X]] = Adapter.applyAdapterFunction(factor, `trait`, ff, matchFactors)
+  def apply(factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X]): Try[Adaptation[X]] = Adapter.applyAdapterFunction(factor, `trait`, ff)(matchFactors)
 
   override def toString(): String = super[NamedFunction].toString()
 
 }
 
 object Adapter {
-  def applyAdapterFunction[T, X](factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X], mf: (Factor, Trait[T]) => Try[(T, ShapeFunction[T, X])]): Try[Adaptation[X]] = {
+  def applyAdapterFunction[T, X](factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X])(mf: (Factor, Trait[T]) => Try[(T, ShapeFunction[T, X])]): Try[Adaptation[X]] = {
     // TODO tidy this all up nicely
     val fc: T => (ShapeFunction[T, X]) => X => Fitness = ff.curried
     val x_f_t: Try[X => Fitness] = for ((t, s) <- mf(factor, `trait`)) yield fc(t)(s)

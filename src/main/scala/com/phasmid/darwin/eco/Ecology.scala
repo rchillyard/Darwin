@@ -34,14 +34,14 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
   *
   * An ecology in which organisms can adapt and thrive (or not as the case may be).
   *
-  * @param name    name by which to refer to this Ecology
-  * @param factors the factors present in this Ecology
-  * @param fitness the fitness function
-  * @param adapter the adapter
+  * @param name        name by which to refer to this Ecology
+  * @param factors     the factors present in this Ecology
+  * @param fitnessFunc the fitness function
+  * @param adapter     the adapter
   * @tparam T the trait type
   * @tparam X the eco-type
   */
-case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Identifying with Ecological[T, X] with Identifiable {
+case class Ecology[T, X](name: String, factors: Map[String, Factor], fitnessFunc: FitnessFunction[T, X], adapter: Adapter[T, X]) extends Identifying with Ecological[T, X] with Identifiable {
 
   /**
     * The apply method for this Ecology. For each Trait in the given Phenotype, we look up its corresponding Factor
@@ -53,11 +53,11 @@ case class Ecology[T, X](name: String, factors: Map[String, Factor], fitness: Fi
     * @return an Adaptatype
     */
   def apply(phenotype: Phenotype[T]): Adaptatype[X] = {
-    val xats = for (t <- phenotype.traits; f <- factors.get(t.characteristic.name)) yield for (a <- adapter(f, t, fitness)) yield a
+    val xats = for (t <- phenotype.traits; f <- factors.get(t.characteristic.name)) yield for (a <- adapter(f, t, fitnessFunc)) yield a
     Adaptatype(IdentifierStrUID("at", UID(phenotype.id)), sequence(xats).get)
   }
 
-  override def toString: String = s"Ecology($name, $factors, $fitness, $adapter"
+  override def toString: String = s"Ecology($name, $factors, $fitnessFunc, $adapter"
 
   override def render(indent: Int)(implicit tab: (Int) => Prefix): String = CaseIdentifiable.renderAsCaseClass(this.asInstanceOf[Ecology[Any, Any]])(indent)
 

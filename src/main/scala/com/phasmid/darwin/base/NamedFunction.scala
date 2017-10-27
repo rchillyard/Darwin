@@ -27,6 +27,7 @@ package com.phasmid.darwin.base
   * NamedFunction class. Could equally be called NamedFunction1
   *
   * TODO move this module to LaScala
+  * TODO add other aritys
   *
   * @param name the name of this function
   * @param f    the function itself
@@ -36,7 +37,7 @@ package com.phasmid.darwin.base
 class NamedFunction[-T, +R](val name: String, val f: T => R) extends (T => R) {
   override def apply(t: T) = f(t)
 
-  override def toString: String = s"<function1: $name>"
+  override def toString: String = NamedFunction.toString(name, 1)
 
   override def compose[A](g: (A) => T): A => R = g match {
     case NamedFunction(w, gf) => new NamedFunction(s"$name&&&$w", f.compose(gf))
@@ -59,7 +60,7 @@ class NamedFunction[-T, +R](val name: String, val f: T => R) extends (T => R) {
 class NamedFunction0[+R](val name: String, val f: () => R) extends (() => R) with Identifier {
   override def apply() = f()
 
-  override def toString: String = s"<function0: $name>"
+  override def toString: String = NamedFunction.toString(name, 0)
 }
 
 /**
@@ -74,7 +75,7 @@ class NamedFunction0[+R](val name: String, val f: () => R) extends (() => R) wit
 class NamedFunction2[-T1, -T2, +R](val name: String, val f: (T1, T2) => R) extends ((T1, T2) => R) with Identifier {
   override def apply(t1: T1, t2: T2) = f(t1, t2)
 
-  override def toString: String = s"<function2: $name>"
+  override def toString: String = NamedFunction.toString(name, 2)
 
   override def curried = new NamedFunction(s"$name!!!", f.curried)
 
@@ -94,7 +95,7 @@ class NamedFunction2[-T1, -T2, +R](val name: String, val f: (T1, T2) => R) exten
 class NamedFunction3[-T1, -T2, -T3, +R](val name: String, val f: (T1, T2, T3) => R) extends ((T1, T2, T3) => R) with Identifier {
   override def apply(t1: T1, t2: T2, t3: T3) = f(t1, t2, t3)
 
-  override def toString: String = s"<function3: $name>"
+  override def toString: String = NamedFunction.toString(name, 3)
 
   override def curried = new NamedFunction(s"$name!!!", f.curried)
 
@@ -102,6 +103,8 @@ class NamedFunction3[-T1, -T2, -T3, +R](val name: String, val f: (T1, T2, T3) =>
 }
 
 object NamedFunction {
+  def toString(name: String, arity: Int): String = s"<function$arity: $name>"
+
   def unapply[T, R](arg: NamedFunction[T, R]): Option[(String, T => R)] = Some(arg.name, arg.f)
 }
 

@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.base.IdentifierName
+import com.phasmid.darwin.base.{IdentifierName, NamedFunction3}
 import com.phasmid.darwin.genetics._
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -37,6 +37,7 @@ class EcologySpec extends FlatSpec with Matchers {
   private val sElephantGrass = "elephant grass"
   private val elephantGrass = Factor(sElephantGrass)
   private val factorMap = Map("height" -> elephantGrass)
+  private val ff = new NamedFunction3[Double, ShapeFunction[Double, Int], Int, Fitness]("shape-only", { (t, fs, x) => fs(x)(t) })
 
   val adapter: Adapter[Double, Int] = new AbstractAdapter[Double, Int]("elephant grass adapter") {
     def matchFactors(f: Factor, t: Trait[Double]): Try[(Double, ShapeFunction[Double, Int])] = f match {
@@ -47,17 +48,9 @@ class EcologySpec extends FlatSpec with Matchers {
     }
   }
 
-  val ff: (Double, ShapeFunction[Double, Int], Int) => Fitness = {
-    (t, fs, x) =>
-      fs match {
-        case ShapeFunction(_, f) => f(x)(t)
-        case _ => throw GeneticsException(s"ecoFitness does not implement functionType: $fs")
-      }
-  }
-
   "render" should "work" in {
     val ecology = Ecology[Double, Int]("test", factorMap, ff, adapter)
-    ecology.render() shouldBe "Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitness:<function3>\n  adapter:<function1: elephant grass adapter>\n  )"
+    ecology.render() shouldBe "Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitnessFunc:<function3: shape-only>\n  adapter:<function1: elephant grass adapter>\n  )"
     ecology.render(1) shouldBe "Ecology:test"
   }
 

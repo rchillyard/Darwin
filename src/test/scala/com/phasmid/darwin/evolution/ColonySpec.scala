@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.base.IdentifierName
+import com.phasmid.darwin.base.{IdentifierName, NamedFunction3}
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
 import com.phasmid.darwin.genetics.dna.Base
@@ -57,16 +57,9 @@ class ColonySpec extends FlatSpec with Matchers with Inside {
     }
   }
 
-  val ff: (Double, ShapeFunction[Double, Int], Int) => Fitness = {
-    (t, fs, x) =>
-      fs match {
-        case ShapeFunction(_, f) => f(x)(t)
-        case _ => throw GeneticsException(s"ecoFitness does not implement functionType: $fs")
-      }
-  }
-
   import com.phasmid.darwin.evolution.Random.RandomizableBase
 
+  val ff = new NamedFunction3[Double, ShapeFunction[Double, Int], Int, Fitness]("shape-only", { (t, fs, x) => fs(x)(t) })
   val height: Characteristic = Characteristic(sHeight)
   val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test phenotype"), Seq(Trait(height, 2.0)))
   val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test ecology", Map(sHeight -> elephantGrass), ff, adapter)

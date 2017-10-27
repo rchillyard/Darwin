@@ -142,7 +142,7 @@ class WheelSpec extends FlatSpec with Matchers {
     import Hand.RandomizableHand
     val wheel = Wheel(Hand.hands, Hand.hands map (_.frequency.toLong))()
     val hands: List[Hand] = (wheel.toStream take 649740).toList
-    hands count (_.name == "Royal Flush") shouldBe (1 +- 3) // 3
+    hands count (_.name == "Royal Flush") shouldBe (1 +- 4) // 3
     hands count (_.name == "Straight Flush") shouldBe (9 +- 10) // 1.11
     hands count (_.name == "Four of a kind") shouldBe (156 +- 42) // 0.27
     hands count (_.name == "Full House") shouldBe (936 +- 94) // 0.1

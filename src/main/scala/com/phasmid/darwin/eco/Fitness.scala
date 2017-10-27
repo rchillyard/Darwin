@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.base.{Auditable, Identifiable, Plain}
+import com.phasmid.darwin.base.{Auditable, Identifiable, NamedFunction, Plain}
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 
@@ -160,12 +160,12 @@ object Viability {
   * against the eco value (x).
   * For the delta function, for instance, if t>x, then viable, otherwise nonViable.
   *
-  * @param name the name of the shape function
-  * @param f    the (T,X)=>Fitness
+  * @param s the name of the shape function
+  * @param g the (T,X)=>Fitness
   * @tparam T the underlying type of the trait
   * @tparam X the underlying type of the ecofactor
   */
-case class ShapeFunction[T, X](name: String, f: X => T => Fitness) extends Identifiable
+case class ShapeFunction[T, X](s: String, g: X => T => Fitness) extends NamedFunction[X, T => Fitness](s, g) with Identifiable
 
 object Fitness {
   val viable: Fitness = new Fitness(1)
