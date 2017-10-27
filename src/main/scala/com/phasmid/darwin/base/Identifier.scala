@@ -24,29 +24,14 @@
 package com.phasmid.darwin.base
 
 import com.phasmid.laScala.Version
-import com.phasmid.laScala.fp.Streamer
+import com.phasmid.laScala.fp.{Named, Streamer}
 
 /**
   * This module contains several traits and classes which define aspects of an object's
   * appearance and identification.
   */
 
-/**
-  * This trait defines the concept of an identifier, with a name which is a String.
-  *
-  */
-trait Identifier {
-  /**
-    * Provide the name of an object, primarily for rendering/debugging purposes.
-    *
-    * @return the name
-    */
-  def name: String
-
-  override def toString: String = name
-}
-
-case class IdentifierName(name: String) extends Identifier
+case class IdentifierName(name: String) extends Named
 
 /**
   * CONSIDER do we really need this? It's just a convenience
@@ -55,7 +40,7 @@ case class IdentifierName(name: String) extends Identifier
   *
   * @param id the Identifier
   */
-abstract class Identified(id: Identifier) extends Identifier {
+abstract class Identified(id: Named) extends Named {
   def name: String = id.name
 }
 
@@ -66,7 +51,7 @@ abstract class Identified(id: Identifier) extends Identifier {
   *
   * @param id the Identifier
   */
-abstract class SelfIdentified(id: Identifier) extends Identified(id) with SelfAuditing {
+abstract class SelfIdentified(id: Named) extends Identified(id) with SelfAuditing {
 
   import Audit._
 
@@ -92,7 +77,7 @@ case class UID(id: Long) {
   * @param id         an UID
   * @tparam V the underlying Version type of the generation.
   */
-case class IdentifierStrVerUID[V](prefix: String, generation: Version[V], id: UID) extends Identifier {
+case class IdentifierStrVerUID[V](prefix: String, generation: Version[V], id: UID) extends Named {
   def name: String = s"$prefix-$generation-$id"
 }
 
@@ -109,16 +94,16 @@ trait HasId {
   * @param prefix the prefix (which tends to identify the type of the object owning this IdentifierStrVerUID).
   * @param id     an UID
   */
-case class IdentifierStrUID(prefix: String, id: UID) extends Identifier with HasId {
+case class IdentifierStrUID(prefix: String, id: UID) extends Named with HasId {
   def name: String = s"$prefix${UID.sep}$id"
 }
 
 object IdentifierStrUID {
-  def apply(id: UID, prefix: String): Identifier = apply(prefix, UID(id.id))
+  def apply(id: UID, prefix: String): Named = apply(prefix, UID(id.id))
 }
 
 object UID {
-  def apply(id: Identifier): UID = id match {
+  def apply(id: Named): UID = id match {
     case x: HasId => apply(x.id.id)
     case _ => apply(1L) // TODO randomize this
   }

@@ -23,8 +23,8 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.base.NamedFunction3
 import com.phasmid.darwin.genetics._
+import com.phasmid.laScala.fp.NamedFunction3
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util._

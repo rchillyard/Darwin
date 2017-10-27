@@ -23,8 +23,8 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.base.Identifier
 import com.phasmid.darwin.eco.{Environment, Fitness}
+import com.phasmid.laScala.fp.Named
 import com.phasmid.laScala.values.{Incrementable, Rational}
 import com.phasmid.laScala.{Sequential, Version}
 
@@ -247,7 +247,7 @@ case class EvolvableException(s: String) extends Exception(s)
 /**
   * Trait which defines the properties of an Individual, the kind of thing that makes up the members of a Colony, for instance.
   */
-trait Individual[T, X] extends Identifier {
+trait Individual[T, X] extends Named {
   /**
     * CONSIDER changing the parameters to this method if we can find them more simply
     *

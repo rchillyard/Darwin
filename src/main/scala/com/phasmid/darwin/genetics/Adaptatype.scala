@@ -26,7 +26,7 @@ package com.phasmid.darwin.genetics
 import com.phasmid.darwin.base._
 import com.phasmid.darwin.eco._
 import com.phasmid.laScala.Prefix
-import com.phasmid.laScala.fp.FP
+import com.phasmid.laScala.fp.{FP, Named, NamedFunction}
 
 import scala.util.Try
 
@@ -36,7 +36,7 @@ import scala.util.Try
   * Created by scalaprof on 5/9/16.
   */
 
-case class Adaptatype[X](id: Identifier, adaptations: Seq[Adaptation[X]]) extends SelfIdentified(id) with Identifiable {
+case class Adaptatype[X](id: Named, adaptations: Seq[Adaptation[X]]) extends SelfIdentified(id) with Identifiable {
 
   /**
     * Method to evaluate and blend the fitness of each adaptation into a single fitness, wrapped in Try

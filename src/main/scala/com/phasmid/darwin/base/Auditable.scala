@@ -23,6 +23,7 @@
 
 package com.phasmid.darwin.base
 
+import com.phasmid.laScala.fp.Named
 import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -50,7 +51,7 @@ trait Auditable extends Renderable {
 
 }
 
-trait Identifiable extends Auditable with Identifier {
+trait Identifiable extends Auditable with Named {
   /**
     * This method will normally be overridden, especially if the concrete class is a case class.
     *

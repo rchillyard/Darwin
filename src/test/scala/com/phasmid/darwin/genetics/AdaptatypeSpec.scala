@@ -27,7 +27,6 @@ import com.phasmid.darwin.base.{Audit, IdentifierName, Identifying}
 import com.phasmid.darwin.eco._
 import com.phasmid.laScala.MockLogger
 import org.scalatest.{FlatSpec, Matchers}
-import org.slf4j.event.Level
 
 import scala.util._
 
@@ -61,7 +60,7 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
   it should "log itself" in {
     Audit.auditing = true
     val sb = new StringBuilder
-    val logger = MockLogger("adaptationLogger", Level.DEBUG, sb)
+    val logger = MockLogger("adaptationLogger", "DEBUG", sb)
     Identifying.setLogger(logger)
     val height = Characteristic("height")
     val phenotype: Phenotype[Double] = Phenotype(IdentifierName("test"), Seq(Trait(height, 2.0)))

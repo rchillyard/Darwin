@@ -23,13 +23,14 @@
 
 package com.phasmid.darwin.base
 
+import com.phasmid.laScala.fp.Named
 import org.scalatest.{FlatSpec, Matchers}
 
 class IdentifierSpec extends FlatSpec with Matchers {
 
   behavior of "Identifier"
   it should "yield name" in {
-    val id = new Identifier() {
+    val id = new Named() {
       def name = "Hello"
     }
     id.name shouldBe "Hello"

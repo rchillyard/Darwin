@@ -27,7 +27,7 @@ import com.phasmid.darwin.base._
 import com.phasmid.darwin.eco.{Ecology, Environment, Fitness}
 import com.phasmid.darwin.genetics._
 import com.phasmid.darwin.run.Species
-import com.phasmid.laScala.fp.Streamer
+import com.phasmid.laScala.fp.{Named, Streamer}
 import com.phasmid.laScala.{Prefix, Version}
 
 import scala.util.Try
@@ -116,7 +116,7 @@ trait AdaptedOrganism[B, G, P, T, V, X] extends Organism[B, G, P, T, V, X] {
     * @param ecology the ecology of the new instance
     * @return the new instance
     */
-  def build(id: Identifier, generation: Version[V], species: Species[B, G, P, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, P, T, V, X]
+  def build(id: Named, generation: Version[V], species: Species[B, G, P, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, P, T, V, X]
 }
 
 /**
@@ -133,8 +133,8 @@ trait AdaptedOrganism[B, G, P, T, V, X] extends Organism[B, G, P, T, V, X] {
   * @tparam V the Version (Generation) type
   * @tparam X the Eco-type
   */
-case class SexualAdaptedOrganism[B, G, T, V, X](id: Identifier, generation: Version[V], species: Species[B, G, Boolean, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with Mating[B, G, T, V, X, Organism[B, G, Boolean, T, V, X]] with AdaptedOrganism[B, G, Boolean, T, V, X] with SelfAuditing with Identifiable {
-  def build(id: Identifier, generation: Version[V], species: Species[B, G, Boolean, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, Boolean, T, V, X] = SexualAdaptedOrganism(id, generation, species, nucleus, ecology)
+case class SexualAdaptedOrganism[B, G, T, V, X](id: Named, generation: Version[V], species: Species[B, G, Boolean, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with Mating[B, G, T, V, X, Organism[B, G, Boolean, T, V, X]] with AdaptedOrganism[B, G, Boolean, T, V, X] with SelfAuditing with Identifiable {
+  def build(id: Named, generation: Version[V], species: Species[B, G, Boolean, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]): Organism[B, G, Boolean, T, V, X] = SexualAdaptedOrganism(id, generation, species, nucleus, ecology)
 
   def mate(evolvable: Evolvable[Organism[B, G, Boolean, T, V, X]]): Iterable[Organism[B, G, Boolean, T, V, X]] = ??? // TODO
 
@@ -163,11 +163,11 @@ object SexualAdaptedOrganism {
   * @tparam V the Version (Generation) type
   * @tparam X the Eco-type
   */
-case class Bacterium[B, G, T, V, X](id: Identifier, generation: Version[V], species: Species[B, G, Unit, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with ASexual[B, G, T, V, X, Organism[B, G, Unit, T, V, X]] with AdaptedOrganism[B, G, Unit, T, V, X] with SelfAuditing {
+case class Bacterium[B, G, T, V, X](id: Named, generation: Version[V], species: Species[B, G, Unit, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]) extends Identified(id) with ASexual[B, G, T, V, X, Organism[B, G, Unit, T, V, X]] with AdaptedOrganism[B, G, Unit, T, V, X] with SelfAuditing {
 
   def fission: Iterable[Organism[B, G, Unit, T, V, X]] = ??? // TODO
 
-  def build(id: Identifier, generation: Version[V], species: Species[B, G, Unit, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]) = Bacterium(id, generation, species, nucleus, ecology)
+  def build(id: Named, generation: Version[V], species: Species[B, G, Unit, T, X], nucleus: Nucleus[B], ecology: Ecology[T, X]) = Bacterium(id, generation, species, nucleus, ecology)
 
   override def render(indent: Int)(implicit tab: (Int) => Prefix): String = CaseIdentifiable.renderAsCaseClass(this.asInstanceOf[Bacterium[Any, Any, Any, Any, Any]])(indent)
 }

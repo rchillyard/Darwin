@@ -23,7 +23,8 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.base.{Auditable, Identifiable, NamedFunction, Plain}
+import com.phasmid.darwin.base.{Auditable, Identifiable, Plain}
+import com.phasmid.laScala.fp.NamedFunction
 import com.phasmid.laScala.{Prefix, RenderableCaseClass}
 
 

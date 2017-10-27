@@ -25,6 +25,7 @@ package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base._
 import com.phasmid.laScala.Prefix
+import com.phasmid.laScala.fp.Named
 
 /**
   * This class represents the Phenotype for an Organism. The Phenotype is "expressed" from the Genotype with respect to
@@ -35,7 +36,7 @@ import com.phasmid.laScala.Prefix
   * @author scalaprof
   *         Created by scalaprof on 5/5/16.
   */
-case class Phenotype[T](id: Identifier, traits: Seq[Trait[T]]) extends CaseIdentifiable[Phenotype[Any]] {
+case class Phenotype[T](id: Named, traits: Seq[Trait[T]]) extends CaseIdentifiable[Phenotype[Any]] {
   def name: String = id.name
 
   override def render(indent: Int)(implicit tab: (Int) => Prefix): String = CaseIdentifiable.renderAsCaseClass(this.asInstanceOf[Phenotype[Any]])(indent)

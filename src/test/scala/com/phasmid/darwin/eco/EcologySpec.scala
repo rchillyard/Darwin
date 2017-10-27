@@ -23,8 +23,9 @@
 
 package com.phasmid.darwin.eco
 
-import com.phasmid.darwin.base.{IdentifierName, NamedFunction3}
+import com.phasmid.darwin.base.IdentifierName
 import com.phasmid.darwin.genetics._
+import com.phasmid.laScala.fp.{Named, NamedFunction3}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util._
@@ -54,7 +55,7 @@ class EcologySpec extends FlatSpec with Matchers {
     ecology.render(1) shouldBe "Ecology:test"
   }
 
-  val id: _root_.com.phasmid.darwin.base.Identifier = IdentifierName("test")
+  val id: Named = IdentifierName("test")
 
   "apply" should "create adaptatype" in {
     val ecology: Ecology[Double, Int] = Ecology[Double, Int]("test", factorMap, ff, adapter)

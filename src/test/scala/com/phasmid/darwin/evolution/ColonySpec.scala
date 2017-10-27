@@ -23,7 +23,7 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.base.{IdentifierName, NamedFunction3}
+import com.phasmid.darwin.base.IdentifierName
 import com.phasmid.darwin.eco._
 import com.phasmid.darwin.genetics._
 import com.phasmid.darwin.genetics.dna.Base
@@ -31,7 +31,7 @@ import com.phasmid.darwin.plugin.Listener
 import com.phasmid.darwin.run.Species
 import com.phasmid.darwin.visualization.{Avagen, Avatar, Visualizer}
 import com.phasmid.laScala.Version
-import com.phasmid.laScala.fp.Streamer
+import com.phasmid.laScala.fp.{NamedFunction3, Streamer}
 import org.scalatest.{FlatSpec, Inside, Matchers}
 
 import scala.util.{Failure, Success, Try}
