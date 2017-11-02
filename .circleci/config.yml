@@ -21,11 +21,11 @@ jobs:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
       # LaScala Circle CI latest successful build. Can be found from: https://circleci.com/gh/rchillyard/LaScala/tree/master
-      LaScalaBuildNumber: 2
+      LaScalaBuildNumber: 10
       # GitHub Username
       GitHubName: rchillyard
       # Circle CI Token for download artifacts. Can be generated from: https://circleci.com/account/api
-      CircleCIToken: 4cf8c4341b1054f81036e0231edf20085f3ac90c
+      CircleCIToken: 6f3ba7ac5e21272e7917e8ca2fd3b560456e5960
     
     steps:
       - checkout

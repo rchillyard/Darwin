@@ -8,7 +8,7 @@ version := "1.0.0-SNAPSHOT"
 scalaVersion := "2.11.8"
 crossScalaVersions := Seq("2.10.6","2.11.8","2.12.3")
 
-val laScalaVersion = "1.0.9-SNAPSHOT"
+val laScalaVersion = "1.0.10-SNAPSHOT"
 
 val scalaModules = "org.scala-lang.modules"
 val scalaModulesVersion = "1.0.6"
