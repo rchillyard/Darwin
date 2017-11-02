@@ -52,6 +52,6 @@ class AdapterSpec extends FlatSpec with Matchers {
       }
     }
 
-    adapter.toString() shouldBe "<function1: elephant grass adapter>"
+    adapter.toString() shouldBe "<function3: elephant grass adapter>"
   }
 }

@@ -67,7 +67,7 @@ class AdaptatypeSpec extends FlatSpec with Matchers {
     val ecology: Ecology[Double, Double] = Ecology("test", factorMap, fitnessFunction, adapter)
     val _: Adaptatype[Double] = ecology(phenotype)
     // TODO we should see something about Adaptatype too!
-    sb.toString() shouldBe "adaptationLogger: DEBUG: Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitnessFunc:<function3>\n  adapter:<function1: elephant grass adapter>\n  )\n"
+    sb.toString() shouldBe "adaptationLogger: DEBUG: Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitnessFunc:<function3>\n  adapter:<function3: elephant grass adapter>\n  )\n"
   }
   it should "render correctly" in {
     val height = Characteristic("height")

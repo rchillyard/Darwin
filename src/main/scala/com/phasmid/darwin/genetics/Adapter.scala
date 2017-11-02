@@ -50,11 +50,11 @@ sealed trait Adapter[T, X] extends AdapterFunction[T, X] {
   * @tparam T the trait type
   * @tparam X the eco-type
   */
-abstract class AbstractAdapter[T, X](name: String) extends NamedFunction[Unit, Unit](name, { _ => () }) with Adapter[T, X] {
+abstract class AbstractAdapter[T, X](name: String) extends Adapter[T, X] {
 
   def apply(factor: Factor, `trait`: Trait[T], ff: FitnessFunction[T, X]): Try[Adaptation[X]] = Adapter.applyAdapterFunction(factor, `trait`, ff)(matchFactors)
 
-  override def toString(): String = super[NamedFunction].toString()
+  override def toString(): String = NamedFunction.toString(name, 3)
 
 }
 

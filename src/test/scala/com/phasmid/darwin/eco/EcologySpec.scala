@@ -51,7 +51,7 @@ class EcologySpec extends FlatSpec with Matchers {
 
   "render" should "work" in {
     val ecology = Ecology[Double, Int]("test", factorMap, ff, adapter)
-    ecology.render() shouldBe "Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitnessFunc:<function3: shape-only>\n  adapter:<function1: elephant grass adapter>\n  )"
+    ecology.render() shouldBe "Ecology(\n  name:\"test\"\n  factors:((height,elephant grass))\n  fitnessFunc:<function3: shape-only>\n  adapter:<function3: elephant grass adapter>\n  )"
     ecology.render(1) shouldBe "Ecology:test"
   }
 
