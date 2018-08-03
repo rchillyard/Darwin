@@ -40,7 +40,7 @@ import scala.util.Try
 class DarwinSpec extends FlatSpec with Matchers {
 
   behavior of "Darwin"
-  it should "work from plugins directory" in {
+  ignore should "work from plugins directory" in {
     import scala.concurrent.ExecutionContext.Implicits.global
     val a1 = Args("Test Harness", "PT0.1S", "src/test/resources/plugins/", "5")
     val (name: String, a2) = a1.get(classOf[String]).get

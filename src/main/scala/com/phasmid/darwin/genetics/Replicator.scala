@@ -24,7 +24,7 @@
 package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.Auditable
-import com.phasmid.laScala.{Prefix, RNG, RenderableCaseClass}
+import com.phasmid.laScala.{OldRenderableCaseClass, Prefix, RNG}
 
 /**
   * Created by scalaprof on 7/31/16.
@@ -74,7 +74,7 @@ case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Repl
       if (random == 0) implicitly[Ordinal[B]].fromInt(random)
       else b
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[ImperfectReplicator[Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this.asInstanceOf[ImperfectReplicator[Any]]).render(indent)(tab)
 
 }
 
@@ -88,5 +88,5 @@ case class ImperfectReplicator[B: Ordinal](mnopc: Int, r: RNG[Int]) extends Repl
 case class PerfectReplicator[B]() extends Replicator[B] with Auditable {
   def replicate(bs: Seq[B]): Seq[B] = bs
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[PerfectReplicator[Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this.asInstanceOf[PerfectReplicator[Any]]).render(indent)(tab)
 }

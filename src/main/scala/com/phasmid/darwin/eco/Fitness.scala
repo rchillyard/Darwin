@@ -25,7 +25,7 @@ package com.phasmid.darwin.eco
 
 import com.phasmid.darwin.base.{Auditable, Identifiable, Plain}
 import com.phasmid.laScala.fp.NamedFunction
-import com.phasmid.laScala.{Prefix, RenderableCaseClass}
+import com.phasmid.laScala.{OldRenderableCaseClass, Prefix}
 
 
 /**
@@ -144,7 +144,7 @@ case class Viability(fs: Seq[Fitness]) extends (() => Fitness) with Auditable {
 
   override def toString(): String = s"Viability($fs)"
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this).render(indent)(tab)
 
 }
 

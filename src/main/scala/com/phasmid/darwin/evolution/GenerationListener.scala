@@ -25,8 +25,10 @@ package com.phasmid.darwin.evolution
 
 /**
   * Created by scalaprof on 7/26/17.
+  *
+  * @tparam Z the underlying type of evolvable organisms
   */
-trait GenerationListener {
+trait GenerationListener[Z] {
   /**
     * This method is called whenever the
     * {@link Evolvable} implementer
@@ -41,8 +43,7 @@ trait GenerationListener {
     *
     * NOTE: implementers of this method must be prepared to accept
     * null as the parameter.
-    * @tparam Z the underlying type of individuals
     */
-  def onGeneration[Z <: Individual[_, _]](evolvable: Evolvable[Z]): Unit
+  def onGeneration(evolvable: Evolvable[Z]): Unit
 
 }

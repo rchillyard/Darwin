@@ -24,7 +24,7 @@
 package com.phasmid.darwin.base
 
 import com.phasmid.laScala.fp.Named
-import com.phasmid.laScala.{Prefix, Renderable, RenderableCaseClass}
+import com.phasmid.laScala.{OldRenderable, OldRenderableCaseClass, Prefix, Renderable}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.language.implicitConversions
@@ -38,7 +38,7 @@ import scala.language.implicitConversions
   * This trait defines the concept of something that can be audited in a form which is readable (because Auditable
   * extends Renderable).
   */
-trait Auditable extends Renderable {
+trait Auditable extends OldRenderable {
 
   /** previously extended also from LazyLogging **/
 
@@ -142,7 +142,7 @@ object CaseIdentifiable {
     */
   def renderAsCaseClass[T: TypeTag](t: T)(indent: Int)(implicit tab: (Int) => Prefix): String = {
     if (indent > 0) Identifiable.render(t)
-    else RenderableCaseClass(t).render(indent)(tab)
+    else OldRenderableCaseClass(t).render(indent)(tab)
   }
 
 }
@@ -194,7 +194,7 @@ abstract class Identifying extends SelfAuditing {
 }
 
 object SelfAuditing {
-  def unapply(arg: SelfAuditing): Option[Renderable] = Some(arg)
+  def unapply(arg: SelfAuditing): Option[OldRenderable] = Some(arg)
 }
 
 object Identifying {

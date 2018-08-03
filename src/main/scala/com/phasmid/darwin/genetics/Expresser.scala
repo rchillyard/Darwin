@@ -25,7 +25,7 @@ package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.Auditable
 import com.phasmid.laScala.fp.FP
-import com.phasmid.laScala.{Prefix, RenderableCaseClass}
+import com.phasmid.laScala.{OldRenderableCaseClass, Prefix}
 
 import scala.util.Try
 
@@ -95,7 +95,7 @@ abstract class AbstractExpresser[G, P, T] extends Expresser[G, P, T]
 case class ExpresserMendelian[G, P, T](traitMapper: TraitMapper[G, T]) extends AbstractExpresser[G, P, T] with Auditable {
   override def toString(): String = s"ExpresserMendelian($traitMapper)"
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[ExpresserMendelian[Any, Any, Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this.asInstanceOf[ExpresserMendelian[Any, Any, Any]]).render(indent)(tab)
 }
 
 /**
@@ -116,5 +116,5 @@ case class TraitMapperMapped[G, T](map: Map[Characteristic, Map[G, T]]) extends 
 
   override def toString(): String = s"TraitMapperMapped($map)"
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[TraitMapperMapped[Any, Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this.asInstanceOf[TraitMapperMapped[Any, Any]]).render(indent)(tab)
 }

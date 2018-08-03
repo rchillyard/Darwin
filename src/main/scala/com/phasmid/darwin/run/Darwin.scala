@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import com.phasmid.darwin.plugin._
-import com.phasmid.darwin.visualization.Avatar
 import com.phasmid.laScala.fp.Args
 import org.slf4j.LoggerFactory
 
@@ -95,6 +94,6 @@ trait Pluggable {
   def addPlugin(p: EvolvablePlugin): Unit
 }
 
-case class CreateAvatar(avatar: Avatar)
-
-case class KillAvatar(avatar: Avatar)
+//case class CreateAvatar(avatar: Avatar)
+//
+//case class KillAvatar(avatar: Avatar)

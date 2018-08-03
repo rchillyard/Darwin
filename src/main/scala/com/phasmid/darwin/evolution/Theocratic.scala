@@ -23,6 +23,8 @@
 
 package com.phasmid.darwin.evolution
 
+import com.phasmid.darwin.genetics.Sequence
+
 /**
   * Defines the concept of a supreme being which has the power to create living
   * objects out of nothing, and of course kill them at will.
@@ -35,7 +37,7 @@ package com.phasmid.darwin.evolution
   *         Created on Jan 5, 2010 as Theological
   *
   */
-trait Theocratic[B, Repr] {
+trait Theocratic[Repr] {
 
   /**
     * Method to cull all members of an Evolvable so we can make a fresh start.
@@ -49,5 +51,5 @@ trait Theocratic[B, Repr] {
     * {@link Evolvable} which a certain number of
     * members.
     */
-  def seedMembers(size: Int, random: RNG[B]): Repr
+  def seedMembers[B](size: Int, bss: Stream[Sequence[B]]): Repr
 }

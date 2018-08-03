@@ -23,8 +23,9 @@
 
 package com.phasmid.darwin.evolution
 
-import com.phasmid.darwin.eco.{Environment, Fitness}
-import com.phasmid.laScala.fp.Named
+import com.phasmid.darwin.eco.{Environment, Fit, Fitness, Survival}
+import com.phasmid.darwin.genetics.Reproduction
+import com.phasmid.laScala.fp.{FP, Named}
 import com.phasmid.laScala.values.{Incrementable, Rational}
 import com.phasmid.laScala.{Sequential, Version}
 
@@ -45,25 +46,22 @@ import scala.util.Try
   *
   *           Created by scalaprof on 7/27/16.
   */
-trait Evolvable[Z <: Individual[_, _]] extends Ordered[Evolvable[Z]] with Permutable[Z] {
+trait Evolvable[Z] extends Permutable[Z] {
 
-  /**
-    * TODO make this an implicit function in Evolvable sub-class
-    * Evaluate the fitness of a member of this Evolvable
-    *
-    * @param z the member
-    * @return true if z is fit enough to survive this generation
-    */
-  def evaluateFitness(z: Z): Boolean
-
-  /**
-    * This method yields a new set of Z objects, by reproduction.
-    * If the ploidy of Z is haploid, then reproduction will be asexual, otherwise mating must occur between male/female pairs.
-    * All members of this Evolvable take part in reproduction, as deceased organisms have already been eliminated from this.
-    *
-    * @return a new Evolvable
-    */
-  def offspring: Iterator[Z]
+//  /**
+//    * This method yields a new set of Z objects, by reproduction.
+//    * If the ploidy of Z is haploid, then reproduction will be asexual, otherwise mating must occur between male/female pairs.
+//    * All members of this Evolvable take part in reproduction, as deceased organisms have already been eliminated from this.
+//    *
+//    * @return a new Evolvable
+//    */
+//  def offspring: Iterable[Z]
+//
+//  /**
+//    * This method yields an iterable of members which will die this generation.
+//    * @return
+//    */
+//  def terminal: Iterable[Z]
 }
 
 /**
@@ -89,22 +87,25 @@ abstract class BaseGenerational[V, Repr](vv: Version[V]) extends Generational[V]
     */
   def generation: Version[V] = vv
 
-  /**
-    * By default, this implementation of next allows k non-survivors to mate (before they are killed, presumably).
-    *
-    * @return a new generation of this Evolvable
-    */
-  def next(isSnapshot: Boolean = false): Try[Repr] = for (v <- vv.next(isSnapshot)) yield next(v)
+//  /**
+//    * By default, this implementation of next allows k non-survivors to mate (before they are killed, presumably).
+//    *
+//    * @return a new generation of this Evolvable
+//    */
+//  def next(isSnapshot: Boolean = false): Try[Repr] = for (vy: Try[Repr] <- vv.next(isSnapshot); v: Repr <- vy) yield next(v)
 
   /**
     * Method to create the next generation
     *
     * @param v the Version for the next generation
-    * @return the next generation as a Repr
+    * @return the next generation as a Repr, wrapped in Try
     */
-  def next(v: Version[V]): Repr
+  def next(v: Version[V]): Try[Repr]
 }
+
 /**
+  * TODO remove Evolvable (replace with Permutable)
+  *
   * This trait captures the essence of an Evolvable which undergoes a sequence of generations.
   * You might think of this as normal, natural evolution without skipping any generations
   * (i.e. this does not model punctuated equilibrium).
@@ -119,44 +120,38 @@ abstract class BaseGenerational[V, Repr](vv: Version[V]) extends Generational[V]
   * @tparam V    the generation type that identifies successive generations
   * @tparam Repr the result type of calling next (defined in Sequential)
   */
-trait SequentialEvolvable[Z <: Individual[_, _], V, Repr] extends Evolvable[Z] with Sequential[Repr] with Iterable[Z] with Generational[V] {
+trait SequentialEvolvable[Z, V, Repr] extends Evolvable[Z] with Sequential[Repr] with Iterable[Z] with Generational[V] {
 
   /**
     * Method to create a new concrete instance of this BaseEvolvable.
     *
     * CONSIDER using CanBuildFrom
     *
-    * @param zs the zs to be included in this BaseEvolvable
+    * @param zs the sequence of Zs to be included in this SequentialEvolvable
     * @param v  a Version
-    * @return a concrete instance of BaseEvolvable corresponding to the same type as this
+    * @return a concrete instance of SequentialEvolvable corresponding to the same type as this
     */
-  def build(zs: Iterable[Z], v: Version[V]): Repr
+  def build(zs: Evolute[Z])(v: Version[V]): Repr
 }
 
 /**
   * This abstract base class for Evolvable represents a Seq of Z objects which, together, are Evolvable.
   *
-  * @param zs      an unsorted collection of objects which, together, are Evolvable
+  * When migrating to Scala 3, rewrite this as a trait.
+  *
+  * @param ze      an unsorted collection of objects which, together, are Evolvable
   * @param vv      a Version (Evolvables which are not complete generations use a snapshot here)
   * @tparam V the generation type (defined to be Incrementable)
   * @tparam Z the underlying type of the zs (must implement Individual)
   */
-abstract class BaseEvolvable[V: Incrementable, Z <: Individual[_, _], Repr](zs: Iterable[Z], vv: Version[V]) extends BaseGenerational[V, Repr](vv) with SequentialEvolvable[Z, V, Repr] {
+abstract class BaseEvolvable[V: Incrementable, Z : Fit : Reproduction, Repr](ze: Evolute[Z], vv: Version[V]) extends BaseGenerational[V, Repr](vv) with SequentialEvolvable[Z, V, Repr] {
 
-  def next(v: Version[V]): Repr = doNext(v)
-
-  /**
-    * Method which determines if a particular Fitness value will be considered sufficiently fit to survive this generation
-    *
-    * @param f a Fitness value
-    * @return true if f represents a sufficiently fit value to survive to the next generation
-    */
-  def isFit(f: Fitness): Boolean
+  def next(v: Version[V]): Try[Repr] = doNext(v)
 
   /**
     * @return an Iterator based on the individual members of this Evolvable
     */
-  def iterator: Iterator[Z] = zs.iterator
+  def iterator: Iterator[Z] = ze.iterator
 
   /**
     * Method to compare this Evolvable with that Evolvable.
@@ -169,59 +164,35 @@ abstract class BaseEvolvable[V: Incrementable, Z <: Individual[_, _], Repr](zs: 
     case _ => throw EvolutionException(s"cannot compare $that with $this")
   }
 
-  /**
-    * This method yields an iterator from the elements of xs which survive this generation.
-    * Note that, although the default implementation simply culls all the unfit xs
-    * and keeps all of the fit xs, sub-classes may redefine this method to allow a random choice
-    * of survivors which is only partially guided by fitness.
-    *
-    * CONSIDER do we really need this method, as opposed to survivors()?
-    *
-    * @return an Iterable containing the elements of xs who survive this generation.
-    */
-  protected def survivors(xs: Iterable[Z]): Iterable[Z] = xs filter evaluateFitness
-
-  /**
-    * This method yields an iterator of xs which survive this generation.
-    * It invokes survivors(iterator) to do its work
-    *
-    * @return an Iterator containing the elements of xs who survive this generation.
-    */
-  protected def survivors: Iterable[Z] = survivors(this)
-
-  /**
-    * This method yields the complement of survivors such that survivors + nonSurvivors = this
-    *
-    * @return
-    */
-  protected def nonSurvivors: Iterable[Z] = this - survivors(this)
-
-  /**
-    * @param i the iterator whose elements are to be removed
-    * @return an Iterator composed from this but without any of the elements of i
-    */
-  protected def -(i: Iterable[Z]): Iterable[Z] = this.filterNot(i.toSet)
-
-  /**
-    * This method randomly selects a fraction of this Evolvable
-    *
-    * @param fraction the fraction of xs that will be randomly selected.
-    * @return an Iterator containing a randomly chosen fraction of the xs of this.
-    */
-  protected def *(fraction: Rational[Long])(implicit random: RNG[Long]): Iterable[Z] = permute.take((fraction * zs.size).floor.toInt).toSeq
-
-  private def doNext(v: Version[V])(implicit k: Evolvable[Z] => Rational[Long], r: Evolvable[Z] => RNG[Long]): Repr = {
-    // TODO in sexual reproduction, we need to introduce to s a small number (possibly zero) of members of a distinct Evolvable
-    // such as a rival Colony. Typically, these additions, if any, will be males.
-    val (s, n) = (buildInternal(survivors, v), buildInternal(nonSurvivors, v))
-    implicit val random: RNG[Long] = r(this)
-    // TODO need to fix this because, currently, sexual reproduction will be from pairs
-    // chosen from two different populations: survivors and non-survivors.
-    val nextGeneration = (s.iterator ++ s.offspring ++ buildInternal(n * k(this), v).offspring).toSeq.distinct
-    build(nextGeneration, v)
+  private def doNext(v: Version[V]): Try[Repr] = {
+    val f: Try[Evolute[Z]] => Try[Repr] = FP.lift(build(_)(v))
+    f(ze.next())
   }
 
-  private def buildInternal(xs: Iterable[Z], v: Version[V]): BaseEvolvable[V, Z, Repr] = build(xs, v).asInstanceOf[BaseEvolvable[V, Z, Repr]]
+//  private def buildInternal(zet: Try[Evolute[Z]], v: Version[V]): BaseEvolvable[V, Z, Repr] = build(xs).asInstanceOf[BaseEvolvable[V, Z, Repr]]
+
+  /**
+    * Evaluate the fitness of a member of this Evolvable in the given environment
+    *
+    * @param z the member
+    *          @param environment the environment in which z's fitness will be measured.
+    * @return true if z is fit enough to survive this generation
+    */
+  def evaluateFitness[T,X](z: Z, environment: Environment[T, X]): Boolean = implicitly[Fit[Z]].isFit(z, environment)
+
+//  private def nextGeneration: Evolute[Z] =
+//  {
+//    val next: Try[Evolute[Z]] = ze.next()
+//    buildInternal(next)
+////    // TODO in sexual reproduction, we need to introduce to s a small number (possibly zero) of members of a distinct Evolvable
+////    // such as a rival Colony. Typically, these additions, if any, will be males.
+////    val (s, n) = (buildInternal(survivors, v), buildInternal(nonSurvivors, v))
+////    implicit val random: RNG[Long] = r(this)
+////    // TODO need to fix this because, currently, sexual reproduction will be from pairs
+////    // chosen from two different populations: survivors and non-survivors.
+////    (s.iterator ++ s.offspring ++ buildInternal(n * k(this), v).offspring).toSeq.distinct
+//  }
+
 
 }
 
@@ -229,7 +200,7 @@ object Evolvable {
   /**
     * This is the rate at which non-survivors can yet have offspring
     */
-  implicit def k[Z <: Individual[_, _]](e: Evolvable[Z]): Rational[Long] = Rational.half
+  implicit def k[Z](e: Evolvable[Z]): Rational[Long] = Rational.half
 
   import com.phasmid.darwin.evolution.Random.RandomizableLong
 
@@ -239,22 +210,8 @@ object Evolvable {
     * TODO Huh??
     *
     */
-  implicit def random[Z <: Individual[_, _]](e: Evolvable[Z]): RNG[Long] = RNG[Long](0L)
+  implicit def random[Z](e: Evolvable[Z]): RNG[Long] = RNG[Long](0L)
 }
 
 case class EvolvableException(s: String) extends Exception(s)
 
-/**
-  * Trait which defines the properties of an Individual, the kind of thing that makes up the members of a Colony, for instance.
-  */
-trait Individual[T, X] extends Named {
-  /**
-    * CONSIDER changing the parameters to this method if we can find them more simply
-    *
-    * @param environment the Environment in which this Individual thrives
-    * @return the Fitness of this Individual in the ecology, wrapped in Try
-    */
-  def fitness(environment: Environment[T, X]): Try[Fitness]
-
-
-}

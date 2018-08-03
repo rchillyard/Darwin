@@ -53,7 +53,7 @@ class PluginSpec extends FlatSpec with Matchers {
     }
   }
 
-  it should "work with PluginManager finding TestPlugin with implicit path" in {
+  ignore should "work with PluginManager finding TestPlugin with implicit path" in {
     val pm = PluginManager[EvolvablePlugin]("src/test/resources/plugins/")
     val mp = pm.getPlugin("MockPlugin")
     mp should matchPattern { case None => }
@@ -62,7 +62,7 @@ class PluginSpec extends FlatSpec with Matchers {
     for (p <- po) p.name shouldBe "Test plugin"
   }
 
-  it should "return the exact same plugin when re-asked" in {
+  ignore should "return the exact same plugin when re-asked" in {
     val pm = PluginManager[EvolvablePlugin]("src/test/resources/plugins/")
     val po = pm.getPlugin("com.phasmid.darwin.plugin.TestPlugin")
     po should matchPattern { case Some(_) => }
@@ -71,7 +71,7 @@ class PluginSpec extends FlatSpec with Matchers {
 
   behavior of "clear and plugins"
 
-  it should "work" in {
+  ignore should "work" in {
     val pm = PluginManager[EvolvablePlugin]("src/test/resources/plugins/")
     pm.pluginMap shouldBe null
     val po = pm.getPlugin("TestPlugin")

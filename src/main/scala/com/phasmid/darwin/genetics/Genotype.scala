@@ -25,7 +25,7 @@ package com.phasmid.darwin.genetics
 
 import com.phasmid.darwin.base.{Auditable, Identifiable}
 import com.phasmid.laScala.fp.Named
-import com.phasmid.laScala.{Prefix, RenderableCaseClass}
+import com.phasmid.laScala.{OldRenderableCaseClass, Prefix}
 
 /**
   * This class represents a genotype: the genes of a particular organism.
@@ -41,7 +41,7 @@ import com.phasmid.laScala.{Prefix, RenderableCaseClass}
   */
 case class Genotype[G, P](id: Named, genes: Seq[Gene[G, P]]) extends Auditable {
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Genotype[Any, Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this.asInstanceOf[Genotype[Any, Any]]).render(indent)(tab)
 
 }
 
@@ -105,7 +105,7 @@ case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: 
     */
   def apply(): Set[Allele[G]] = alleles
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[PlainLocus[Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this.asInstanceOf[PlainLocus[Any]]).render(indent)(tab)
 
 }
 
@@ -123,7 +123,7 @@ case class PlainLocus[G](location: Location, alleles: Set[Allele[G]], dominant: 
 case class MendelianGene[G, P](l: Locus[G], as: Seq[Allele[G]]) extends AbstractGene[G, P](l, as) {
   override def toString = s"""MendelianGene: at $l with alleles: ${as.mkString(", ")}"""
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[MendelianGene[Any, Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this.asInstanceOf[MendelianGene[Any, Any]]).render(indent)(tab)
 }
 
 abstract class AbstractGene[G, P](l: Locus[G], as: Seq[Allele[G]]) extends Gene[G, P] {
@@ -167,5 +167,5 @@ abstract class AbstractGene[G, P](l: Locus[G], as: Seq[Allele[G]]) extends Gene[
 case class Allele[G](t: G) extends Identifiable {
   override def name: String = t.toString
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Allele[Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this.asInstanceOf[Allele[Any]]).render(indent)(tab)
 }

@@ -27,7 +27,7 @@ import com.phasmid.darwin.Ecological
 import com.phasmid.darwin.base._
 import com.phasmid.darwin.genetics._
 import com.phasmid.laScala.fp.FP.sequence
-import com.phasmid.laScala.{Prefix, RenderableCaseClass}
+import com.phasmid.laScala.{OldRenderableCaseClass, Prefix}
 
 /**
   * Created by scalaprof on 5/9/16.
@@ -65,6 +65,6 @@ case class Ecology[T, X](name: String, factors: Map[String, Factor], fitnessFunc
 
 case class Factor(name: String) extends Identifiable {
   override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = if (indent > 0) name
-  else RenderableCaseClass(this).render(indent)(tab)
+  else OldRenderableCaseClass(this).render(indent)(tab)
 }
 

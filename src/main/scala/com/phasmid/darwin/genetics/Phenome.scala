@@ -26,7 +26,7 @@ package com.phasmid.darwin.genetics
 import com.phasmid.darwin.base._
 import com.phasmid.darwin.eco.{Fitness, Viability}
 import com.phasmid.laScala.fp.FP._
-import com.phasmid.laScala.{Prefix, RenderableCaseClass}
+import com.phasmid.laScala.{OldRenderableCaseClass, Prefix}
 import org.slf4j.Logger
 
 import scala.util.Try
@@ -84,7 +84,7 @@ case class Phenome[G, P, T](name: String, characteristics: Map[Locus[G], Charact
     Viability(for ((t1, t2) <- tts) yield attraction(t1, t2))()
   }
 
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this.asInstanceOf[Phenome[Any, Any, Any]]).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this.asInstanceOf[Phenome[Any, Any, Any]]).render(indent)(tab)
 
   implicit private val auditLogger: Logger = Audit.getLogger(getClass)
 }
@@ -96,5 +96,5 @@ case class Phenome[G, P, T](name: String, characteristics: Map[Locus[G], Charact
   * @param isSexuallySelective (defaults to false) true if this characteristic is observable as a sexually selective trait
   */
 case class Characteristic(name: String, isSexuallySelective: Boolean = false) extends Identifiable {
-  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = RenderableCaseClass(this).render(indent)(tab)
+  override def render(indent: Int = 0)(implicit tab: (Int) => Prefix): String = OldRenderableCaseClass(this).render(indent)(tab)
 }

@@ -21,43 +21,39 @@
 // *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // */
 //
-//package com.phasmid.darwin.visualization
+//package com.phasmid.darwin.experimental
 //
-//import com.phasmid.darwin.evolution.{Evolvable}
+//import com.phasmid.darwin.base.IdentifierName
+//import com.phasmid.darwin.eco._
+//import com.phasmid.darwin.genetics._
+//import com.phasmid.darwin.genetics.dna.Base
 //import com.phasmid.darwin.plugin.Listener
-//import com.phasmid.darwin.run.{CreateAvatar, KillAvatar}
+//import com.phasmid.darwin.run.Species
+//import com.phasmid.darwin.visualization.{Avagen, Avatar, Visualizer}
+//import com.phasmid.laScala.Version
+//import com.phasmid.laScala.fp.{NamedFunction3, Streamer}
+//import org.scalatest.{FlatSpec, Inside, Matchers}
 //
-//import scala.collection.mutable
+//import scala.util.{Failure, Success, Try}
 //
-//case class Visualizer[T, X](avagen: Avagen[T, X], listener: Listener) {
+///**
+//  * Created by scalaprof on 7/25/16.
+//  */
+//class TribeSpec extends FlatSpec with Matchers with Inside {
 //
-//  def visualize[Z <: Individual[T, X]](e: Evolvable[Z]): Unit = {
-//    // TODO no, we need to do this when an individual is born
-//    for (i <- e) createAvatar(i)
+//  behavior of "Tribe"
+//
+//  trait Simple[A] extends Genetic[A] {
+//    override def isFemale(a: A): Boolean = a.hashCode() %2 == 0
 //  }
 //
-//  private val hashMap = new mutable.HashMap[String, Avatar]()
-//
-//  def createAvatar(i: Individual[T, X]): Unit = {
-//    val avatar = avagen(i)
-//    hashMap.put(i.name, avatar)
-//    listener.receive(this, CreateAvatar(avatar))
+//  implicit object SimpleString extends Simple[String] {
+//    override def progeny(m: String, f: String): String = s"$f-$m"
+//  }
+//  it should "produce progeny" in {
+//    val xs = List[String]("a","b","c","d")
+//    val tribe = Tribe(xs)
+//    tribe.progeny shouldBe List("b-a", "d-c")
 //  }
 //
-//  def updateAvatar(i: Individual[T, X]): Unit = {
-//    hashMap.get(i.name) match {
-//      case Some(a) =>
-//        listener.receive(this, KillAvatar(a))
-//        createAvatar(i)
-//      case None => println(s"logic error re: $i")
-//    }
-//  }
-//
-//  def destroyAvatar(i: Individual[T, X]): Unit = {
-//    hashMap.get(i.name) match {
-//      case Some(a) =>
-//        listener.receive(this, KillAvatar(a))
-//      case None => println(s"logic error re: $i")
-//    }
-//  }
 //}
