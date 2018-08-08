@@ -21,7 +21,7 @@ jobs:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
       # LaScala Circle CI latest successful build. Can be found from: https://circleci.com/gh/rchillyard/LaScala/tree/master
-      LaScalaBuildNumber: 10
+      LaScalaBuildNumber: 61
       # GitHub Username
       GitHubName: rchillyard
       # Circle CI Token for download artifacts. Can be generated from: https://circleci.com/account/api
@@ -38,11 +38,11 @@ jobs:
       # - run: find /home/circleci/.m2
       - run: export CIRCLE_TOKEN=?circle-token=$CircleCIToken
       - run: curl https://circleci.com/api/v1.1/project/github/$GitHubName/LaScala/$LaScalaBuildNumber/artifacts$CIRCLE_TOKEN | grep -o 'https://[^"]*' > artifacts.txt
-      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/docs/ -A 'lascala_*-javadoc.jar*' %$CIRCLE_TOKEN
-      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/ivys/ -A 'ivy.xml*' %$CIRCLE_TOKEN
-      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/jars/ -A 'lascala_*.jar*' -R '*-javadoc.jar*,*-sources.jar*' %$CIRCLE_TOKEN
-      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/poms/ -A 'lascala_*.pom*' %$CIRCLE_TOKEN
-      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.11/$lascalaver/srcs/ -A 'lascala_*-sources.jar*' %$CIRCLE_TOKEN
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.12/$lascalaver/docs/ -A 'lascala_*-javadoc.jar*' %$CIRCLE_TOKEN
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.12/$lascalaver/ivys/ -A 'ivy.xml*' %$CIRCLE_TOKEN
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.12/$lascalaver/jars/ -A 'lascala_*.jar*' -R '*-javadoc.jar*,*-sources.jar*' %$CIRCLE_TOKEN
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.12/$lascalaver/poms/ -A 'lascala_*.pom*' %$CIRCLE_TOKEN
+      - run: <artifacts.txt xargs -P4 -I % wget -P /home/circleci/.ivy2/local/com.phasmid/lascala_2.12/$lascalaver/srcs/ -A 'lascala_*-sources.jar*' %$CIRCLE_TOKEN
       - run: find /home/circleci/.ivy2/local -name "*.tmp"  | xargs rm -f
       # - run: awk -F/ '{wget}' $0$CIRCLE_TOKEN artifacts.txt
       - run: find /home/circleci/.ivy2/local
